@@ -2,7 +2,6 @@ Direct BWT construction
 
 Kunihiko Sadakane
 National Institute of Informatics (NII)
-sada@nii.ac.jp
 http://researchmap.jp/sada/
 
 Usage:
@@ -25,6 +24,8 @@ Algorithm:
     Using Induced Sorting. In Proc. of SPIRE, LNCS 5721, pp. 90-101, 2009,
   with some simplification.  For most of inputs, the program uses less than 2.5n bytes
   where n is the length of the input.
+
+http://dx.doi.org/10.1007/978-3-642-03784-9_9
 
 Changes:
 2010-07-30: Fixed a bug (the previous one did not work on Ubuntu).
