@@ -1,6 +1,7 @@
 *.o
 *.test
 bin/*
+dbwt/bin
 *~
 \#*\#
 .*.swp

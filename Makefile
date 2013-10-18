@@ -11,7 +11,7 @@ COMMONS_DIR = $(LIBS_ROOT)/commons
 
 CUDA_LOCATION=/usr/lib/nvidia-cuda-toolkit
 
-CC = g++
+CC = gcc
 NVCC = nvcc
 CFLAGS = -Wall -g -fopenmp -DFM_COMP_32 -I . -I $(LIBS_ROOT)/common-libs/ -I $(CUDA_LOCATION)/include/ -L /usr/local/cuda/lib64/ -lcudart #-DVERBOSE_DBG
 NVCCFLAGS = --compiler-options -Wall,-fopenmp -O3 -Xptxas -v -arch=sm_13 -DFM_COMP_32 -I . -I $(LIBS_ROOT)/common-libs/ #-DVERBOSE_DBG
