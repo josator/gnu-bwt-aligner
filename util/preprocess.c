@@ -30,7 +30,7 @@ int main(int argc, char **argv)
   save_ref_vector(&X, argv[2], "Xi");
   revstring((char *)X.vector, X.n-1);
 
-	tic("Calculating Suffix array");
+	tic("Calc. Suffix Array -> Parallel DC3");
   calculate_S(&S, &X);
   read_ref_vector(&X, argv[2], "X");
 	calculate_B(&B, &X, &S); 

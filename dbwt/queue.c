@@ -1,15 +1,4 @@
-/*
-   Copyright 2010, Kunihiko Sadakane, all rights reserved.
-
-   This software may be used freely for any purpose.
-   No warranty is given regarding the quality of this software.
-*/
-#include <stdio.h>
-#include <stdlib.h>
-#include "utils.h"
 #include "queue.h"
-
-#define QSIZ 1024
 
 queue *init_queue(int w)
 {
@@ -23,8 +12,6 @@ queue *init_queue(int w)
   que->e_ofs = QSIZ-1;
   return que;
 }
-
-
 
 void enqueue(queue *que, long x)
 {
@@ -326,3 +313,10 @@ test()
 
 }
 #endif
+
+/*
+   Copyright 2010, Kunihiko Sadakane, all rights reserved.
+
+   This software may be used freely for any purpose.
+   No warranty is given regarding the quality of this software.
+*/

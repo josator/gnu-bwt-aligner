@@ -572,6 +572,10 @@ void calculate_S(comp_vector *S, ref_vector *X) {
 	fflush(stdout);
 }
 
+void calculate_B_sadakane_SAIS(ref_vector *B, ref_vector *X) {
+		bwt(X->vector, X->n);
+}
+
 void calculate_B(ref_vector *B, ref_vector *X, comp_vector *S) {
 
 	B->n = X->n;

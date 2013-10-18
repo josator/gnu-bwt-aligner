@@ -80,7 +80,7 @@ typedef struct {
 typedef struct {
 
 	REF_TYPE *vector;
-  REF_TYPE n;
+  SA_TYPE n;
 
 } ref_vector;
 

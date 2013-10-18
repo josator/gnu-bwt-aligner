@@ -1,12 +1,3 @@
-/*
-   Copyright 2010, Kunihiko Sadakane, all rights reserved.
-
-   This software may be used freely for any purpose.
-   No warranty is given regarding the quality of this software.
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
 #include "utils.h"
 
 int blog(ulong x)
@@ -44,16 +35,16 @@ void *mymalloc(size_t n)
   return p;
 }
 
-void *myrealloc(void *ptr, size_t new, size_t old)
+void *myrealloc(void *ptr, size_t next, size_t last)
 {
   void *p;
 
-  p = realloc(ptr, new);
-  if (new > 0 && p == NULL) {
-    printf("realloc failed. ptr=%p new=%zd old=%zd\n",ptr,new,old);
+  p = realloc(ptr, next);
+  if (next > 0 && p == NULL) {
+    printf("realloc failed. ptr=%p new=%zd old=%zd\n",ptr,next,last);
     exit(1);
   }
-  cur_alloc += new - old;
+  cur_alloc += next - last;
   if (cur_alloc > max_alloc) {
     max_alloc = cur_alloc;
     //printf("allocated %ld\n",max_alloc);
@@ -62,7 +53,7 @@ void *myrealloc(void *ptr, size_t new, size_t old)
   return p;
 }
 
-void report_mem(char *s)
+void report_mem(const char *s)
 {
   puts(s);
   printf("allocated total %zu   max %zu\n",cur_alloc,max_alloc);
@@ -173,6 +164,7 @@ int setbits(pb *B, ulong i, int d, ulong x)
     d -= d2;
     x &= (1<<d)-1; // x の上位ビットを消去
   }
+
   m = (1<<d)-1;
   y = x << (D-i-d);
   m <<= (D-i-d);
@@ -192,7 +184,7 @@ pb *allocate_vector(ulong n)
   pb *b;
 
   x = (n+PBS-1)/PBS;
-  b = mymalloc(x*sizeof(pb));
+  b = (pb *) mymalloc(x*sizeof(pb));
   for (i=0; i<x; i++) b[i] = 0;
   return b;
 }
@@ -206,10 +198,10 @@ packed_array *allocate_packed_array(ulong n, int w)
     printf("warning: w=%d\n",w);
   }
 
-  p = mymalloc(sizeof(packed_array));
+  p = (packed_array *) mymalloc(sizeof(packed_array));
   p->n = n;  p->w = w;
   x = (n / PBS)*w + ((n % PBS)*w + PBS-1) / PBS;
-  p->b = mymalloc(x*sizeof(pb));
+  p->b = (pb *) mymalloc(x*sizeof(pb));
   for (i=0; i<x; i++) p->b[i] = 0;
   return p;
 }
@@ -253,3 +245,9 @@ void pa_set(packed_array *p, ulong i, long x)
   setbits(b,i,p->w,x);
 }
 
+/*
+   Copyright 2010, Kunihiko Sadakane, all rights reserved.
+
+   This software may be used freely for any purpose.
+   No warranty is given regarding the quality of this software.
+*/

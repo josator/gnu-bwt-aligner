@@ -1,9 +1,13 @@
-/*
-   Copyright 2010, Kunihiko Sadakane, all rights reserved.
+#ifndef _DBWT_QUEUE_
+#define _DBWT_QUEUE_
 
-   This software may be used freely for any purpose.
-   No warranty is given regarding the quality of this software.
-*/
+#include <stdio.h>
+#include <stdlib.h>
+#include "utils.h"
+#include "queue.h"
+
+#define QSIZ 1024
+
 typedef struct qblock {
   struct qblock *prev, *next;
   packed_array *b;
@@ -23,3 +27,12 @@ long dequeue(queue *que);
 int emptyqueue(queue *que);
 void free_queue(queue *que);
 void printqueue(queue *que);
+
+#endif
+
+/*
+   Copyright 2010, Kunihiko Sadakane, all rights reserved.
+
+   This software may be used freely for any purpose.
+   No warranty is given regarding the quality of this software.
+*/

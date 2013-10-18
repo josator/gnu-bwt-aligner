@@ -1,9 +1,10 @@
-/*
-   Copyright 2010, Kunihiko Sadakane, all rights reserved.
-    
-   This software may be used freely for any purpose.
-   No warranty is given regarding the quality of this software.
-*/
+#ifndef _DBWT_UTILS_
+#define _DBWT_UTILS_
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "utils.h"
+
 #ifndef uchar
 typedef unsigned char uchar;
 #endif
@@ -46,9 +47,9 @@ typedef dword pb;
 #define D (1<<logD)
 
 void *mymalloc(size_t n);
-void *myrealloc(void *ptr, size_t new, size_t old);
+void *myrealloc(void *ptr, size_t next, size_t last);
 void myfree(void *p, size_t s);
-void report_mem(char *s);
+void report_mem(const char *s);
 extern size_t cur_alloc, max_alloc;
 
 unsigned int getbits(unsigned short *B, unsigned long i, int d);
@@ -70,3 +71,12 @@ int getbit(pb *B, ulong i);
 int setbit(pb *B, ulong i,int x);
 dword getbits(pb *B, ulong i, int d);
 int setbits(pb *B, ulong i, int d, ulong x);
+
+#endif
+
+/*
+   Copyright 2010, Kunihiko Sadakane, all rights reserved.
+    
+   This software may be used freely for any purpose.
+   No warranty is given regarding the quality of this software.
+*/

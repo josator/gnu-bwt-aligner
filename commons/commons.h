@@ -45,8 +45,13 @@ extern double mean_batch_size;
 
 #define timevars() struct timeval t1, t2;
 
-#define min(x,y)	(((x) < (y)) ? (x) : (y))
-#define max(x,y)	(((x) > (y)) ? (x) : (y))
+#ifndef min
+#define min(x,y) (((x)<(y))?(x):(y))
+#endif
+
+#ifndef max
+#define max(x,y) (((x)>(y))?(x):(y))
+#endif
 
 #define tic(msg)\
   printf("--->> " msg " \n");\

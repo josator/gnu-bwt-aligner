@@ -1,29 +1,7 @@
-/*
-   Copyright 2010, Kunihiko Sadakane, all rights reserved.
-
-   This software may be used freely for any purpose.
-   No warranty is given regarding the quality of this software.
-*/
-#include <stdio.h>
-#include <stdlib.h>
-//#include "mman.h"
-#include "utils.h"
-#include "queue.h"
-
-#define HSIZ 67777
-//#define HSIZ 375559
-#define HBSIZ (256*2)
-
-typedef struct {
-  int rest[HSIZ];
-  int head[HSIZ];
-  uchar *buf;
-  int bufsiz;
-} htbl;
-
-htbl *h1;
+#include "dbwt.h"
 
 static long collision;
+htbl *h1;
 
 htbl *init_hashtable(void)
 {
@@ -375,12 +353,10 @@ uchar **sort_LMS(int n, htbl *h)
 
 #define SIGMA (256+1)
 
-int sais_main(const unsigned short *T, int *SA, int fs, int n, int k, int cs);
+void bwt(uchar *T, long n) {
 
-void bwt(char *fname)
-{
-  uchar *T;
-  long n;
+	FILE *fp;
+
   long i,j;
   int t,tt;
   long p,q;
@@ -405,38 +381,6 @@ void bwt(char *fname)
   packed_array *T2;
   uchar *bwp_base;
   int bwp_w;
-  FILE *fp;
-//  MMAP *map;
-
-///////////////////////////////////////////////
-// ファイルの読み込み
-#if 1
-  fp = fopen(fname,"rb");
-  if (fp == NULL) {
-    printf("??? %s\n",fname);
-    exit(1);
-  }
-  fseek(fp,0,SEEK_END);
-  n = ftell(fp);
-  fseek(fp,0,SEEK_SET);
-
-  T = mymalloc((n+1)*sizeof(uchar));
-  report_mem("read string");
-  
-  for (i=0; i<n; i += (1<<20)) {
-    long size;
-    printf("%ld \r",i/(1<<20));
-    fflush(stdout);
-    size = min(n-i,1<<20);
-    fread(&T[i],1,size,fp);
-  }
-  fclose(fp);
-#else
-  map = mymmap(fname);
-  n = map->len;
-  T = map->addr;
-#endif
-///////////////////////////////////////////////
 
   h1 = init_hashtable();
 
@@ -452,7 +396,6 @@ void bwt(char *fname)
 
   // C[c] : c で始まるS*
   // M[c]: c の数
-
 
 //////////////////////////
 // T[n] = $ が1つのS*-string
@@ -503,7 +446,7 @@ void bwt(char *fname)
     }
     tt = t;
   }
-  printf("n=%ld n1=%ld\n",n,n1);
+  printf("n=%ju n1=%ld\n", (uintmax_t) n,n1);
   printf("s1=%ld m1=%ld\n",s1,m1);
   //printf("space for level 1 %ld bytes\n",n1/8*blog(s1)+m1);
   printf("collision1 %ld\n",collision);
@@ -512,7 +455,7 @@ void bwt(char *fname)
 
   { // T[0..p] は S* ではないがBW変換には必要なので保存
     uchar *r;
-    r = myrealloc(h1->buf, h1->bufsiz + p+1+1+lenlen(p+1) + 4, h1->bufsiz);
+    r = (uchar *) myrealloc(h1->buf, h1->bufsiz + p+1+1+lenlen(p+1) + 4, h1->bufsiz);
     if (r != h1->buf) {
 //      printf("buf has moved from %p to %p\n", h1->buf, r);
       h1->buf = r;
@@ -585,7 +528,7 @@ void bwt(char *fname)
   mymunmap(map);
 #endif
 
-  sa = (int *)mymalloc((n1+1)*sizeof(*sa));
+  sa = (int *) mymalloc((n1+1)*sizeof(*sa));
   report_mem("allocate sa");
 ////////////////////////////////////
 // T2[1..n1] の文字列の接尾辞配列を作成
@@ -633,7 +576,7 @@ void bwt(char *fname)
     enqueue_l(Q[TYPE_LMS][c+1], q-bwp_base);
     if (i % 1024 == 0) {
       sa2 = sa;
-      sa = myrealloc(sa,i*sizeof(*sa),j*sizeof(*sa));
+      sa = (int *) myrealloc(sa,i*sizeof(*sa),j*sizeof(*sa));
       //if (sa != sa2) printf("sa = %p\n",sa);
       j = i;
     }
@@ -650,7 +593,7 @@ void bwt(char *fname)
 
   report_mem("allocate tmp");
     
-  printf("induced-sorting-L n=%ld\n",n);
+  printf("induced-sorting-L n=%ju\n", (uintmax_t) n);
 
   // C2 は TYPE_S バケットの先頭
   for (i=0; i<=SIGMA; i++) C2[i] = M2[i] + NL[i];
@@ -720,7 +663,7 @@ void bwt(char *fname)
     
   report_mem("allocate queue");
     
-  printf("induced-sorting-S n=%ld\n",n);
+  printf("induced-sorting-S n=%ju\n", (uintmax_t) n);
 
   // 使う配列: M2, C2
   // M2: コピー先のアドレス, 初期値はバケットの最後
@@ -801,13 +744,9 @@ void bwt(char *fname)
 
 }
 
-#if 1
-int main(int argc, char *argv[])
-{
-  printf("sizeof(uchar *)=%u sizeof(uint)=%u sizeof(ulong)=%u\n",sizeof(uchar *),sizeof(uint),sizeof(ulong));
+/*
+   Copyright 2010, Kunihiko Sadakane, all rights reserved.
 
-  bwt(argv[1]);
-  
-  return 0;
-}
-#endif
+   This software may be used freely for any purpose.
+   No warranty is given regarding the quality of this software.
+*/

@@ -183,7 +183,7 @@ void read_ref_vector(ref_vector *vector, const char *directory, const char *name
   fp  = fopen(path,  "rb+");
   check_file_open(fp, path);
 
-  err = fread(&vector->n, sizeof(REF_TYPE),  1, fp);
+  err = fread(&vector->n, sizeof(SA_TYPE),  1, fp);
   check_file_read(err, 1, path);
 
   vector->vector = (REF_TYPE *) malloc(vector->n * sizeof(REF_TYPE));
@@ -340,7 +340,7 @@ void save_ref_vector(ref_vector *vector, const char *directory, const char *name
   fp  = fopen(path,  "wb+");
   check_file_open(fp, path);
 
-  err = fwrite(&vector->n,     sizeof(REF_TYPE), 1, fp);
+  err = fwrite(&vector->n,     sizeof(SA_TYPE), 1, fp);
   check_file_write(err, 1, path);
 
 	err = fwrite(vector->vector, sizeof(REF_TYPE), vector->n, fp);
