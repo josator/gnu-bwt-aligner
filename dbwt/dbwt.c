@@ -701,6 +701,8 @@ void bwt(uchar *T, long n) {
     exit(1);
   }
 
+	fwrite(&n, sizeof(uint32_t), 1, fp);
+
   {
     uchar *p;
     long s,t,w;

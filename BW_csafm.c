@@ -433,6 +433,7 @@ void load_exome_file(exome *ex, const char *directory) {
 
 			int j;
 			char c = 0;
+
 			for(j=0; j<IDMAX-1; j++) {
 				c = line[j+1];
 				if (c==' ') break;

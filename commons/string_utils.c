@@ -13,7 +13,7 @@ void init_replace_table(const char *str) {
     nA = 4;
     AA = 0; CC = 1; GG = 2; TT = 3;
 
-  	rev_table = (char *) malloc(nA * sizeof(char));
+  	rev_table = (char *) malloc(256 * sizeof(char));
 
     table['a'] = AA; table['A'] = AA;
     table['c'] = CC; table['C'] = CC;
@@ -25,12 +25,13 @@ void init_replace_table(const char *str) {
     rev_table[CC] = 'C';
     rev_table[GG] = 'G';
     rev_table[TT] = 'T';
+		rev_table[255] = '$';
 
   } else {
 
     nA = strlen(str);
 
-    rev_table = (char *) malloc(nA * sizeof(char));
+    rev_table = (char *) malloc(256 * sizeof(char));
 
     for (REF_TYPE i = 0; i < nA; i++) {
       rev_table[i] = toupper(str[i]);
@@ -43,6 +44,8 @@ void init_replace_table(const char *str) {
       else if (toupper(str[i]) == 'G') GG = i;
       else if (toupper(str[i]) == 'T') TT = i;
     }
+
+		rev_table[255] = '$';
 
   }
 

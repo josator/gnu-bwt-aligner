@@ -1,6 +1,3 @@
-#include "commons/commons.h"
-#include "commons/string_utils.h"
-
 #include "BW_preprocess.h"
 
 int main(int argc, char **argv)
@@ -16,27 +13,21 @@ int main(int argc, char **argv)
 
   exome ex;
 
-	check_syntax(argc, 5, "preprocess ref_file output_dir s_ratio nucleotides");
+	check_syntax(argc, 5, "preprocess_debug ref_file output_dir s_ratio nucleotides");
 
   timevars();
-  init_replace_table(argv[4]);
+	init_replace_table(argv[4]);
 
   s_ratio = atoi(argv[3]);
 
-  encode_reference(&X, &ex, false, argv[1]);
+  encode_reference(&X, &ex, true, argv[1]);
   save_exome_file(&ex, argv[2]);
-  save_ref_vector(&X, argv[2], "X");
-  revstring((char *)X.vector, X.n-1);
-  save_ref_vector(&X, argv[2], "Xi");
-  revstring((char *)X.vector, X.n-1);
 
-	tic("Calc. Suffix Array -> Parallel DC3");
-  calculate_S(&S, &X);
-  read_ref_vector(&X, argv[2], "X");
-	calculate_B(&B, &X, &S); 
+  tic("Calculating BWT");
+  calculateBWTdebug(&B, &S, &X, 0);
   toc();
 
-  free(X.vector);
+  save_ref_vector(&X, argv[2], "X");
 
   print_vector(S.vector, S.n);
   print_vector(B.vector, B.n);
@@ -62,7 +53,6 @@ int main(int argc, char **argv)
   tic("Calculating R");
   calculate_R(&R, &S);
   toc();
-
   print_vector(R.vector, R.n);
 
   tic("Calculating Scomp Rcomp");
@@ -72,7 +62,7 @@ int main(int argc, char **argv)
   print_vector(Rcomp.vector, Rcomp.n);
   toc();
 
-	save_comp_vector(&S, argv[2], "S");
+  save_comp_vector(&S, argv[2], "S");
   free(S.vector);
   save_comp_vector(&R, argv[2], "R");
   free(R.vector);
@@ -81,14 +71,11 @@ int main(int argc, char **argv)
   save_comp_vector(&Rcomp, argv[2], "Rcomp");
   free(Rcomp.vector);
 
-	tic("Calculating BWT of reverse reference");
-	read_ref_vector(&X, argv[2], "Xi");
-  calculate_S(&Si, &X);
-  read_ref_vector(&X, argv[2], "Xi");
-	calculate_B(&Bi, &X, &Si); 
+  tic("Calculating BWT of reverse reference");
+  calculateBWTdebug(&Bi, &Si, &X, 1);
   toc();
 
-  free(X.vector);
+  save_ref_vector(&X, argv[2], "Xi");
 
   print_vector(Bi.vector, Bi.n);
   print_vector(Si.vector, Si.n);
@@ -97,9 +84,11 @@ int main(int argc, char **argv)
   calculate_O(&Oi, &Bi);
   toc();
 
-  print_comp_matrix(Oi);
+  free(X.vector);
 
-  save_ref_vector(&Bi, argv[2], "Bi");
+	print_comp_matrix(Oi);
+
+	save_ref_vector(&Bi, argv[2], "Bi");
   free(Bi.vector);
 
 	save_comp_matrix(&Oi, argv[2], "Oi");

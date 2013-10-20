@@ -1,16 +1,26 @@
 #include "BW_preprocess.h"
 
-void encode_reference(ref_vector *X, exome *ex, const char *ref_path) {
+void duplicate_reference(ref_vector *X) {
+
+  for (uintmax_t i=X->n, j=0; j<X->n-1; i++,j++)
+    X->vector[i] = X->vector[j];
+
+}
+
+void encode_reference(ref_vector *X, exome *ex, bool duplicate, const char *ref_path) {
 
 	FILE *ref_file;
 	ref_file = fopen(ref_path, "r");
 	check_file_open(ref_file, ref_path);
 
-	size_t size;
+	size_t size, read;
 
 	fseek(ref_file, 0, SEEK_END);
-	size = ftell(ref_file) + 2;
+	read = ftell(ref_file);
 	fseek(ref_file, 0, SEEK_SET);
+
+  if (duplicate) size = 2*read+1;
+	else size = read;
 
 	X->vector = (REF_TYPE *) malloc( size * sizeof(REF_TYPE) );
 	check_malloc(X->vector, ref_path);
@@ -79,6 +89,123 @@ void encode_reference(ref_vector *X, exome *ex, const char *ref_path) {
 	X->n = total_length + 1; // $ Symbol
 
 	fclose(ref_file);
+
+	if (duplicate) duplicate_reference(X);
+
+}
+
+REF_TYPE *BW_aux;
+size_t nB_aux;
+
+int my_sort(const void *a, const void *b) {
+
+	// Casting pointer types
+	const SA_TYPE *ia = (const SA_TYPE *)a;
+	const SA_TYPE *ib = (const SA_TYPE *)b;
+
+	REF_TYPE *pa = BW_aux + *ia;
+	REF_TYPE *pb = BW_aux + *ib;
+
+	for (uintmax_t i=0; /*i<MAX_SEARCH &&*/ i<nB_aux; i++) {
+		if (pa[i] == pb[i]) continue;
+		if (pb[i] == (REF_TYPE) -1)  return 1;
+		if (pa[i]  > pb[i]) return 1;
+		else                return -1;
+	}
+
+	return 0;
+
+}
+
+int my_sort_reverse(const void *a, const void *b) {
+
+	// Casting pointer types
+	const SA_TYPE *ia = (const SA_TYPE *)a;
+	const SA_TYPE *ib = (const SA_TYPE *)b;
+
+	REF_TYPE *pa = BW_aux + *ia;
+	REF_TYPE *pb = BW_aux + *ib;
+
+	for (uintmax_t i=nB_aux - 1; /*i<MAX_SEARCH &&*/ i>=0; i--) {
+		if (pa[i] == pb[i]) continue;
+		if (pa[i] == (REF_TYPE) -1)  return -1;
+	  if (pa[i] < pb[i])  return -1;
+		else                return  1;
+	}
+
+	return 0;
+
+}
+
+void calculateBWTdebug(ref_vector *B, comp_vector *S, ref_vector *X, bool reverse) {
+
+	uintmax_t i;
+
+	B->n     = X->n;
+	nB_aux   = B->n;
+
+	S->siz   = B->n;
+	S->n     = S->siz;
+	S->ratio = 1;
+
+	B->vector  = ( REF_TYPE *) malloc(B->n * sizeof(REF_TYPE));
+	check_malloc(B->vector, "calculateBWT");
+	S->vector  = ( SA_TYPE *) malloc(S->n * sizeof(SA_TYPE));
+	check_malloc(S->vector, "calculateBWT");
+
+	BW_aux  = X->vector;
+
+	/*Generation of B and S*/
+
+	for(i=0; i<S->n; i++)
+		S->vector[i] = i;
+
+	if (reverse) {
+
+		qsort(S->vector, S->n, sizeof(SA_TYPE), my_sort_reverse);
+
+		for(i=0; i<B->n; i++) {
+			B->vector[i] = BW_aux[S->vector[i]];
+			S->vector[i] = S->n - (S->vector[i] + 1);
+		}
+
+	} else {
+
+		qsort(S->vector, S->n, sizeof(SA_TYPE), my_sort);
+
+		SA_TYPE nBlast = B->n-1;
+
+		for(i=0; i<B->n; i++)
+			B->vector[i] = BW_aux[S->vector[i] + nBlast];
+
+	}
+
+#if defined VERBOSE_DBG
+	SA_TYPE j;
+
+	for(i=0; i<B->n; i++) {
+		for(j=0; j<B->n; j++) {
+
+			if (reverse) {
+				if(BW_aux[S->n - (S->vector[i] + 1) + j] == (REF_TYPE) -1)
+					printf("-");
+				else
+					printf("%d", BW_aux[S->n - (S->vector[i] + 1) + j]);
+
+			} else {
+
+				if(BW_aux[S->vector[i]+j]== (REF_TYPE) -1)
+					printf("-");
+				else
+					printf("%d", BW_aux[S->vector[i]+j]);
+
+			}
+
+		}
+		printf("\n");
+	}
+#endif
+
 }
 
 inline SA_TYPE ternary_quicksort_start(SA_TYPE *S, ref_vector *X, SA_TYPE *ranges, SA_TYPE start, SA_TYPE end, uintmax_t h) {
@@ -358,7 +485,8 @@ void calculate_S(comp_vector *S, ref_vector *X) {
 	S->ratio  = 1;
 	S->vector = (SA_TYPE *) malloc(S->n * sizeof(SA_TYPE));
 
-	for (SA_TYPE i=0; i < X->n; i++) { //TODO: Paralelizar bucle con OpenMP
+#pragma omp parallel for
+	for (SA_TYPE i=0; i < X->n; i++) {
 		S->vector[i] = i;
 	}
 
@@ -567,13 +695,10 @@ void calculate_S(comp_vector *S, ref_vector *X) {
 	free(V.vector);
 	for(SA_TYPE i=0; i<nA*nA; i++)
 		free(L[i]);
-
+  free(L);
+ 
 	printf("**** Finished ****\n");
 	fflush(stdout);
-}
-
-void calculate_B_sadakane_SAIS(ref_vector *B, ref_vector *X) {
-		bwt(X->vector, X->n);
 }
 
 void calculate_B(ref_vector *B, ref_vector *X, comp_vector *S) {
@@ -615,7 +740,7 @@ void calculate_R(comp_vector *R, comp_vector *S) {
 	R->n     = S->n;
 	R->ratio = S->ratio;
 
-	R->vector = (SA_TYPE *) malloc(S->n * sizeof(SA_TYPE));
+	R->vector = (SA_TYPE *) malloc(R->n * sizeof(SA_TYPE));
 
 #pragma omp parallel for
 	for(SA_TYPE i=0; i<S->n; i++) {
@@ -642,6 +767,7 @@ void calculate_C(vector *C, vector *C1, ref_vector *B) {
 
 	for (i = 0; i<B->n; i++) {
 		if (B->vector[i] == (REF_TYPE) -1) continue;
+		if (B->vector[i] + 1 == nA) continue;
 		C->vector[B->vector[i] + 1]++;
 	}
 

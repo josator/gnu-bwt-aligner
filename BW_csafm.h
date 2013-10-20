@@ -32,7 +32,7 @@ void free_comp_matrix(comp_matrix *reverse, comp_matrix *strand);
 {\
   printf("Matrix " #M ":\n");\
   for (SA_TYPE i_=0; i_<((SA_TYPE) (n)); i_++) {\
-    printf("%ju: ", i_);\
+    printf("%ju: ", (uintmax_t) i_);\
     for (SA_TYPE j_=0; j_<((SA_TYPE) (m)); j_++) {\
       printf("%ju ", (uintmax_t) (M)[i_][j_]);\
     }\
@@ -45,7 +45,7 @@ void free_comp_matrix(comp_matrix *reverse, comp_matrix *strand);
 	SA_TYPE bit, bbb;\
 	printf("Matrix " #M ":\n");\
 	for (SA_TYPE i_=0; i_<((SA_TYPE) (n)); i_++) {\
-		printf("%ju: ", i_);\
+		printf("%ju: ", (uintmax_t) i_);\
 		for (SA_TYPE j_=0; j_<((SA_TYPE) (siz)); j_++) {\
 			bbb = j_ / FM_COMP_VALUE;\
 			bit  = j_ % FM_COMP_VALUE;\
