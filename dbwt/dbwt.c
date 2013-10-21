@@ -353,7 +353,7 @@ uchar **sort_LMS(int n, htbl *h)
 
 #define SIGMA (256+1)
 
-void bwt(uchar *T, long n) {
+void direct_bwt(uchar *T, long n, char *directory) {
 
 	FILE *fp;
 
@@ -480,7 +480,7 @@ void bwt(uchar *T, long n) {
   for (i=1; i<=s1; i++) {
     if (S[i] < min_ptr) min_ptr = S[i];
     if (S[i] > max_ptr) max_ptr = S[i];
-  } 
+  }
 
   T2 = allocate_packed_array(n1+1,blog(s1+2)+1);
   report_mem("create new string T2");
@@ -694,14 +694,26 @@ void bwt(uchar *T, long n) {
     }
   }
 
+	///////////////////////////////////////////////
+	// File writing
+
   printf("writing...\n");
-  fp = fopen("output.bw","wb");
-  if (fp == NULL) {
-    printf("fopen\n");
-    exit(1);
-  }
+
+  char path[500];
+
+	path[0]='\0';
+	if (directory == NULL) {
+		strcat(path, "output.bw");
+	} else {
+		strcat(path, directory);
+		strcat(path, "/B.vec");
+	}
+	
+  fp = fopen(path,"wb");
+	check_file_open(fp, path);
 
 	fwrite(&n, sizeof(uint32_t), 1, fp);
+	fwrite(&last, sizeof(uint32_t), 1, fp);
 
   {
     uchar *p;
@@ -731,14 +743,13 @@ void bwt(uchar *T, long n) {
 
   fclose(fp);
 
-  fp = fopen("output.lst","w");
-  if (fp == NULL) {
-    printf("fopen2\n");
-    exit(1);
-  }
-  fprintf(fp,"%lu",last);
-  fclose(fp);
-  
+	if (directory == NULL) {
+		fp = fopen("output.lst","w");
+		check_file_open(fp, "output.lst");
+
+		fprintf(fp,"%lu",last);
+		fclose(fp);
+	}
 
   report_mem("done");
   printf("%.2f bpc\n",(double)max_alloc/n);

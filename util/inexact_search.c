@@ -432,7 +432,7 @@ int main(int argc, char **argv) {
 
 		while (exit) {
 
-			exit = nextFASTAToken(queries_file, read_Worig + tam_read_gpu * MAXLINE, read_We + tam_read_gpu * MAXLINE, read_nWe + tam_read_gpu, NULL, NULL);
+			exit = nextFASTAToken(queries_file, read_Worig + tam_read_gpu * MAXLINE, read_We + tam_read_gpu * MAXLINE, read_nWe + tam_read_gpu);
 
 			tam_read_gpu++;
 

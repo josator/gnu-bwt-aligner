@@ -1,5 +1,5 @@
-#ifndef _BW_RESULTS_
-#define _BW_RESULTS_
+#ifndef _SEARCH_RESULTS_
+#define _SEARCH_RESULTS_
 
 #include <stdio.h>
 #include <stdlib.h>

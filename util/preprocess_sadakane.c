@@ -15,10 +15,10 @@ int main(int argc, char **argv)
   timevars();
   init_replace_table(argv[4]);
 
-  encode_reference(&X, NULL, false, argv[1]);
+	encode_reference(&X, NULL, false, argv[1]);
 
 	tic("Calc. Suffix Array -> Sadakane direct SAIS");
-  bwt(X.vector, X.n-1);
+  direct_bwt(X.vector, X.n, argv[2]);
 	toc();
 
 }

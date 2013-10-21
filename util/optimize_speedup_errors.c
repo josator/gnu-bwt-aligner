@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
 
   tic("Read mappings from disk");
 
-  while(nextFASTAToken(queries_file, h_Worig + TAM_BUS_GPU * MAXLINE, h_We + TAM_BUS_GPU * MAXLINE, h_nWe + TAM_BUS_GPU, NULL, NULL)) {
+  while(nextFASTAToken(queries_file, h_Worig + TAM_BUS_GPU * MAXLINE, h_We + TAM_BUS_GPU * MAXLINE, h_nWe + TAM_BUS_GPU)) {
 
     TAM_BUS_GPU++;
     if (TAM_BUS_GPU == MAX_BUS_GPU) break;

@@ -8,15 +8,13 @@ void bwt_wrapper(char *fname)
 //  MMAP *map;
 
 ///////////////////////////////////////////////
-// ファイルの読み込み
+// File loading
 
 #if 1
 	size_t err;
   fp = fopen(fname,"rb");
-  if (fp == NULL) {
-    printf("??? %s\n",fname);
-    exit(1);
-  }
+	check_file_open(fp, fname);
+
   fseek(fp,0,SEEK_END);
   n = ftell(fp);
   fseek(fp,0,SEEK_SET);
@@ -30,10 +28,7 @@ void bwt_wrapper(char *fname)
     fflush(stdout);
     size = min(n-i,1<<20);
 		err = fread(&T[i],1,size,fp);
-		if (err != size) {
-    	fprintf(stderr, "Error reading file\n");
-    	exit(1);
-  	}
+		check_file_read(err, size, fname);
   }
   fclose(fp);
 #else
@@ -43,7 +38,7 @@ void bwt_wrapper(char *fname)
 #endif
 ///////////////////////////////////////////////
 
-bwt(T, n);
+direct_bwt(T, n, NULL);
 
 }
 
@@ -51,8 +46,8 @@ int main(int argc, char *argv[])
 {
   printf("sizeof(uchar *)=%lu sizeof(uint)=%lu sizeof(ulong)=%lu\n",sizeof(uchar *),sizeof(uint),sizeof(ulong));
 
-  bwt_wrapper(argv[1]);
-  
+	bwt_wrapper(argv[1]);
+ 
   return 0;
 }
 

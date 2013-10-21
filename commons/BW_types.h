@@ -1,5 +1,5 @@
-#ifndef _BW_TYPES_
-#define _BW_TYPES_
+#ifndef _COMMON_TYPES_
+#define _COMMON_TYPES_
 
 #include <inttypes.h>
 
@@ -46,9 +46,8 @@ typedef uint8_t REF_TYPE;
 
 typedef struct {
 
-	SA_TYPE siz;
-
 	SA_TYPE **desp; // nA
+	SA_TYPE siz; //Real number of columns of the uncompressed matrix
   SA_TYPE n_desp;
   SA_TYPE m_desp;
 
@@ -69,9 +68,9 @@ typedef struct {
 
 typedef struct {
 
-  SA_TYPE siz;
-
 	SA_TYPE *vector;
+
+  SA_TYPE siz; //Real size of the uncompressed vector
 	SA_TYPE n;
   SA_TYPE ratio;
 
@@ -81,6 +80,7 @@ typedef struct {
 
 	REF_TYPE *vector;
   SA_TYPE n;
+	SA_TYPE dollar; //Position ending with the $ symbol (the first in the reference)
 
 } ref_vector;
 

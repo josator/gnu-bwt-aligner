@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 
   tic("Sequence mapping");
 
-  while(nextFASTAToken(queries_file, Worig, W.vector, &nW_aux, NULL, NULL)) {
+  while(nextFASTAToken(queries_file, Worig, W.vector, &nW_aux)) {
 
     if (!W.vector) {
       printf ("Error de lectura de la cadena a buscar\n");

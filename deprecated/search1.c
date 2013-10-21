@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
   unsigned int nW_aux;
   result res;
 
-  while(nextFASTAToken(queries_file, Worig.vector, W.vector, &nW_aux, NULL, NULL)) {
+  while(nextFASTAToken(queries_file, Worig.vector, W.vector, &nW_aux)) {
 
     if (!W.vector) {
       printf ("Error de lectura de la cadena a buscar\n");

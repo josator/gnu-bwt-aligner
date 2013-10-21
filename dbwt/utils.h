@@ -17,13 +17,6 @@ typedef unsigned int uint;
 typedef unsigned long ulong;
 #endif
 
-#ifndef min
-#define min(x,y) (((x)<(y))?(x):(y))
-#endif
-#ifndef max
-#define max(x,y) (((x)>(y))?(x):(y))
-#endif
-
 #ifndef byte
 typedef unsigned char byte;
 #endif

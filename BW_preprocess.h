@@ -1,5 +1,5 @@
-#ifndef _BW_PREPROCESS_
-#define _BW_PREPROCESS_
+#ifndef _SEARCH_PREPROCESS_
+#define _SEARCH_PREPROCESS_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,8 +12,8 @@
 
 void encode_reference(ref_vector *X, exome *ex, bool duplicate, const char *ref_path);
 
-void calculate_S(comp_vector *S, ref_vector *X);
-void calculate_B(ref_vector *B, ref_vector *X, comp_vector *S);
+//void calculate_B(ref_vector *B, ref_vector *X);
+//void calculate_S(comp_vector *S, ref_vector *B);
 void calculate_R(comp_vector *R, comp_vector *S);
 void calculate_C(vector *C, vector *C1, ref_vector *B);
 void calculate_O(comp_matrix *O, ref_vector *B);

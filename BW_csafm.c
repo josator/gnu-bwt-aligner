@@ -149,10 +149,10 @@ void read_comp_vector(comp_vector *vector, const char *directory, const char *na
   fp  = fopen(path,  "rb+");
   check_file_open(fp, path);
 
-  err = fread(&vector->n, sizeof(SA_TYPE),  1, fp);
+  err = fread(&vector->siz, sizeof(SA_TYPE),  1, fp);
   check_file_read(err, 1, path);
 
-  err = fread(&vector->siz, sizeof(SA_TYPE),  1, fp);
+  err = fread(&vector->n, sizeof(SA_TYPE),  1, fp);
   check_file_read(err, 1, path);
 
   err = fread(&vector->ratio, sizeof(SA_TYPE),  1, fp);
@@ -186,6 +186,10 @@ void read_ref_vector(ref_vector *vector, const char *directory, const char *name
   err = fread(&vector->n, sizeof(SA_TYPE),  1, fp);
   check_file_read(err, 1, path);
 
+  err = fread(&vector->dollar, sizeof(SA_TYPE),  1, fp);
+  check_file_read(err, 1, path);
+
+  check_file_read(err, 1, path);
   vector->vector = (REF_TYPE *) malloc(vector->n * sizeof(REF_TYPE));
   check_malloc(vector->vector, path);
 
@@ -308,10 +312,10 @@ void save_comp_vector(comp_vector *vector, const char *directory, const char *na
   fp  = fopen(path,  "wb+");
   check_file_open(fp, path);
 
-  err = fwrite(&vector->n,     sizeof(SA_TYPE), 1, fp);
+  err = fwrite(&vector->siz,   sizeof(SA_TYPE), 1, fp);
   check_file_write(err, 1, path);
 
-  err = fwrite(&vector->siz,   sizeof(SA_TYPE), 1, fp);
+  err = fwrite(&vector->n,     sizeof(SA_TYPE), 1, fp);
   check_file_write(err, 1, path);
 
   err = fwrite(&vector->ratio, sizeof(SA_TYPE), 1, fp);
@@ -340,7 +344,10 @@ void save_ref_vector(ref_vector *vector, const char *directory, const char *name
   fp  = fopen(path,  "wb+");
   check_file_open(fp, path);
 
-  err = fwrite(&vector->n,     sizeof(SA_TYPE), 1, fp);
+  err = fwrite(&vector->n,      sizeof(SA_TYPE), 1, fp);
+  check_file_write(err, 1, path);
+
+  err = fwrite(&vector->dollar, sizeof(SA_TYPE), 1, fp);
   check_file_write(err, 1, path);
 
 	err = fwrite(vector->vector, sizeof(REF_TYPE), vector->n, fp);

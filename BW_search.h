@@ -1,5 +1,5 @@
-#ifndef _BW_SEARCH_
-#define _BW_SEARCH_
+#ifndef _SEARCH_SEARCH_
+#define _SEARCH_SEARCH_
 
 #include "commons/commons.h"
 #include "commons/string_utils.h"
@@ -235,6 +235,6 @@ void BWExactSearchVectorBackward(REF_TYPE *W, int16_t start, int16_t end, SA_TYP
 void BWExactSearchVectorForward(REF_TYPE *W, int16_t start, int16_t end, SA_TYPE k, SA_TYPE l, SA_TYPE *vec_k, SA_TYPE *vec_l, vector *C, vector *C1, comp_matrix *O);
 /********************************/
 
-bool nextFASTAToken(FILE *queries_file, char *uncoded, REF_TYPE *coded, SA_TYPE *nquery, uint8_t *compressed, SA_TYPE* ncompress); 
+bool nextFASTAToken(FILE *queries_file, char *uncoded, REF_TYPE *coded, SA_TYPE *nquery); 
 
 #endif

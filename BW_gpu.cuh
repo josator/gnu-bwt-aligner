@@ -1,5 +1,5 @@
-#ifndef _BW_GPU_
-#define _BW_GPU_
+#ifndef _SEARCH_GPU_
+#define _SEARCH_GPU_
 
 #include <cuda.h>
 

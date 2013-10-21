@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <inttypes.h>
 
 //#include "mman.h"
@@ -11,6 +12,7 @@
 #include "sais.h"
 
 #include "../commons/BW_types.h"
+#include "../commons/commons.h"
 
 #define HSIZ 67777
 //#define HSIZ 375559
@@ -23,7 +25,7 @@ typedef struct {
   int bufsiz;
 } htbl;
 
-void bwt(uchar *T, long n);
+void direct_bwt(uchar *T, long n, char *directory);
 
 #endif
 

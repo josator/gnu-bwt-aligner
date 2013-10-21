@@ -1,5 +1,5 @@
-#ifndef _BW_CSAFM_
-#define _BW_CSAFM_
+#ifndef _SEARCH_CSAFM_
+#define _SEARCH_CSAFM_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -93,6 +93,8 @@ void free_comp_matrix(comp_matrix *reverse, comp_matrix *strand);
 #define print_string(S);
 
 #endif
+
+//TODO: Machine instruction bit operation
 
 #if   defined FM_COMP_32
 
@@ -189,14 +191,17 @@ inline SA_TYPE getScompValueB(SA_TYPE m, comp_vector *Scomp, vector *C, comp_mat
   i=m; j=0;
 
   while (i % Scomp->ratio) {
-    
-    b_aux = B->vector[i];
-    
-    if (b_aux == (REF_TYPE) -1) {
+ 
+    if (i == B->dollar) {
 
       i=0;
 
-    } else {
+		} else {
+
+			if (i > B->dollar)
+    		b_aux = B->vector[i-1];
+			else
+				b_aux = B->vector[i];
 
 #if defined FM_COMP_32 || FM_COMP_64
       i = C->vector[b_aux] + getOcompValue(b_aux, i+1, O);
@@ -271,13 +276,17 @@ inline SA_TYPE getRcompValueB(SA_TYPE m, comp_vector *Rcomp, vector *C, comp_mat
 
   while (i) {
 
-    b_aux = B->vector[j];
 
-    if (b_aux == (REF_TYPE) -1) {
+    if (j == B->dollar) {
 
       j=0;
 
     } else {
+
+			if (j > B->dollar)
+				b_aux = B->vector[j-1];
+			else
+				b_aux = B->vector[j];
 
 #if defined FM_COMP_32 || FM_COMP_64
       j = C->vector[b_aux] + getOcompValue(b_aux, j+1, O);

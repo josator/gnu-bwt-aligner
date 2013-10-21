@@ -124,8 +124,8 @@ dword getbits(pb *B, ulong i, int d)
     x += z;
     x >>= (2*D-d);
   }
-  
-  return x;
+
+	return x;
 }
 #else
 dword getbits(pb *B, ulong i, int d)
@@ -198,10 +198,11 @@ packed_array *allocate_packed_array(ulong n, int w)
     printf("warning: w=%d\n",w);
   }
 
-  p = (packed_array *) mymalloc(sizeof(packed_array));
+	p = (packed_array *) mymalloc(sizeof(packed_array));
   p->n = n;  p->w = w;
   x = (n / PBS)*w + ((n % PBS)*w + PBS-1) / PBS;
-  p->b = (pb *) mymalloc(x*sizeof(pb));
+  p->b = (pb *) mymalloc((x)*sizeof(pb)); //TODO: When x < 2 there are memory errors in function getbits: x = (((qword)B[0]) << D) + B[1];
+
   for (i=0; i<x; i++) p->b[i] = 0;
   return p;
 }
@@ -223,7 +224,7 @@ ulong pa_get(packed_array *p, ulong i)
   b = p->b + (i>>logD)*w;
   i = (i % D)*w;
 
-  return (ulong)getbits(b,i,p->w);
+  return (ulong) getbits(b,i,p->w);
 }
 
 void pa_set(packed_array *p, ulong i, long x)

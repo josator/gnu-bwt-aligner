@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
 
   tic("Leer de disco");
 
-  while(nextFASTAToken(queries_file, h_Worig + TAM_BUS_GPU * MAXLINE, h_We + TAM_BUS_GPU * MAXLINE, h_nWe + TAM_BUS_GPU, NULL, NULL)) {
+  while(nextFASTAToken(queries_file, h_Worig + TAM_BUS_GPU * MAXLINE, h_We + TAM_BUS_GPU * MAXLINE, h_nWe + TAM_BUS_GPU)) {
 
     TAM_BUS_GPU++;
 
