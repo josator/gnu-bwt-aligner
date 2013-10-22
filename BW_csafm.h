@@ -94,23 +94,33 @@ void free_comp_matrix(comp_matrix *reverse, comp_matrix *strand);
 
 #endif
 
-//TODO: Machine instruction bit operation
+#ifdef __SSE4_2__
+#include <smmintrin.h>
+#endif
 
 #if   defined FM_COMP_32
 
-inline SA_TYPE bitcount(uint32_t i) {
+#ifdef __SSE4_2__
+#define popcount(x) _mm_popcnt_u32(x)
+#else
+inline SA_TYPE popcount(uint32_t i) {
   i = i - ((i >> 1) & 0x55555555);
   i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
   return (((i + (i >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
 }
+#endif
 
 #elif defined FM_COMP_64
 
-inline SA_TYPE bitcount(uint64_t i) {
+#ifdef __SSE4_2__
+#define popcount(x) _mm_popcnt_u64(x)
+#else
+inline SA_TYPE popcount(uint64_t i) {
   i = i - ((i >> 1) & 0x5555555555555555);
   i = (i & 0x3333333333333333) + ((i >> 2) & 0x3333333333333333);
   return (((i + (i >> 4)) & 0xF0F0F0F0F0F0F0F) * 0x101010101010101) >> 56;
 }
+#endif
 
 #endif
 
@@ -120,7 +130,7 @@ inline SA_TYPE getOcompValue(SA_TYPE n, SA_TYPE m, comp_matrix *O) {
   SA_TYPE pos, desp;
   pos  = m / FM_COMP_VALUE;
   desp = m % FM_COMP_VALUE;
-  return O->desp[n][pos] + bitcount( O->count[n][pos] << (FM_COMP_VALUE - (desp + 1)) );
+  return O->desp[n][pos] + popcount( O->count[n][pos] << (FM_COMP_VALUE - (desp + 1)) );
 }
 
 #endif
