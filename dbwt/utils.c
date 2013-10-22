@@ -201,9 +201,9 @@ packed_array *allocate_packed_array(ulong n, int w)
 	p = (packed_array *) mymalloc(sizeof(packed_array));
   p->n = n;  p->w = w;
   x = (n / PBS)*w + ((n % PBS)*w + PBS-1) / PBS;
-  p->b = (pb *) mymalloc((x)*sizeof(pb)); //TODO: When x < 2 there are memory errors in function getbits: x = (((qword)B[0]) << D) + B[1];
+  p->b = (pb *) mymalloc((x+1)*sizeof(pb));
+  for (i=0; i<x+1; i++) p->b[i] = 0;
 
-  for (i=0; i<x; i++) p->b[i] = 0;
   return p;
 }
 

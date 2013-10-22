@@ -554,6 +554,8 @@ void direct_bwt(uchar *T, long n, char *directory) {
 
     sa[i] = q - bwp_base;
   }
+
+	free(S);
   free_packed_array(T2);
   report_mem("free T2");
 
@@ -694,6 +696,11 @@ void direct_bwt(uchar *T, long n, char *directory) {
     }
   }
 
+  for (i=0; i<=SIGMA; i++) {
+    free_queue(Q[TYPE_L][i]);
+    free_queue(Q[TYPE_S][i]);
+  }
+
 	///////////////////////////////////////////////
 	// File writing
 
@@ -750,6 +757,8 @@ void direct_bwt(uchar *T, long n, char *directory) {
 		fprintf(fp,"%lu",last);
 		fclose(fp);
 	}
+
+	free(bw);
 
   report_mem("done");
   printf("%.2f bpc\n",(double)max_alloc/n);
