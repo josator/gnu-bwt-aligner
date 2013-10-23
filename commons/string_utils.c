@@ -66,7 +66,7 @@ void decode_bases(char* dest, REF_TYPE* src, uintmax_t length) {
   dest[length] = '\0';
 }
 
-void revstring(char *X, uintmax_t nX) {
+void revstring(REF_TYPE *X, uintmax_t nX) {
 
   char tmp;
   uintmax_t i, j;

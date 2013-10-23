@@ -353,11 +353,11 @@ uchar **sort_LMS(int n, htbl *h)
 
 #define SIGMA (256+1)
 
-void direct_bwt(uchar *T, long n, char *directory) {
+void direct_bwt(uchar *T, long n, const char *directory, const char *name) {
 
 	FILE *fp;
 
-  long i,j;
+	long i,j;
   int t,tt;
   long p,q;
   long n1;
@@ -367,34 +367,34 @@ void direct_bwt(uchar *T, long n, char *directory) {
   ulong last;
   uchar *lastptr;
 
-  uchar **S;
+	uchar **S;
   long C[SIGMA+2]; // 文字 c から始まるS*文字列の数
   long M[SIGMA+2]; // 文字 c の頻度 (c は -1 から SIGMA-1)
   long NL[SIGMA+2]; // TYPE_Lの文字 c の数
   long M2[SIGMA+2], M3[SIGMA+2];
   long C2[SIGMA+2], cc;
 
-  queue *Q[3][SIGMA+2];
+	queue *Q[3][SIGMA+2];
 
-  int *sa; // uint??
+	int *sa; // uint??
   uchar *bw;
   packed_array *T2;
   uchar *bwp_base;
   int bwp_w;
 
-  h1 = init_hashtable();
+	h1 = init_hashtable();
 
-  s1 = 0; // S*の数
+	s1 = 0; // S*の数
   m1 = 0; // S*の長さの合計
   n1 = 0; // 次のレベルの文字列長 (S*の数)
 
-  for (i=0; i<=SIGMA+1; i++) {
+	for (i=0; i<=SIGMA+1; i++) {
     C[i] = C2[i] = 0;
     M[i] = M2[i] = 0;
     NL[i] = 0; // TYPE_L の数
   }
 
-  // C[c] : c で始まるS*
+	// C[c] : c で始まるS*
   // M[c]: c の数
 
 //////////////////////////
@@ -709,20 +709,22 @@ void direct_bwt(uchar *T, long n, char *directory) {
   char path[500];
 
 	path[0]='\0';
-	if (directory == NULL) {
+	if (directory == NULL || name == NULL) {
 		strcat(path, "output.bw");
 	} else {
 		strcat(path, directory);
-		strcat(path, "/B.vec");
+  	strcat(path, "/");
+  	strcat(path, name);
+  	strcat(path, ".vec");
 	}
-	
-  fp = fopen(path,"wb");
+
+	fp = fopen(path,"wb");
 	check_file_open(fp, path);
 
 	fwrite(&n, sizeof(uint32_t), 1, fp);
 	fwrite(&last, sizeof(uint32_t), 1, fp);
 
-  {
+	{
     uchar *p;
     long s,t,w;
     s = last;
@@ -750,7 +752,7 @@ void direct_bwt(uchar *T, long n, char *directory) {
 
   fclose(fp);
 
-	if (directory == NULL) {
+	if (directory == NULL || name == NULL) {
 		fp = fopen("output.lst","w");
 		check_file_open(fp, "output.lst");
 

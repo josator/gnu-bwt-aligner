@@ -5,9 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "commons/commons.h"
-
 #include "BW_csafm.h"
+#include "BW_io.h"
 
 #define MAX_MISMATCHES 10
 
@@ -123,30 +122,7 @@ inline void concat_error_string(char *mask, char *mask_aux, result *r, uint8_t r
 
 }
 
-inline SA_TYPE binsearch(SA_TYPE *array, SA_TYPE size, SA_TYPE key) {
-
-  if( !array ) return 0;
-
-  SA_TYPE *p = array;
-  SA_TYPE w;
-
-  while( size > 0 ) {
-
-    w=size/2;
-    
-    if ( p[w] <= key ) {
-      p+=w+1;
-      size-=w+1;
-    } else {
-      size=w;
-    }
-
-  }
-
-  return p - array;
-}
-
-inline void manage_single_result(result *r, exome* ex, comp_vector *S, comp_vector *Si, vector *C, comp_matrix *O, comp_matrix *Oi, char *search, SA_TYPE nW, bool type, FILE *fp, uintmax_t read_index, bool *found) {
+inline void manage_single_result(result *r, exome* ex, comp_vector *S, comp_vector *Si, vector *C, comp_matrix *O, comp_matrix *Oi, char *search, bool type, FILE *fp, uintmax_t read_index, bool *found) {
 
 	bool direction;
 	SA_TYPE enW;

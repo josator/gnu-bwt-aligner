@@ -25,7 +25,7 @@ typedef struct {
   int bufsiz;
 } htbl;
 
-void direct_bwt(uchar *T, long n, char *directory);
+void direct_bwt(uchar *T, long n, const char *directory, const char *name);
 
 #endif
 

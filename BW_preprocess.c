@@ -1,106 +1,46 @@
 #include "BW_preprocess.h"
 
-void encode_reference(ref_vector *X, exome *ex, bool duplicate, const char *ref_path) {
-
-	FILE *ref_file;
-	ref_file = fopen(ref_path, "r");
-	check_file_open(ref_file, ref_path);
-
-	size_t size, read;
-
-	fseek(ref_file, 0, SEEK_END);
-	read = ftell(ref_file);
-	fseek(ref_file, 0, SEEK_SET);
-
-  if (duplicate) size = 2*read+1;
-	else size = read;
-
-	X->vector = (REF_TYPE *) malloc( size * sizeof(REF_TYPE) );
-	check_malloc(X->vector, ref_path);
-
-	char *reference = (char *) X->vector;
-
-	if (ex !=NULL) ex->size=0;
-
-	SA_TYPE partial_length=0, total_length=0;
-
-	while ( fgets(reference + total_length, MAXLINE, ref_file) ) {
-
-		if ( (reference + total_length)[0] == '>') {
-
-			if (ex!=NULL) {
-
-				if (total_length == 0) {
-
-					sscanf(reference + total_length, ">%s ", ex->chromosome + ex->size * IDMAX);
-					ex->start[ex->size] = 0;
-
-				} else {
-
-					ex->end[ex->size] = partial_length - 1;
-					partial_length=0;
-
-					if (ex->size==0)
-						ex->offset[0] = 0;
-					else
-						ex->offset[ex->size] = ex->offset[ex->size-1] + (ex->end[ex->size-1] - ex->start[ex->size-1] + 1);
-					ex->size++;
-
-					sscanf(reference + total_length, ">%s ", ex->chromosome + ex->size * IDMAX);
-					ex->start[ex->size] = 0;
-
-				}
-
-			}
-
-			continue;
-
-		}
-
-		size_t length = strlen(reference + total_length);
-		if ((reference + total_length)[length-1]=='\n')
-			length--;
-
-		partial_length += length;
-		total_length += length;
-
-	}
-
-	if (ex != NULL) {
-		ex->end[ex->size] = partial_length - 1;
-		partial_length=0;
-
-		if (ex->size==0)
-			ex->offset[0] = 0;
-		else
-			ex->offset[ex->size] = ex->offset[ex->size-1] + (ex->end[ex->size-1] - ex->start[ex->size-1] + 1);
-		ex->size++;
-	}
-
-	encode_bases(X->vector, reference, total_length);
-	X->n = total_length;
-	X->dollar = 0;
-
-	fclose(ref_file);
-
+void calculate_and_save_B(ref_vector *X, const char *directory, const char *name) {
+  direct_bwt(X->vector, X->n, directory, name);
 }
 
-void calculate_R(comp_vector *R, comp_vector *S) {
+void calculate_S_and_R(comp_vector *S, comp_vector *R, ref_vector *B, vector *C, comp_matrix *O, SA_TYPE ratio) {
 
-	if (S->ratio != 1) {
-		fprintf(stderr, "calculateR: The S vector must be uncompressed\n");
-		exit(1);
+	SA_TYPE i,j;
+  REF_TYPE b_aux;
+
+	S->siz = B->n + 1;
+	R->siz = B->n + 1;
+
+	S->n = (S->siz / ratio);
+	R->n = (S->siz / ratio);
+	if (S->siz % ratio) {
+		S->n++;	R->n++;
 	}
 
-	R->siz   = S->siz;
-	R->n     = S->n;
-	R->ratio = S->ratio;
+	S->ratio = ratio;
+	R->ratio = ratio;
 
+	S->vector = (SA_TYPE *) malloc(S->n * sizeof(SA_TYPE));
 	R->vector = (SA_TYPE *) malloc(R->n * sizeof(SA_TYPE));
 
-#pragma omp parallel for
-	for(SA_TYPE i=0; i<S->n; i++) {
-		R->vector[S->vector[i]] = i;
+	if (B->dollar % S->ratio == 0) S->vector[B->dollar / S->ratio] = 0;	
+	R->vector[0] = B->dollar;
+
+	for(j = S->siz-1, i = 0; j > 0; j--) {
+	
+		if (i % S->ratio == 0) S->vector[i / S->ratio] = j;
+		if (j % R->ratio == 0) R->vector[j / S->ratio] = i;
+
+		if (i > B->dollar) b_aux = B->vector[i-1];
+		else               b_aux = B->vector[i];
+
+#if defined FM_COMP_32 || FM_COMP_64
+		i = C->vector[b_aux] + getOcompValue(b_aux, i+1/*0 is -1*/, O);
+#else
+		i = C->vector[b_aux] + O->desp[b_aux][i+1/*0 is -1*/];
+#endif
+
 	}
 
 }
@@ -232,7 +172,12 @@ void calculate_O(comp_matrix *O, ref_vector *B) {
 
 }
 
-void compress_SR(comp_vector *SR, comp_vector *SRcomp, SA_TYPE ratio) {
+void compress_S_or_R(comp_vector *SR, comp_vector *SRcomp, SA_TYPE ratio) {
+
+	if (SR->ratio != 1) {
+		fprintf(stderr, "compress_SR: The S or R vectors must be uncompressed\n");
+		exit(1);
+	}
 
 	SRcomp->n = (SR->siz / ratio);
 	if (SR->siz % ratio) SRcomp->n++;

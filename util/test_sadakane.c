@@ -4,10 +4,7 @@
 
 #include <sys/time.h>
 
-#include "commons/commons.h"
-#include "commons/string_utils.h"
-
-#include "BW_csafm.h"
+#include "../BW_csafm.h"
 
 int main(int argc, char **argv) {
 

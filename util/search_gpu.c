@@ -2,9 +2,8 @@
 #include <cuda_runtime_api.h>
 
 #include "BW_gpu.cuh"
-
 #include "BW_search.h"
-//#include "cuPrintf.cuh"
+#include "BW_io.h"
 
 #define MAX_READ_GPU 256000
 #define TAM_BLOQUE_GPU 32

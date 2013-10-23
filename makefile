@@ -14,7 +14,7 @@ CUDA_LOCATION=/usr/lib/nvidia-cuda-toolkit
 
 CC = g++
 NVCC = nvcc
-CFLAGS = -Wall -g -fopenmp -DFM_COMP_32 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -I . -I $(LIBS_ROOT)/common-libs/ -I $(CUDA_LOCATION)/include/ -L /usr/local/cuda/lib64/ -lcudart #-msse4.2 #-DVERBOSE_DBG
+CFLAGS = -Wall -g -fopenmp -DFM_COMP_32 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -I . -I $(LIBS_ROOT)/common-libs/ -I $(CUDA_LOCATION)/include/ -L /usr/local/cuda/lib64/ -lcudart -DVERBOSE_DBG#-msse4.2 #-DVERBOSE_DBG
 NVCCFLAGS = --compiler-options -Wall,-fopenmp -O3 -Xptxas -v -arch=sm_13 -DFM_COMP_32 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -I . -I $(LIBS_ROOT)/common-libs/ -msse4.2#-DVERBOSE_DBG
 #THRUST_FLAGS = -Xcompiler -fopenmp -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_OMP -lgomp
 
@@ -26,10 +26,10 @@ DBWT_OBJECTS = dbwt.o sais.o queue.o utils.o
 
 all: dbwt $(TARGETS)
 
-$(BIN_DIR)/preprocess_sadakane: $(DBWT_OBJECTS) preprocess_sadakane.o BW_preprocess.o BW_csafm.o $(COMMONS_DIR)/string_utils.o
-	$(CC) $(CFLAGS) $(DBWT_OBJECTS) BW_preprocess.o BW_csafm.o preprocess_sadakane.o $(COMMONS_DIR)/string_utils.o -o $(BIN_DIR)/preprocess_sadakane
+$(BIN_DIR)/preprocess_sadakane: $(DBWT_OBJECTS) preprocess_sadakane.o BW_preprocess.o BW_csafm.o BW_io.o BW_search.o $(COMMONS_DIR)/string_utils.o
+	$(CC) $(CFLAGS) $(DBWT_OBJECTS) BW_preprocess.o BW_csafm.o BW_io.o BW_search.o preprocess_sadakane.o $(COMMONS_DIR)/string_utils.o -o $(BIN_DIR)/preprocess_sadakane
 
-preprocess_sadakane.o: $(UTIL_DIR)/preprocess_sadakane.c $(COMMONS_DIR)/BW_types.h BW_preprocess.h BW_csafm.h $(COMMONS_DIR)/commons.h $(COMMONS_DIR)/string_utils.h
+preprocess_sadakane.o: $(UTIL_DIR)/preprocess_sadakane.c $(COMMONS_DIR)/BW_types.h BW_search.h BW_preprocess.h BW_csafm.h $(COMMONS_DIR)/commons.h $(COMMONS_DIR)/string_utils.h
 	$(CC) $(CFLAGS) -c $(UTIL_DIR)/preprocess_sadakane.c
 
 $(BIN_DIR)/test_sadakane: $(DBWT_OBJECTS) test_sadakane.o BW_preprocess.o BW_csafm.o $(COMMONS_DIR)/string_utils.o
@@ -38,20 +38,20 @@ $(BIN_DIR)/test_sadakane: $(DBWT_OBJECTS) test_sadakane.o BW_preprocess.o BW_csa
 test_sadakane.o: $(UTIL_DIR)/test_sadakane.c $(COMMONS_DIR)/BW_types.h BW_preprocess.h BW_csafm.h $(COMMONS_DIR)/commons.h $(COMMONS_DIR)/string_utils.h
 	$(CC) $(CFLAGS) -c $(UTIL_DIR)/test_sadakane.c
 
-$(BIN_DIR)/search: search.o BW_results.o BW_csafm.o BW_search.o $(COMMONS_DIR)/string_utils.o
-	$(CC) $(CFLAGS) BW_results.o BW_csafm.o BW_search.o search.o $(COMMONS_DIR)/string_utils.o -o $(BIN_DIR)/search
+$(BIN_DIR)/search: search.o BW_results.o BW_csafm.o BW_search.o BW_io.o $(COMMONS_DIR)/string_utils.o
+	$(CC) $(CFLAGS) BW_results.o BW_csafm.o BW_search.o BW_io.o search.o $(COMMONS_DIR)/string_utils.o -o $(BIN_DIR)/search
 
 search.o: $(UTIL_DIR)/search.c BW_gpu.cuh BW_csafm.h $(COMMONS_DIR)/BW_types.h $(COMMONS_DIR)/commons.h $(COMMONS_DIR)/string_utils.h
 	$(CC) $(CFLAGS) -c $(UTIL_DIR)/search.c
 
-$(BIN_DIR)/inexact_search: inexact_search.o BW_results.o BW_csafm.o BW_search.o $(COMMONS_DIR)/string_utils.o
-	$(CC) $(CFLAGS) BW_results.o BW_csafm.o BW_search.o inexact_search.o $(COMMONS_DIR)/string_utils.o -o $(BIN_DIR)/inexact_search
+$(BIN_DIR)/inexact_search: inexact_search.o BW_results.o BW_csafm.o BW_io.o BW_search.o $(COMMONS_DIR)/string_utils.o
+	$(CC) $(CFLAGS) BW_results.o BW_csafm.o BW_io.o BW_search.o inexact_search.o $(COMMONS_DIR)/string_utils.o -o $(BIN_DIR)/inexact_search
 
 inexact_search.o: $(UTIL_DIR)/inexact_search.c BW_gpu.cuh BW_csafm.h $(COMMONS_DIR)/BW_types.h $(COMMONS_DIR)/commons.h $(COMMONS_DIR)/string_utils.h
 	$(CC) $(CFLAGS) -c $(UTIL_DIR)/inexact_search.c
 
-$(BIN_DIR)/search_gpu: search_gpu.o BW_csafm.o BW_results.o BW_search.o BW_gpu.o $(COMMONS_DIR)/string_utils.o
-	$(CC) $(CFLAGS) BW_csafm.o BW_results.o BW_search.o BW_gpu.o $(COMMONS_DIR)/string_utils.o search_gpu.o -o $(BIN_DIR)/search_gpu
+$(BIN_DIR)/search_gpu: search_gpu.o BW_csafm.o BW_results.o BW_io.o BW_search.o BW_gpu.o $(COMMONS_DIR)/string_utils.o
+	$(CC) $(CFLAGS) BW_csafm.o BW_results.o BW_io.o BW_search.o BW_gpu.o $(COMMONS_DIR)/string_utils.o search_gpu.o -o $(BIN_DIR)/search_gpu
 
 search_gpu.o: $(UTIL_DIR)/search_gpu.c BW_gpu.cuh BW_csafm.h BW_results.h $(COMMONS_DIR)/BW_types.h $(COMMONS_DIR)/commons.h $(COMMONS_DIR)/string_utils.h
 	$(CC) $(CFLAGS) -c $(UTIL_DIR)/search_gpu.c
@@ -69,6 +69,9 @@ optimize_speedup_errors.o: $(UTIL_DIR)/optimize_speedup_errors.c $(COMMONS_DIR)/
 	$(CC) $(CFLAGS) -c $(UTIL_DIR)/optimize_speedup_errors.c
 
 ##########################OBJECTS##################################
+
+BW_io.o: BW_io.c BW_io.h $(COMMONS_DIR)/BW_types.h $(COMMONS_DIR)/commons.h $(COMMONS_DIR)/string_utils.h
+	$(CC) $(CFLAGS) -c BW_io.c
 
 BW_csafm.o: BW_csafm.c BW_csafm.h $(COMMONS_DIR)/BW_types.h $(COMMONS_DIR)/commons.h $(COMMONS_DIR)/string_utils.h
 	$(CC) $(CFLAGS) -c BW_csafm.c

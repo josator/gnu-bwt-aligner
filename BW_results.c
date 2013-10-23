@@ -33,7 +33,7 @@ bool write_results(results_list *r_list, SA_TYPE *k, SA_TYPE *l, exome* ex, comp
 			k[kl] = r->k;
 			l[kl] = r->l;
 			kl_count++;
-			manage_single_result(r, ex, S, Si, C, O, Oi, search, nW, type, fp, r_list->read_index, &found);
+			manage_single_result(r, ex, S, Si, C, O, Oi, search, type, fp, r_list->read_index, &found);
 		}
 
 	}

@@ -1,10 +1,6 @@
 #ifndef _SEARCH_SEARCH_
 #define _SEARCH_SEARCH_
 
-#include "commons/commons.h"
-#include "commons/string_utils.h"
-
-#include "commons/BW_types.h"
 #include "BW_results.h"
 
 #if defined FM_COMP_32 || FM_COMP_64

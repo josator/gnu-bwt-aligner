@@ -2,6 +2,7 @@
 #define _COMMON_TYPES_
 
 #include <inttypes.h>
+#include <stdbool.h>
 
 #if   defined SA_64
 

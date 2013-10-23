@@ -178,7 +178,7 @@ inline SA_TYPE getScompValue(SA_TYPE m, comp_vector *Scomp, vector *C, comp_matr
     } else {
 
 #if defined FM_COMP_32 || FM_COMP_64
-      i = C->vector[b_aux] + getOcompValue(b_aux, i+1, O);
+      i = C->vector[b_aux] + getOcompValue(b_aux, i+1/*0 is -1*/, O);
 #else
       i = C->vector[b_aux] + O->desp[b_aux][i+1/*0 is -1*/];
 #endif
@@ -214,7 +214,7 @@ inline SA_TYPE getScompValueB(SA_TYPE m, comp_vector *Scomp, vector *C, comp_mat
 				b_aux = B->vector[i];
 
 #if defined FM_COMP_32 || FM_COMP_64
-      i = C->vector[b_aux] + getOcompValue(b_aux, i+1, O);
+      i = C->vector[b_aux] + getOcompValue(b_aux, i+1/*0 is -1*/, O);
 #else
       i = C->vector[b_aux] + O->desp[b_aux][i+1/*0 is -1*/];
 #endif
@@ -255,7 +255,7 @@ inline SA_TYPE getRcompValue(SA_TYPE m, comp_vector *Rcomp, vector *C, comp_matr
     } else {
 
 #if defined FM_COMP_32 || FM_COMP_64
-			j = C->vector[b_aux] + getOcompValue(b_aux, j+1, O);
+			j = C->vector[b_aux] + getOcompValue(b_aux, j+1/*0 is -1*/, O);
 #else
 			j = C->vector[b_aux] + O->desp[b_aux][j+1/*0 is -1*/];
 #endif
@@ -299,7 +299,7 @@ inline SA_TYPE getRcompValueB(SA_TYPE m, comp_vector *Rcomp, vector *C, comp_mat
 				b_aux = B->vector[j];
 
 #if defined FM_COMP_32 || FM_COMP_64
-      j = C->vector[b_aux] + getOcompValue(b_aux, j+1, O);
+      j = C->vector[b_aux] + getOcompValue(b_aux, j+1/*0 is -1*/, O);
 #else
       j = C->vector[b_aux] + O->desp[b_aux][j+1/*0 is -1*/];
 #endif
@@ -310,24 +310,8 @@ inline SA_TYPE getRcompValueB(SA_TYPE m, comp_vector *Rcomp, vector *C, comp_mat
 
   }
 
-  return j;
+	return j;
 
 }
-
-//Data structure for chromosome or exome separation positions in the reference
-
-#define INDEX_EXOME 24000
-#define IDMAX 100
-
-typedef struct {
-  char chromosome[INDEX_EXOME*IDMAX];
-  SA_TYPE start[INDEX_EXOME];
-  SA_TYPE end[INDEX_EXOME];
-  SA_TYPE offset[INDEX_EXOME];
-  SA_TYPE size;
-} exome;
-
-void load_exome_file(exome *ex, const char *directory);
-void save_exome_file(exome *ex, const char *directory);
 
 #endif

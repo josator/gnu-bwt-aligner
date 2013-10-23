@@ -23,7 +23,7 @@ void bwt_wrapper(char *fname)
   report_mem("read string");
 
 	for (long i=0; i<n; i += (1<<20)) {
-    long size;
+    size_t size;
     printf("%ld \r",i/(1<<20));
     fflush(stdout);
     size = min(n-i,1<<20);
@@ -38,7 +38,7 @@ void bwt_wrapper(char *fname)
 #endif
 ///////////////////////////////////////////////
 
-direct_bwt(T, n, NULL);
+direct_bwt(T, n, NULL, NULL);
 
 }
 

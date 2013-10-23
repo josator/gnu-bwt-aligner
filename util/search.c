@@ -3,7 +3,7 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include "commons/commons.h"
+#include "../commons/commons.h"
 #include "BW_search.h"
 #include "BW_csafm.h"
 #include "BW_results.h"
