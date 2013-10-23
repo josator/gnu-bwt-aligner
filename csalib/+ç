@@ -1,0 +1,48 @@
+#ifndef _SEARCH_IO_
+#define _SEARCH_IO_
+
+#include <string.h>
+
+#include "commons/commons.h"
+#include "commons/BW_types.h"
+
+//Data structure for chromosome or exome separation positions in the reference
+#define INDEX_EXOME 24000
+#define IDMAX 100
+
+typedef struct {
+  char chromosome[INDEX_EXOME*IDMAX];
+  SA_TYPE start[INDEX_EXOME];
+  SA_TYPE end[INDEX_EXOME];
+  SA_TYPE offset[INDEX_EXOME];
+  SA_TYPE size;
+} exome;
+
+void load_exome_file(exome *ex, const char *directory);
+void save_exome_file(exome *ex, const char *directory);
+
+void encode_reference(ref_vector *X, exome *ex, bool duplicate, const char *ref_path);
+bool nextFASTAToken(FILE *queries_file, char *uncoded, REF_TYPE *coded, SA_TYPE *nquery);
+
+inline SA_TYPE binsearch(SA_TYPE *array, SA_TYPE size, SA_TYPE key) {
+
+  if( !array ) return 0;
+
+  SA_TYPE *p = array;
+  SA_TYPE w;
+
+  while( size > 0 ) {
+
+    w=size/2;
+    
+    if ( p[w] <= key ) {
+      p+=w+1;
+      size-=w+1;
+    } else {
+      size=w;
+    }
+
+  }
+
+  return p - array;
+}
