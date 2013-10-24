@@ -14,7 +14,7 @@ CUDA_LOCATION=/usr/lib/nvidia-cuda-toolkit
 
 CC = g++
 NVCC = nvcc
-CFLAGS = -Wall -g -fopenmp -DFM_COMP_32 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -I . -I $(LIBS_ROOT)/common-libs/ -I $(CUDA_LOCATION)/include/ -L /usr/local/cuda/lib64/ -lcudart -DVERBOSE_DBG#-msse4.2 #-DVERBOSE_DBG
+CFLAGS = -Wall -g -fopenmp -DFM_COMP_32 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -I . -I $(LIBS_ROOT)/common-libs/ -I $(CUDA_LOCATION)/include/ -L /usr/local/cuda/lib64/ -lcudart -msse4.2 #-DVERBOSE_DBG
 NVCCFLAGS = --compiler-options -Wall,-fopenmp -O3 -Xptxas -v -arch=sm_13 -DFM_COMP_32 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -I . -I $(LIBS_ROOT)/common-libs/ -msse4.2#-DVERBOSE_DBG
 #THRUST_FLAGS = -Xcompiler -fopenmp -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_OMP -lgomp
 
