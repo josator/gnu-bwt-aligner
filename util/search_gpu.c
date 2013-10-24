@@ -559,14 +559,14 @@ void *writeResults(void *threadid) {
 		read_vector(&h_C,  argv[2], "C");
 		read_vector(&h_C1, argv[2], "C1");
 		read_comp_matrix_gpu(&h_O,  argv[2], "O");
-		read_comp_vector(&S, argv[2], "Scomp");
+		read_comp_vector(&S, argv[2], "S");
 
 		reverse_strand_C(&h_rC, &h_C, &h_rC1, &h_C1);
 		reverse_strand_O(&h_rO, &h_O);
 
 		if (num_errors) {
 			read_comp_matrix_gpu(&h_Oi, argv[2], "Oi");
-			read_comp_vector(&Si, argv[2], "Scompi");
+			read_comp_vector(&Si, argv[2], "Si");
 			reverse_strand_O(&h_rOi, &h_Oi);
 		}
 

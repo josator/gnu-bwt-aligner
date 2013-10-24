@@ -341,10 +341,10 @@ int main(int argc, char **argv) {
 	read_comp_matrix(&h_O,  argv[2], "O");
 	read_comp_matrix(&h_Oi, argv[2], "Oi");
 
-	read_comp_vector(&S,   argv[2], "Scomp");
-	read_comp_vector(&Si,  argv[2], "Scompi");
-	read_comp_vector(&R,   argv[2], "Rcomp");
-	read_comp_vector(&Ri,  argv[2], "Rcompi");
+	read_comp_vector(&S,   argv[2], "S");
+	read_comp_vector(&Si,  argv[2], "Si");
+	read_comp_vector(&R,   argv[2], "R");
+	read_comp_vector(&Ri,  argv[2], "Ri");
 
 	reverse_strand_C(&h_rC, &h_C, &h_rC1, &h_C1);
 	reverse_strand_O(&h_rO, &h_O);

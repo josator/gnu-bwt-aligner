@@ -10,15 +10,18 @@ int main(int argc, char **argv)
 	comp_matrix O, Oi;
 	comp_vector S, R, Si, Ri;
 
-	check_syntax(argc, 6, "preprocess ref_file output_dir s_ratio nucleotides");
+	exome ex;
+
+	check_syntax(argc, 5, "preprocess ref_file output_dir s_ratio nucleotides");
 
 	timevars();
   init_replace_table(argv[4]);
 
 	SA_TYPE ratio = atoi(argv[3]);
 
-	encode_reference(&X, NULL, argv[1]);
+	encode_reference(&X, &ex, argv[1]);
 	save_ref_vector(&X, argv[2], "X");
+	save_exome_file(&ex, argv[2]);
   print_vector(X.vector, X.n);
 
 	tic("Calc. Suffix Array -> Sadakane direct SAIS");
