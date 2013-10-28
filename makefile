@@ -18,7 +18,7 @@ CFLAGS = -Wall -g -fopenmp -DFM_COMP_32 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_B
 NVCCFLAGS = --compiler-options -Wall,-fopenmp -O3 -Xptxas -v -arch=sm_13 -DFM_COMP_32 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -I . -I $(LIBS_ROOT)/common-libs/ -msse4.2#-DVERBOSE_DBG
 #THRUST_FLAGS = -Xcompiler -fopenmp -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_OMP -lgomp
 
-TARGETS = $(BIN_DIR)/preprocess_sadakane $(BIN_DIR)/test_sadakane $(BIN_DIR)/inexact_search #$(BIN_DIR)/search_gpu #$(BIN_DIR)/generateSRcomp $(BIN_DIR)/optimize_speedup_errors
+TARGETS = $(BIN_DIR)/preprocess_dbwt_new $(BIN_DIR)/test_sadakane $(BIN_DIR)/inexact_search #$(BIN_DIR)/search_gpu #$(BIN_DIR)/generateSRcomp $(BIN_DIR)/optimize_speedup_errors
 
 DBWT_OBJECTS = dbwt.o sais.o queue.o utils.o
 
@@ -26,11 +26,17 @@ DBWT_OBJECTS = dbwt.o sais.o queue.o utils.o
 
 all: dbwt $(TARGETS)
 
-$(BIN_DIR)/preprocess_sadakane: $(DBWT_OBJECTS) preprocess_sadakane.o BW_preprocess.o BW_csafm.o BW_io.o BW_search.o $(COMMONS_DIR)/string_utils.o
-	$(CC) $(CFLAGS) $(DBWT_OBJECTS) BW_preprocess.o BW_csafm.o BW_io.o BW_search.o preprocess_sadakane.o $(COMMONS_DIR)/string_utils.o -o $(BIN_DIR)/preprocess_sadakane
+$(BIN_DIR)/preprocess_dbwt_old: $(DBWT_OBJECTS) preprocess_dbwt_old.o BW_preprocess.o BW_csafm.o BW_io.o BW_search.o $(COMMONS_DIR)/string_utils.o
+	$(CC) $(CFLAGS) $(DBWT_OBJECTS) BW_preprocess.o BW_csafm.o BW_io.o BW_search.o preprocess_dbwt_old.o $(COMMONS_DIR)/string_utils.o -o $(BIN_DIR)/preprocess_dbwt_old
 
-preprocess_sadakane.o: $(UTIL_DIR)/preprocess_sadakane.c $(COMMONS_DIR)/BW_types.h BW_search.h BW_preprocess.h BW_csafm.h $(COMMONS_DIR)/commons.h $(COMMONS_DIR)/string_utils.h
-	$(CC) $(CFLAGS) -c $(UTIL_DIR)/preprocess_sadakane.c
+preprocess_dbwt_old.o: $(UTIL_DIR)/preprocess_dbwt_old.c $(COMMONS_DIR)/BW_types.h BW_search.h BW_preprocess.h BW_csafm.h $(COMMONS_DIR)/commons.h $(COMMONS_DIR)/string_utils.h
+	$(CC) $(CFLAGS) -c $(UTIL_DIR)/preprocess_dbwt_old.c
+
+$(BIN_DIR)/preprocess_dbwt_new: $(DBWT_OBJECTS) preprocess_dbwt_new.o BW_preprocess.o BW_csafm.o BW_io.o BW_search.o $(COMMONS_DIR)/string_utils.o
+	$(CC) $(CFLAGS) $(DBWT_OBJECTS) BW_preprocess.o BW_csafm.o BW_io.o BW_search.o preprocess_dbwt_new.o $(COMMONS_DIR)/string_utils.o -o $(BIN_DIR)/preprocess_dbwt_new
+
+preprocess_dbwt_new.o: $(UTIL_DIR)/preprocess_dbwt_new.c $(COMMONS_DIR)/BW_types.h BW_search.h BW_preprocess.h BW_csafm.h $(COMMONS_DIR)/commons.h $(COMMONS_DIR)/string_utils.h
+	$(CC) $(CFLAGS) -c $(UTIL_DIR)/preprocess_dbwt_new.c
 
 $(BIN_DIR)/test_sadakane: $(DBWT_OBJECTS) test_sadakane.o BW_preprocess.o BW_csafm.o $(COMMONS_DIR)/string_utils.o
 	$(CC) $(CFLAGS) $(DBWT_OBJECTS) BW_preprocess.o BW_csafm.o test_sadakane.o $(COMMONS_DIR)/string_utils.o -o $(BIN_DIR)/test_sadakane

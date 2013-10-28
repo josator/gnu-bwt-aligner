@@ -476,7 +476,7 @@ void direct_bwt(uchar *T, long n, const char *directory, const char *name) {
     *r = 0; // 最後の文字列 T[n..n]．本当は -1
   }
 
-  min_ptr = max_ptr = S[0];
+	min_ptr = max_ptr = S[0];
   for (i=1; i<=s1; i++) {
     if (S[i] < min_ptr) min_ptr = S[i];
     if (S[i] > max_ptr) max_ptr = S[i];
@@ -704,25 +704,30 @@ void direct_bwt(uchar *T, long n, const char *directory, const char *name) {
 	///////////////////////////////////////////////
 	// File writing
 
-  printf("writing...\n");
+	printf("writing...\n");
 
-  char path[500];
-
+	char path[500];
 	path[0]='\0';
-	if (directory == NULL || name == NULL) {
-		strcat(path, "output.bw");
+	if (directory==NULL) {
+		strcat(path, ".");
 	} else {
 		strcat(path, directory);
-  	strcat(path, "/");
-  	strcat(path, name);
-  	strcat(path, ".vec");
+	}
+	strcat(path, "/");
+	if (name == NULL) {
+		strcat(path, "output.bw");
+	} else {
+		strcat(path, name);
+		strcat(path, ".vec");
 	}
 
 	fp = fopen(path,"wb");
 	check_file_open(fp, path);
 
-	fwrite(&n, sizeof(uint32_t), 1, fp);
-	fwrite(&last, sizeof(uint32_t), 1, fp);
+	if (name != NULL) {
+		fwrite(&n, sizeof(uint32_t), 1, fp);
+		fwrite(&last, sizeof(uint32_t), 1, fp);
+	}
 
 	{
     uchar *p;
@@ -752,9 +757,17 @@ void direct_bwt(uchar *T, long n, const char *directory, const char *name) {
 
   fclose(fp);
 
-	if (directory == NULL || name == NULL) {
-		fp = fopen("output.lst","w");
-		check_file_open(fp, "output.lst");
+	if (name == NULL) {
+		path[0]='\0';
+		if (directory==NULL) {
+			strcat(path, ".");
+		} else {
+			strcat(path, directory);
+		}
+		strcat(path, "/output.lst");
+
+		fp = fopen(path,"w");
+		check_file_open(fp, path);
 
 		fprintf(fp,"%lu",last);
 		fclose(fp);

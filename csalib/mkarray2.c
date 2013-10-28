@@ -11,7 +11,7 @@
 
 int main(int argc, char *argv[])
 {
-   csa_new_from_bwt(argc, argv);
+   csa_new_from_bwt_wrapper(argc, argv);
    printf("write ok\n");
 
    return 0;

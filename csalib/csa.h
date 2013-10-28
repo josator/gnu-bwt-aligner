@@ -36,7 +36,6 @@
 #define ID_BWT_HUF 0x0d
 #define ID_BWT_BIT 0x0e
 
-
 #include "typedef.h"
 
 #ifndef min
@@ -89,7 +88,6 @@ typedef struct csa {
 
 } CSA;
 
-
 /* calculate SA[i] */
 pos_t csa_lookup(CSA *csa, rank_t i);
 
@@ -107,7 +105,8 @@ i64 csa_substring(unsigned char *p,CSA *csa,rank_t r,i64 len);
 i64 csa_substring_lf(uchar *p,CSA *csa,rank_t r,i64 len);
 i64 csa_substring_lf_naive(uchar *p,CSA *csa,rank_t r,i64 len);
 
-void csa_new_from_bwt(int argc, char *argv[]);
+void csa_new_from_bwt_dna_wrapper(const char *directory, const char *name);
+void csa_new_from_bwt_wrapper(int argc, char *argv[]);
 int csa_read(CSA *SA, int argc, char *argv[]);
 
 i64 csa_search(uchar *key,i64 keylen,CSA *csa,rank_t *li,rank_t *ri);
@@ -117,7 +116,6 @@ rank_t csa_searchsub_lf(int c, CSA *csa, rank_t *ll, rank_t *rr);
 i64 csa_search_r(i64 keylen,int c, CSA *csa,rank_t *li,rank_t *ri);
 int csa_left_diverse(CSA *csa, rank_t l, rank_t r);
 int csa_right_diverse(CSA *csa, rank_t l, rank_t r, i64 length);
-
 
 int csa_child_l(CSA *csa, rank_t l, rank_t r, uchar *head, rank_t *ll, rank_t *rr);
 int csa_child_r(CSA *csa, i64 len, rank_t l, rank_t r, uchar *tail, rank_t *ll, rank_t *rr);
