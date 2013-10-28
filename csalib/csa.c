@@ -396,6 +396,7 @@ void csa_new_from_bwt(int argc, char *argv[])
   int psi_id, idx_id;
   CSA csa;
 
+
   for (i=0; i<SIGMA+2; i++) csa.C[i] = 0;
 
   fname = NULL;

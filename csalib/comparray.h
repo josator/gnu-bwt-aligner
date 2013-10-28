@@ -4,7 +4,6 @@
    This software may be used freely for any purpose.
    No warranty is given regarding the quality of this software.
 */
-
 #ifndef _COMPARRAY_H_
 #define _COMPARRAY_H_
 

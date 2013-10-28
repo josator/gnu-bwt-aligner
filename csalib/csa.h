@@ -89,6 +89,7 @@ typedef struct csa {
 
 } CSA;
 
+
 /* calculate SA[i] */
 pos_t csa_lookup(CSA *csa, rank_t i);
 
@@ -121,7 +122,6 @@ int csa_right_diverse(CSA *csa, rank_t l, rank_t r, i64 length);
 int csa_child_l(CSA *csa, rank_t l, rank_t r, uchar *head, rank_t *ll, rank_t *rr);
 int csa_child_r(CSA *csa, i64 len, rank_t l, rank_t r, uchar *tail, rank_t *ll, rank_t *rr);
 int csa_child_r0(CSA *csa, i64 len, rank_t l, rank_t r, uchar *tail, rank_t *ll, rank_t *rr);
-
 pos_t csa_lookup_lf(CSA *csa, rank_t i);
 rank_t csa_inverse_lf(CSA *csa, pos_t suf);
 void csa_text_lf(uchar *p,CSA *csa, pos_t s, pos_t t);
@@ -141,5 +141,6 @@ void *mymalloc(size_t n);
 void myfree(void *p, size_t s);
 
 void bw_to_psi(FILE *out, CSA *csa, char *fbw, char *flst, int *k);
+
 
 #endif // _CSA_H_

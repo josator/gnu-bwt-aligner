@@ -22,7 +22,7 @@ void free_comp_matrix(comp_matrix *reverse, comp_matrix *strand) {
 // el análisis con menos de 4 bases. ¿¿¿Esto está hecho???
 void reverse_strand_C(vector *r_C, vector *s_C, vector *r_C1, vector *s_C1) {
 
-  r_C->n  = s_C->n; r_C1->n = s_C1->n;
+	r_C->n  = s_C->n; r_C1->n = s_C1->n;
 
 	r_C->vector  = (SA_TYPE *)malloc(r_C->n  * sizeof(SA_TYPE));
 	check_malloc(r_C->vector,  "reverseStrandC r_C");
