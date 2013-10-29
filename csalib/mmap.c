@@ -59,7 +59,7 @@ i64 len;
 MMAP *m;
 struct stat statbuf;
 void *base;
-  m = malloc(sizeof(*m));
+  m = (MMAP *) malloc(sizeof(*m));
   if (m==NULL) {perror("mymmap malloc");  exit(1);}
 
   stat(fname,&statbuf);

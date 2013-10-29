@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include "huffman.h"
 
-#define mymalloc(p,n) {p = malloc((n)*sizeof(*p)); if ((p)==NULL) {printf("not enough memory in line %d\n",__LINE__); exit(1);};}
-
 static u64 getuint(uchar *s, i64 i, i64 w)
 {
   u64 x;
@@ -45,13 +43,13 @@ i64 l;
 static Huffman *newHuffman(int n)
 {
   Huffman *p;
-  mymalloc(p,1);
+  p = (Huffman *) mymalloc(1 * sizeof(Huffman));
   p->n = n;
-  mymalloc(p->v,n);
-  mymalloc(p->left,2*n+3);
-  mymalloc(p->right,2*n+3);
-  mymalloc(p->clen,n*2);
-  mymalloc(p->code,n*2);
+  p->v = (int *) mymalloc(n * sizeof(int));
+  p->left = (int *) mymalloc((2*n+3) * sizeof(int));
+  p->right = (int *) mymalloc((2*n+3) * sizeof(int));
+  p->clen = (byte *) mymalloc((n*2) * sizeof(byte));
+  p->code = (u64 *) mymalloc((n*2) * sizeof(u64));
   return p;
 }
 
@@ -128,7 +126,7 @@ Huffman *MakeHuffmanTree(int n, double *freq)
   int m1,m2;
 
   h = newHuffman(n);
-  mymalloc(tmpf,2*n+3);
+  tmpf = (double *) mymalloc((2*n+3) * sizeof(double));
 
   for (i=0; i<n; i++) tmpf[i] = freq[i];
   for (i=0; i<n*2+3; i++) h->left[i] = h->right[i] = -1;

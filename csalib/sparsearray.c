@@ -34,9 +34,6 @@
 #define L (1<<logL)
 
 
-static int msize=0;
-#define mymalloc(p,n,f) {p = malloc((n)*sizeof(*p)); msize += (f)*(n)*sizeof(*p); /* if (f) printf("malloc %d bytes at line %d total %d\n",(n)*sizeof(*p),__LINE__,msize);  */ if ((p)==NULL) {printf("not enough memory (%d bytes) in line %d\n",msize,__LINE__); exit(1);};}
-  
 static int blog(i64 x)
 {
 i64 l;
@@ -187,11 +184,11 @@ int sparsearray_construct_init(sparsearray *sa, i64 n, i64 m)
 //  printf("n=%ld m=%ld d=%ld\n",n,m,d);
   sa->d = d;
 
-  mymalloc(buf2,(2*m+PBS-1)/PBS+1,1);  size += sizeof(*buf2) * ((2*m+PBS-1)/PBS+1);
+  buf2 = (bitvec_t*) mymalloc(((2*m+PBS-1)/PBS+1) * sizeof(bitvec_t));  size += sizeof(*buf2) * ((2*m+PBS-1)/PBS+1);
 #if LOWCHAR
-  mymalloc(low,m,1);  size += sizeof(*low) * m;
+  low = (byte *) mymalloc(m * sizeof(byte));  size += sizeof(*low) * m;
 #else
-  mymalloc(low,(d*m+PBS-1)/PBS+1,1);  size += sizeof(*low) * ((d*m+PBS-1)/PBS+1);
+  low = (bitvec_t *) mymalloc(((d*m+PBS-1)/PBS+1) * sizeof(bitvec_t));  size += sizeof(*low) * ((d*m+PBS-1)/PBS+1);
 #endif
 //  printf("sparsearray-size:0 %ld\n",size);
   sa->hi = buf2;
@@ -236,7 +233,7 @@ int sparsearray_construct_end(sparsearray *sa, int opt)
   m = sa->m;
 
   if (sa->opt & SDARRAY_SELECT1) {
-    mymalloc(sa->sd1,1,0);
+    sa->sd1 = (densearray *) mymalloc(1 * sizeof(densearray));
     densearray_construct(sa->sd1,m*2,buf2,SDARRAY_SELECT1);  
     sa->size += sa->sd1->size;
   } else {
@@ -245,7 +242,7 @@ int sparsearray_construct_end(sparsearray *sa, int opt)
 
   if (sa->opt & SDARRAY_RANK1) {
     for (i=0; i<m*2; i++) setbit(buf2,i,1-getbit(buf2,i));
-    mymalloc(sa->sd0,1,0);
+    sa->sd0 = (densearray *) mymalloc(1 * sizeof(densearray));
     densearray_construct(sa->sd0,m*2,buf2,SDARRAY_SELECT1 | SDARRAY_NOBUF);
     sa->size += sa->sd0->size;
 
@@ -294,7 +291,7 @@ i64 sparsearray_write(sparsearray *sa, FILE *f)
 void sparsearray_read(sparsearray *sa, uchar **map)
 {
   uchar *p;
-  i64 size,k;
+  i64 k;
 
   p = *map;
 
@@ -304,18 +301,22 @@ void sparsearray_read(sparsearray *sa, uchar **map)
   sa->d = getuint(p,0,k);  p += k;
   sa->opt = getuint(p,0,1);  p += 1;
 //  printf("sparsearray_read k=%ld n=%ld m=%ld d=%ld\n",k,sa->n, sa->m, sa->d);
-  
-  sa->low = (bitvec_t *)p;
+#if LOWCHAR 
+  sa->low = (byte *) p;
+#else
+  sa->low = (bitvec_t *) p;
+#endif
+
   p += sizeof(*sa->low) * ((sa->d*sa->m+PBS-1)/PBS+1);
 
   *map = p;
   
-  mymalloc(sa->sd1,1,0);
+  sa->sd1 = (densearray *) mymalloc(1 * sizeof(densearray));
   densearray_read(sa->sd1, map);
   sa->hi = sa->sd1->buf;
 
   if (sa->opt & SDARRAY_RANK1) {
-    mymalloc(sa->sd0,1,0);
+    sa->sd0 = (densearray *) mymalloc(1 * sizeof(densearray));
     densearray_read(sa->sd0, map);
     sa->sd0->buf = sa->sd1->buf;
   }

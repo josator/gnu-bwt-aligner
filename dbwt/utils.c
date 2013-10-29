@@ -11,79 +11,9 @@ int l;
   return l;
 }
 
-size_t cur_alloc=0, max_alloc=0;
-
-void *mymalloc(size_t n)
-{
-  void *p;
-
-  p = malloc(n);
-  if (p == NULL) {
-    printf("malloc failed.\n");
-    exit(1);
-  }
-  cur_alloc += n;
-  if (cur_alloc > max_alloc) {
-    max_alloc = cur_alloc;
-    //printf("allocated %ld\n",max_alloc);
-  }
-
-  if (n == 0) {
-    printf("warning: 0 bytes allocated p=%p\n",p);
-  }
-
-  return p;
-}
-
-void *myrealloc(void *ptr, size_t next, size_t last)
-{
-  void *p;
-
-  p = realloc(ptr, next);
-  if (next > 0 && p == NULL) {
-    printf("realloc failed. ptr=%p new=%zd old=%zd\n",ptr,next,last);
-    exit(1);
-  }
-  cur_alloc += next - last;
-  if (cur_alloc > max_alloc) {
-    max_alloc = cur_alloc;
-    //printf("allocated %ld\n",max_alloc);
-  }
-
-  return p;
-}
-
-void report_mem(const char *s)
-{
-  puts(s);
-  printf("allocated total %zu   max %zu\n",cur_alloc,max_alloc);
-}
-
-
-void myfree(void *p, size_t s)
-{
-  free(p);
-  cur_alloc -= s;
-}
-
-int setbit(pb *B, ulong i,int x)
-{
-  ulong j,l;
-
-  j = i / D;
-  l = i % D;
-  if (x==0) B[j] &= (~(1<<(D-1-l)));
-  else if (x==1) B[j] |= (1<<(D-1-l));
-  else {
-    printf("error setbit x=%d\n",x);
-    exit(1);
-  }
-  return x;
-}
-
 int setbits0(pb *B, ulong i, int d, ulong x)
 {
-  ulong j;
+  int j;
 
   for (j=0; j<d; j++) {
     setbit(B,i+j,(x>>(d-j-1))&1);
@@ -97,32 +27,32 @@ int getbit(pb *B, ulong i)
 
   //j = i / D;
   //l = i % D;
-  j = i >> logD;
-  l = i & (D-1);
-  return (B[j] >> (D-1-l)) & 1;
+  j = i >> _logD_;
+  l = i & (_D_-1);
+  return (B[j] >> (_D_-1-l)) & 1;
 }
 
 #if 1
 dword getbits(pb *B, ulong i, int d)
 {
-  qword x,z;
+  dword x,z;
 
-  B += (i >> logD);
-  i &= (D-1);
-  if (i+d <= 2*D) {
-    x = (((qword)B[0]) << D) + B[1];
+  B += (i >> _logD_);
+  i &= (_D_-1);
+  if (i+d <= 2*_D_) {
+    x = (((dword)B[0]) << _D_) + B[1];
     x <<= i;
-    x >>= (D*2-1-d);
+    x >>= (_D_*2-1-d);
     x >>= 1;
   } else {
-    x = (((qword)B[0])<<D)+B[1];
-    z = (x<<D)+B[2];
+    x = (((dword)B[0])<<_D_)+B[1];
+    z = (x<<_D_)+B[2];
     x <<= i;
-    x &= ((1L<<D)-1)<<D;
+    x &= ((1L<<_D_)-1)<<_D_;
     z <<= i;
-    z >>= D;
+    z >>= _D_;
     x += z;
-    x >>= (2*D-d);
+    x >>= (2*_D_-d);
   }
 
 	return x;
@@ -143,20 +73,20 @@ dword getbits(pb *B, ulong i, int d)
 
 int setbits(pb *B, ulong i, int d, ulong x)
 {
-  ulong j;
+  //ulong j;
   ulong y,m;
   int d2;
-  ulong ii,xx;
-  int dd;
-  pb *BB;
+  //ulong ii,xx;
+  //int dd;
+  //pb *BB;
 
   //  BB = B;  ii = i;  dd = d;  xx = x;
 
-  B += (i>>logD);
-  i %= D;
+  B += (i>>_logD_);
+  i %= _D_;
 
-  while (i+d > D) {
-    d2 = D-i; // x の上位 d2 ビットを格納
+  while (i+d > _D_) {
+    d2 = _D_-i; // x の上位 d2 ビットを格納
     y = x >> (d-d2);
     m = (1<<d2)-1;
     *B = (*B & (~m)) | y;
@@ -166,8 +96,8 @@ int setbits(pb *B, ulong i, int d, ulong x)
   }
 
   m = (1<<d)-1;
-  y = x << (D-i-d);
-  m <<= (D-i-d);
+  y = x << (_D_-i-d);
+  m <<= (_D_-i-d);
   *B = (*B & (~m)) | y;
 
 #if 0
@@ -221,8 +151,8 @@ ulong pa_get(packed_array *p, ulong i)
   pb *b;
 
   w = p->w;
-  b = p->b + (i>>logD)*w;
-  i = (i % D)*w;
+  b = p->b + (i>>_logD_)*w;
+  i = (i % _D_)*w;
 
   return (ulong) getbits(b,i,p->w);
 }
@@ -240,12 +170,26 @@ void pa_set(packed_array *p, ulong i, long x)
   }
 #endif
   w = p->w;
-  b = p->b + (i>>logD)*w;
-  i = (i % D)*w;
+  b = p->b + (i>>_logD_)*w;
+  i = (i % _D_)*w;
 
   setbits(b,i,p->w,x);
 }
 
+int setbit(pb *B, ulong i,int x)
+{
+  ulong j,l;
+
+  j = i / _D_;
+  l = i % _D_;
+  if (x==0) B[j] &= (~(1<<(_D_-1-l)));
+  else if (x==1) B[j] |= (1<<(_D_-1-l));
+  else {
+    printf("error setbit x=%d\n",x);
+    exit(1);
+  }
+  return x;
+}
 /*
    Copyright 2010, Kunihiko Sadakane, all rights reserved.
 

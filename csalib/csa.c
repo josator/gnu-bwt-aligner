@@ -11,6 +11,7 @@
 #include <ctype.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <stdbool.h>
 #include "typedef.h"
 #include "mman.h"
 #include "csa.h"
@@ -22,29 +23,6 @@
 
 
 #define display_progressbar(str,i,n) if (i % 10000000 == 0) {fprintf(stderr,"%s %ld/%ld                       \r",str,i/10000000,n/10000000);  fflush(stderr); }
-
-void *mymalloc(size_t n)
-{
-	void *p;
-
-	//  printf("allocating %ld bytes (%ld bytes available)\n",n,available_memory());
-
-	p = malloc(n);
-	if (p == NULL) {
-		printf("malloc failed.\n");
-		exit(1);
-	}
-	if (n == 0) {
-		printf("warning: 0 bytes allocated p=%p\n",p);
-	}
-
-	return p;
-}
-
-void myfree(void *p, size_t s)
-{
-	free(p);
-}
 
 static void csa_error(void)
 {
@@ -384,8 +362,9 @@ void psi_options(CSA *csa, char *p)
 	}
 }
 
-void csa_new_from_bwt(CSA csa, char *fname, char *fidx, int psi_id, int idx_id, int k)
+void csa_new_from_bwt(CSA csa, char *fname, char *fidx, int psi_id, int idx_id, bool coded)
 {
+	int k;
 	i64 i,j,v,m;
 	FILE *f2;
 	i64 psize,isize;
@@ -419,7 +398,7 @@ void csa_new_from_bwt(CSA csa, char *fname, char *fidx, int psi_id, int idx_id, 
 						psize,(double)psize*8/csa.n);
 				break;
 			case ID_BWT_DNA:
-				psize = lf_dna_makeindex(&csa, fname);
+				psize = lf_dna_makeindex(&csa, fname, coded);
 				printf("n     %ld\n",csa.n);
 				printf("BW    %ld bytes (%1.3f bpc)\n",
 						psize,(double)psize*8/csa.n);
@@ -491,8 +470,8 @@ void csa_new_from_bwt(CSA csa, char *fname, char *fidx, int psi_id, int idx_id, 
 		n = csa.n;
 		k = csa.k;
 		////  compute SA and ISA
-		if (csa.D > 0) csa.SA = mymalloc(((n-1)/csa.D+1+1)*k);
-		if (csa.D2 > 0) csa.ISA = mymalloc(((n-1)/csa.D2+1+1)*k);
+		if (csa.D > 0) csa.SA = (uchar *) mymalloc(((n-1)/csa.D+1+1)*k);
+		if (csa.D2 > 0) csa.ISA = (uchar *) mymalloc(((n-1)/csa.D2+1+1)*k);
 		if (csa.D == 0 && csa.D2 == 0) goto brk;
 
 		switch (psi_id & 0x3f) {
@@ -579,31 +558,40 @@ brk:
 	free(fidx);
 }
 
-void csa_new_from_bwt_dna_wrapper(const char *directory, const char *name) {
+void csa_new_from_bwt_gnu_bwt_wrapper(const char *directory, const char *name) {
 	i64 i;
-	int k;
 	int psi_id, idx_id;
-	char *fname,*fidx;
+	char *fname, *fidx;
 	CSA csa;
 
 	for (i=0; i<SIGMA+2; i++) csa.C[i] = 0;
 
 	idx_id = -1;
 	psi_id =  0;
-	psi_options(&csa, "3:512");
 
-	k = strlen(name) + strlen(directory);
-	fname = mymalloc(k+10);
-	fidx = mymalloc(k+10);
+	char psi_opt[10];
+	strcpy(psi_opt, "3:512");
+
+	psi_options(&csa, psi_opt);
+
+	fname = (char *) malloc(500 * sizeof(char));
+	fidx = (char *) malloc(500 * sizeof(char));
+	fname[0]='\0';
+	fidx[0]='\0';
+
 	if (name==NULL) {
-		sprintf(fname,"%s/output",directory);
+		strcat(fname, directory);
+		strcat(fname, "/output");
   } else {
-		sprintf(fname,"%s/%s",directory, name);
+		strcat(fname, directory);
+		strcat(fname, "/");
+		strcat(fname, name);
 	}
-	sprintf(fidx,"%s.idx", fname);
 
-	csa_new_from_bwt(csa, fname, fidx, psi_id, idx_id, k);
+	strcat(fidx, fname);
+	strcat(fidx, ".idx");
 
+	csa_new_from_bwt(csa, fname, fidx, psi_id, idx_id, true);
 }
 
 void csa_new_from_bwt_wrapper(int argc, char *argv[]) {
@@ -643,7 +631,7 @@ void csa_new_from_bwt_wrapper(int argc, char *argv[]) {
 		} else {
 			fname = argv[i];
 			k = strlen(fname);
-			fidx = mymalloc(k+5);
+			fidx = (char *) mymalloc(k+5);
 			sprintf(fidx,"%s.idx",fname);
 		}
 	}
@@ -653,7 +641,7 @@ void csa_new_from_bwt_wrapper(int argc, char *argv[]) {
 		exit(0);
 	}
 
-	csa_new_from_bwt(csa, fname, fidx, psi_id, idx_id, k);
+	csa_new_from_bwt(csa, fname, fidx, psi_id, idx_id, false);
 
 }
 
@@ -668,7 +656,7 @@ i64 read_idx(CSA *csa, char *fidx)
 
 	mapidx = mymmap(fidx);
 	csa->mapidx = (void *)mapidx;
-	p = q = mapidx->addr;
+	p = q = (uchar *) mapidx->addr;
 	if (p == NULL) {
 		perror("mmap2\n");
 		exit(1);
@@ -750,14 +738,14 @@ int csa_read(CSA *csa,int argc, char *argv[])
 		if (strcmp(fname+k-4,".bwd") == 0) {
 			////       read bw
 			lf_dna_read(csa, fname);
-			lf_d = csa->psi_struc;
+			lf_d = (lf_dna *) csa->psi_struc;
 			psize = lf_d->psize;
 			//      printf("psize %ld\n",psize);
 		}
 		if (strcmp(fname+k-4,".bwb") == 0) {
 			////       read bw
 			lf_bit_read(csa, fname);
-			lf_d = csa->psi_struc;
+			lf_d = (lf_dna *) csa->psi_struc;
 			psize = lf_d->psize;
 			//      printf("psize %ld\n",psize);
 		}
@@ -769,7 +757,7 @@ int csa_read(CSA *csa,int argc, char *argv[])
 				|| strcmp(fname+k-4,".wsa") == 0) {
 			////       read bw
 			lf_wt_read(csa, fname);
-			lf_w = csa->psi_struc;
+			lf_w = (lf_wt *) csa->psi_struc;
 			psize = lf_w->psize;
 			//      printf("psize %ld\n",psize);
 		}
@@ -790,7 +778,7 @@ int csa_read(CSA *csa,int argc, char *argv[])
 				|| strcmp(fname+k-4,".pss") == 0) {
 			////       read psi  
 			psi1_read(csa, fname);
-			ps = csa->psi_struc;
+			ps = (psi1 *) csa->psi_struc;
 			psize = ps->psize;
 			//      printf("psize %ld\n",psize);
 			////
@@ -798,7 +786,7 @@ int csa_read(CSA *csa,int argc, char *argv[])
 		if (strcmp(fname+k-4,".pxd") == 0) {
 			////       read psi  
 			psi1_read(csa, fname);
-			ps = csa->psi_struc;
+			ps = (psi1 *) csa->psi_struc;
 			psize = ps->psize;
 			//      printf("psize %ld\n",psize);
 			////
@@ -806,7 +794,7 @@ int csa_read(CSA *csa,int argc, char *argv[])
 		if (strcmp(fname+k-4,".psa") == 0) {
 			////       read psi  
 			psi2_read(csa, fname);
-			ps2 = csa->psi_struc;
+			ps2 = (psi2 *) csa->psi_struc;
 			psize = ps2->psize;
 			//      printf("psize %ld\n",psize);
 			////
@@ -1435,7 +1423,7 @@ i64 csa_search_r(i64 keylen, int c, CSA *csa,rank_t *li,rank_t *ri)
 	uchar *substr;
 	i64 ret;
 
-	substr = mymalloc(keylen+1);
+	substr = (uchar *) mymalloc(keylen+1);
 
 	csa->substring(substr, csa, *li, keylen);
 	substr[keylen] = c;
@@ -1490,7 +1478,7 @@ int csa_child_r0(CSA *csa, i64 len, rank_t l, rank_t r, uchar *tail, rank_t *ll,
 	uchar *substr;
 	i64 ret;
 
-	substr = mymalloc(len+1);
+	substr = (uchar *) mymalloc(len+1);
 	csa->substring(substr, csa, l, len);
 
 	num = 0;
@@ -1588,13 +1576,13 @@ int csa_child_r(CSA *csa, i64 len, rank_t l, rank_t r, uchar *tail, rank_t *ll, 
 	uchar *tailtmp;
 	int *hc;
 
-	substr = mymalloc(len+1);
+	substr = (uchar *) mymalloc(len+1);
 	csa->substring(substr, csa, l, len);
 
-	tailtmp = mymalloc(SIGMA * sizeof(*tailtmp));
-	ltmp = mymalloc(SIGMA * sizeof(*ltmp));
-	rtmp = mymalloc(SIGMA * sizeof(*ltmp));
-	hc = mymalloc(SIGMA * sizeof(*hc));
+	tailtmp = (uchar *) mymalloc(SIGMA * sizeof(*tailtmp));
+	ltmp = (rank_t *) mymalloc(SIGMA * sizeof(*ltmp));
+	rtmp = (rank_t *) mymalloc(SIGMA * sizeof(*ltmp));
+	hc = (int *) mymalloc(SIGMA * sizeof(*hc));
 
 	num = csa_child_r_sub(csa, len, l, r, 0, substr, tailtmp, ltmp, rtmp);
 

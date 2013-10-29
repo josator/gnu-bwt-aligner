@@ -13,9 +13,6 @@
 #define CHECK
 //#define RANDOM
 
-static int msize=0;
-#define mymalloc(p,n,f) {p = malloc((n)*sizeof(*p)); msize = (f)*(n)*sizeof(*p); /* if (f) printf("malloc %d bytes at line %d total %d\n",(n)*sizeof(*p),__LINE__,msize);  */ if ((p)==NULL) {printf("not enough memory (%ld bytes) in line %d\n",msize,__LINE__); exit(1);};}
-
 #define BLOCK (1<<12)  
 
 static int blog(i64 x) // [0,n] の数を格納するには blog(n)+1 ビット必要
@@ -155,7 +152,7 @@ int sparsearray_sb_construct_init(sparsearray_sb *sa, i64 n, i64 m)
 
   if (m >= n/4) {
     d = 0;
-    mymalloc(sa->hi,(n+PBS-1)/PBS+1,1);
+    sa->hi = (bitvec_t *) mymalloc(((n+PBS-1)/PBS+1) * sizeof(bitvec_t));
 //    printf("hi = %p size = %ld\n",sa->hi,sizeof(*sa->hi)*((n+PBS-1)/PBS+1));
     sa->low = NULL;
 //    for (i=0; i<n; i++) setbit(sa->hi,i,0);
@@ -167,8 +164,8 @@ int sparsearray_sb_construct_init(sparsearray_sb *sa, i64 n, i64 m)
       mm <<= 1;
       d++;
     }
-    mymalloc(sa->hi,(2*m+PBS-1)/PBS+1,1);
-    mymalloc(sa->low,(d*m+PBS-1)/PBS+1,1);
+    sa->hi = (bitvec_t*) mymalloc(((2*m+PBS-1)/PBS+1) * sizeof(bitvec_t));
+    sa->low = (bitvec_t*) mymalloc(((d*m+PBS-1)/PBS+1) * sizeof(bitvec_t));
 //    for (i=0; i<m*2; i++) setbit(sa->hi,i,0);
 //    for (i=0; i<m; i++) setbits(sa->low,i*d,d,0);
     for (i=0; i<(2*m+PBS-1)/PBS+1; i++) sa->hi[i] = 0;
@@ -176,8 +173,6 @@ int sparsearray_sb_construct_init(sparsearray_sb *sa, i64 n, i64 m)
   }
 //  printf("sparsearray_sb_construct_init: n=%ld m=%ld d=%ld\n",n,m,d);
   sa->d = d;
-
-
 
   return 0;
 }
@@ -233,13 +228,13 @@ i64 sparsearray_sb_construct_end(sparsearray_sb *sa, int opt)
   buf2 = sa->hi;
 
   sa->sd1 = NULL;
-  mymalloc(sa->sd1,1,0);  size += sizeof(*(sa->sd1));
+  sa->sd1 = (densearray_sb *) mymalloc(1 * sizeof(densearray_sb));  size += sizeof(*(sa->sd1));
   size += densearray_sb_construct(sa->sd1,n2,buf2,opt_da1);
 
   sa->sd0 = NULL;
   if ((opt & SDARRAY_RANK1) && (d>0)) {
     for (i=0; i<n2; i++) setbit(buf2,i,1-getbit(buf2,i));
-    mymalloc(sa->sd0,1,0);  size += sizeof(*(sa->sd0));
+    sa->sd0 = (densearray_sb *) mymalloc(1 * sizeof(densearray_sb));  size += sizeof(*(sa->sd0));
     size += densearray_sb_construct(sa->sd0,n2,buf2,opt_da0);
 
     for (i=0; i<n2; i++) setbit(buf2,i,1-getbit(buf2,i));
@@ -313,12 +308,12 @@ i64 sparsearray_sb_read(sparsearray_sb *sa, int opt, uchar **map)
 
   *map = p;
 
-  mymalloc(sa->sd1,1,0);
+  sa->sd1 = (densearray_sb *) mymalloc(1 * sizeof(densearray_sb));
   densearray_sb_read(sa->sd1,n2,opt_da1, map);
   sa->hi = sa->sd1->b;
 
   if ((opt & SDARRAY_RANK1) && (d>0)) {
-    mymalloc(sa->sd0,1,0);
+    sa->sd0 = (densearray_sb *) mymalloc(1 * sizeof(densearray_sb));
     densearray_sb_read(sa->sd0,n2,opt_da0, map);
     sa->sd0->b = sa->sd1->b;
   }
@@ -521,8 +516,8 @@ int sparsearray4_construct_init(sparsearray4 *sa, i64 n, i64 m)
 //  printf("sparsearray4_construct_init: n=%ld m=%ld d=%ld\n",n,m,d);
   sa->d = d;
 
-  mymalloc(sa->hi,(2*m+PBS-1)/PBS+1,1);
-  mymalloc(sa->low,(d*m+PBS-1)/PBS+1,1);
+  sa->hi = (bitvec_t*) mymalloc(((2*m+PBS-1)/PBS+1) * sizeof(bitvec_t));
+  sa->low = (bitvec_t*) mymalloc(((d*m+PBS-1)/PBS+1) * sizeof(bitvec_t));
 
 //  for (i=0; i<m*2; i++) setbit(sa->hi,i,0);
 //  for (i=0; i<m; i++) setbits(sa->low,i*d,d,0);
@@ -575,9 +570,8 @@ i64 sparsearray4_construct_end(sparsearray4 *sa, ushort L, int opt)
 
 
   b = (m+BLOCK-1)/BLOCK;
-  mymalloc(sa->sa, b, 0);  size += sizeof(*sa->sa) * b;
-  mymalloc(sa->s,b*k,1);  size += sizeof(*sa->s) * b*k;
-
+  sa->sa = (sparsearray_sb *) mymalloc(b * sizeof(sparsearray_sb));  size += sizeof(*sa->sa) * b;
+  sa->s  = (uchar *) mymalloc((b*k) * sizeof(uchar));  size += sizeof(*sa->s) * b*k;
 
   r = 0;  s = -1;  xs = 0;
   for (bi = 0; bi < b; bi++) {
@@ -683,7 +677,7 @@ i64 sparsearray4_read(sparsearray4 *sa, uchar **map)
 //  printf("sparsearray4_read: n=%ld m=%ld d=%ld opt=%d\n",n,m,d,sa->opt);
 
   b = (m+BLOCK-1)/BLOCK;
-  mymalloc(sa->sa, b, 0);
+  sa->sa = (sparsearray_sb *) mymalloc(b * sizeof(sparsearray_sb));
 
   sa->s = p;
   p += sizeof(sa->s[0]) * b * k;
@@ -700,7 +694,7 @@ i64 sparsearray4_read(sparsearray4 *sa, uchar **map)
 
 i64 sparsearray4_select(sparsearray4 *sa, i64 i)
 {
-  i64 d,x,a,r;
+  i64 x,a,r;
 
 #if 0
   if ((sa->opt & DENSEARRAY_SELECT1) == 0) {

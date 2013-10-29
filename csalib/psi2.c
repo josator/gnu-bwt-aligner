@@ -11,6 +11,18 @@
 
 #define display_progressbar(str,i,n) if (i % 10000000 == 0) {fprintf(stderr,"%s %ld/%ld                       \r",str,i/10000000,n/10000000);  fflush(stderr); }
 
+static u64 getuint(uchar *s, i64 i, i64 w)
+{
+  u64 x;
+  i64 j;
+  s += i*w;
+  x = 0;
+  for (j=0; j<w; j++) {
+    x += ((u64)(*s++)) << (j*8);
+  }
+  return x;
+}
+
 static int blog(i64 x) // [0,n] の数を格納するには blog(n)+1 ビット必要
 {
 int l;
@@ -35,7 +47,7 @@ void psi2_options(CSA *csa, char *p)
 {
   psi2 *ps;
 
-  csa->psi_struc = ps = mymalloc(sizeof(psi2));
+  csa->psi_struc = ps = (psi2 *) mymalloc(sizeof(psi2));
   ps->id = csa->id;
   if (p[0] == 0) goto end;
   p++;
@@ -87,9 +99,9 @@ sparsearray4 sa;
   id = csa->id;
 
   k = strlen(fname);
-  fbw = mymalloc(k+5);
-  flst = mymalloc(k+5);
-  fpsi = mymalloc(k+5);
+  fbw = (char *) mymalloc(k+5);
+  flst = (char *) mymalloc(k+5);
+  fpsi = (char *) mymalloc(k+5);
   sprintf(fbw,"%s.bw",fname);
   sprintf(flst,"%s.lst",fname);
 
@@ -160,14 +172,13 @@ sparsearray4 sa;
 
 i64 psi2_read(CSA *csa, char *fname)
 {
-  FILE *f1;
   i64 psize;
   i64 n;
   int k,id;
   psi2 *ps;
   uchar *p, *q;
-  
-  csa->psi_struc = ps = mymalloc(sizeof(psi2));
+ 
+  csa->psi_struc = ps = (psi2 *) mymalloc(sizeof(psi2));
 
   printf("psi_read: map %s\n",fname);
   ps->mappsi = mymmap(fname);
@@ -198,7 +209,7 @@ i64 psi2_read(CSA *csa, char *fname)
   }
 
 
-  ps->sa = mymalloc(sizeof(*ps->sa));
+  ps->sa = (sparsearray4 *) mymalloc(sizeof(*ps->sa));
   sparsearray4_read(ps->sa, &p);
   psize = p - q;
 

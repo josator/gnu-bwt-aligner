@@ -11,6 +11,10 @@
 #ifndef _CSA_H_
 #define _CSA_H_
 
+#include <stdio.h>
+#include "typedef.h"
+#include "../commons/commons.h"
+
 #define VERSION 2009071800
 
 #define ID_HEADER 0x00
@@ -35,8 +39,6 @@
 #define ID_BWT_WT_RR 0x0c
 #define ID_BWT_HUF 0x0d
 #define ID_BWT_BIT 0x0e
-
-#include "typedef.h"
 
 #ifndef min
 #define min(x,y) ((x)<(y)?(x):(y))
@@ -105,7 +107,7 @@ i64 csa_substring(unsigned char *p,CSA *csa,rank_t r,i64 len);
 i64 csa_substring_lf(uchar *p,CSA *csa,rank_t r,i64 len);
 i64 csa_substring_lf_naive(uchar *p,CSA *csa,rank_t r,i64 len);
 
-void csa_new_from_bwt_dna_wrapper(const char *directory, const char *name);
+void csa_new_from_bwt_gnu_bwt_wrapper(const char *directory, const char *name);
 void csa_new_from_bwt_wrapper(int argc, char *argv[]);
 int csa_read(CSA *SA, int argc, char *argv[]);
 
@@ -134,9 +136,6 @@ int csa_BW_rank(CSA *csa,i64 i, rank_t *r);
 int csa_T(CSA *csa,rank_t i);
 int csa_head_rank(CSA *csa,rank_t i);
 //void csa_error(void);
-
-void *mymalloc(size_t n);
-void myfree(void *p, size_t s);
 
 void bw_to_psi(FILE *out, CSA *csa, char *fbw, char *flst, int *k);
 

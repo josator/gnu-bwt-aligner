@@ -3,6 +3,7 @@
 bin/*
 dbwt/bin
 csalib/bin
+csalib/csa.a
 *~
 \#*\#
 .*.swp

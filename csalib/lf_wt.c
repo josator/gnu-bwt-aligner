@@ -46,7 +46,7 @@ void lf_wt_options(CSA *csa, char *p)
   lf_wt *lf;
   int L,opt;
 
-  csa->psi_struc = lf = mymalloc(sizeof(lf_wt));
+  csa->psi_struc = lf = (lf_wt *) mymalloc(sizeof(lf_wt));
   lf->L = 512;
   lf->opt = opt = 0;
 
@@ -55,7 +55,7 @@ void lf_wt_options(CSA *csa, char *p)
   if (p[0] != ':') {
     if (sscanf(p,"%d",&L)==1) lf->L = L;
     if (L < sizeof(u64)*8) {
-      printf("L must be >= %d\n",sizeof(u64)*8);
+      printf("L must be >= %lu\n",sizeof(u64)*8);
       exit(1);
     }
 //    printf("L = %d\n",lf->l);
@@ -101,7 +101,7 @@ static void make_huffman_tree(CSA *csa, lf_wt *lf)
   }
   csa->m = m;
 
-  freq = mymalloc(m*sizeof(freq[0]));
+  freq = (double *) mymalloc(m*sizeof(freq[0]));
   for (i=0; i<m; i++) {
     freq[i] = (double)(csa->C[csa->AtoC[i]]+1) / csa->n;
 //    printf("freq[%d] = %lf\n",i,freq[i]);
@@ -144,15 +144,15 @@ static void make_wavelet_sub(lf_wt *lf, i64 n, int depth, int node)
   case ID_BWT_WT:
   case ID_BWT_WT_HUF:
   case ID_BWT_WT_RR:
-    lf->da[node-m] = mymalloc(sizeof(comparray));
-    comparray_construct_init(lf->da[node-m], n);
+    lf->da[node-m] = (comparray *) mymalloc(sizeof(comparray));
+    comparray_construct_init( (comparray *) lf->da[node-m], n);
     break;
   case ID_BWT_WT_DENSE:
-    lf->da[node-m] = mymalloc(sizeof(densearray));
-    densearray_construct_init(lf->da[node-m], n);
+    lf->da[node-m] = (densearray *) mymalloc(sizeof(densearray));
+    densearray_construct_init((densearray *) lf->da[node-m], n);
     break;
   case ID_BWT_WT_SPARSE4:
-    lf->da[node-m] = mymalloc(sizeof(sparsearray4));
+    lf->da[node-m] = (sparsearray4 *) mymalloc(sizeof(sparsearray4));
     in = open_tmp(node);
     for (i=0; i<n; i++) {
       c = fgetc(in);
@@ -161,7 +161,7 @@ static void make_wavelet_sub(lf_wt *lf, i64 n, int depth, int node)
       if (d == 1) nr++;
     }
     fclose(in);
-    sparsearray4_construct_init(lf->da[node-m], n, nr);
+    sparsearray4_construct_init((sparsearray4 *) lf->da[node-m], n, nr);
     break;
   }
 
@@ -180,7 +180,7 @@ static void make_wavelet_sub(lf_wt *lf, i64 n, int depth, int node)
     if (lf->id != ID_BWT_WT_SPARSE4) {
       lf->set(lf->da[node-m], i, d);
     } else {
-      if (d==1) sparsearray4_construct_set(lf->da[node-m], nr, i);
+      if (d==1) sparsearray4_construct_set((sparsearray4 *) lf->da[node-m], nr, i);
     }
     if (d == 0) {
       fputc(c, fl);
@@ -538,7 +538,6 @@ int lf_wt_child_l(CSA *csa, i64 l, i64 r, uchar *head, rank_t *ll, rank_t *rr)
   lf_wt *lf;
   int node;
   int i,c,m, num;
-  i64 rank;
   rank_t *ltmp, *rtmp;
   uchar *headtmp;
   int *hc;
@@ -550,10 +549,10 @@ int lf_wt_child_l(CSA *csa, i64 l, i64 r, uchar *head, rank_t *ll, rank_t *rr)
   if (r >= lf->last) r--;
   node = 2 * m - 2;
 
-  headtmp = mymalloc(m * sizeof(*headtmp));
-  ltmp = mymalloc(m * sizeof(*ltmp));
-  rtmp = mymalloc(m * sizeof(*ltmp));
-  hc = mymalloc(SIGMA * sizeof(*hc));
+  headtmp = (uchar*) mymalloc(m * sizeof(*headtmp));
+  ltmp = (rank_t *) mymalloc(m * sizeof(*ltmp));
+  rtmp = (rank_t *) mymalloc(m * sizeof(*ltmp));
+  hc = (int *) mymalloc(SIGMA * sizeof(*hc));
 
   num = 0;
   lf_wt_child_l_sub(csa, l, r, node, &num, headtmp, ltmp, rtmp);
@@ -595,10 +594,10 @@ i64 lf_wt_makeindex(CSA *csa, char *fname)
   lf = (lf_wt *)csa->psi_struc;
 
   k = strlen(fname);
-  fbw = mymalloc(k+5);
-  flst = mymalloc(k+5);
-  fbw2 = mymalloc(k+5);
-  fidx = mymalloc(k+5);
+  fbw = (char *) mymalloc(k+5);
+  flst = (char *) mymalloc(k+5);
+  fbw2 = (char *) mymalloc(k+5);
+  fidx = (char *) mymalloc(k+5);
   sprintf(fbw,"%s.bw",fname);
   sprintf(flst,"%s.lst",fname);
   switch (csa->id) {

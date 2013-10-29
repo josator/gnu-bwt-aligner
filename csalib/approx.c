@@ -19,12 +19,12 @@ int nnodes;
 approx_list *approx_list_init(void)
 {
   approx_list *list;
-  list = malloc(sizeof(approx_list));
+  list = (approx_list *) malloc(sizeof(approx_list));
   if (list == NULL) {
     printf("approx_list_init: malloc failed.\n");
     exit(1);
   }
-  list->p = malloc(sizeof(approx_set)*BLOCKSIZE);
+  list->p = (approx_set *) malloc(sizeof(approx_set)*BLOCKSIZE);
   if (list->p == NULL) {
     printf("approx_list_init: malloc failed.\n");
     exit(1);
@@ -39,7 +39,7 @@ void approx_list_append(approx_list *list, int error, int len, i64 l, i64 r)
   if (list->num == list->len) {
     list->len += BLOCKSIZE;
 //    printf("list->p = %p ",list->p);
-    list->p = realloc(list->p, sizeof(approx_set)*list->len);
+    list->p = (approx_set *) realloc(list->p, sizeof(approx_set)*list->len);
 //    printf("realloc list->p = %p\n",list->p);
   }
   list->p[list->num].error = error;
@@ -55,7 +55,7 @@ void approx_list_print(CSA *csa, approx_list *list)
   uchar *text;
   for (i=0; i<list->num; i++) {
     printf("[%ld,%ld] error=%d ",list->p[i].l,list->p[i].r,list->p[i].error);
-    text = mymalloc(list->p[i].len+1);
+    text = (uchar *) mymalloc(list->p[i].len+1);
     csa->substring(text, csa, list->p[i].l, list->p[i].len);
     text[list->p[i].len] = 0;
     printf("%s\n",text);
@@ -69,7 +69,7 @@ void approx_list_print2(CSA *csa, approx_list *list)
   uchar *text;
   for (i=0; i<list->num; i++) {
     printf("[%ld,%ld] error=%d ",list->p[i].l,list->p[i].r,list->p[i].error);
-    text = mymalloc(list->p[i].len+1);
+    text = (uchar *) mymalloc(list->p[i].len+1);
     csa->text(text, csa, list->p[i].l, list->p[i].l+list->p[i].len-1);
     text[list->p[i].len] = 0;
     printf("%s\n",text);
@@ -145,9 +145,9 @@ approx_list *csa_approxsearch(unsigned char *key,int keylen,int k,CSA *csa)
   int buflen;
   approx_list *list;
 
-  score = malloc(sizeof(int)*(1+keylen)*(1+keylen+k+1));
+  score = (int *) malloc(sizeof(int)*(1+keylen)*(1+keylen+k+1));
   buflen = keylen+k+1;
-  buf = malloc(buflen);
+  buf = (uchar *) malloc(buflen);
 //  printf("buf %d\n",buflen);
   for (i=0; i<=keylen; i++) score[INDEX(0,i)] = i * GAP_PENALTY;
   for (i=0; i<=keylen+k; i++) score[INDEX(i,0)] = i * GAP_PENALTY;
@@ -186,9 +186,9 @@ approx_list *csa_approxsearch2(unsigned char *key,int keylen,int k,CSA *csa)
   l1 = keylen/2;
   l2 = keylen-l1;
 
-  score = malloc(sizeof(int)*(1+keylen)*(1+keylen+k+1));
+  score = (int *) malloc(sizeof(int)*(1+keylen)*(1+keylen+k+1));
   buflen = keylen+k+1;
-  buf = malloc(buflen);
+  buf = (uchar *) malloc(buflen);
 //  printf("buf %d\n",buflen);
   for (i=0; i<=keylen; i++) score[INDEX(0,i)] = i;
   for (i=0; i<=keylen+k; i++) score[INDEX(i,0)] = i;

@@ -112,7 +112,7 @@ void read_vector(vector *vector, const char *directory, const char *name) {
   size_t err=0;
   FILE *fp;
 
-  char path[500];
+	char path[500]; //TODO: Change to dynamic allocation to avoid buffer overflow
   path[0]='\0';
   strcat(path, directory);
   strcat(path, "/");

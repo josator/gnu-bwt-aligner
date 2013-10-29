@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #if 1
  #include <sys/timeb.h>
 #else
@@ -15,6 +16,7 @@
 #endif
 #include "csa.h"
 #include "cst.h"
+#include "lf_wt.h"
 
 #ifndef min
 #define min(x,y) ((x)<(y)?(x):(y))
@@ -183,7 +185,7 @@ int main(int argc, char *argv[])
     i64 s,t,j,k;
     while (1) {
       printf("key ");
-      fgets(key,100,stdin);
+      fgets((char *) key,100,stdin);
       keylen = strlen2(key)-1;
       s = SA.search(key,keylen,&SA,&l,&r);
       if (s == keylen) {

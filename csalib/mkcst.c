@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
 
 #define display_progressbar(str,i,n) if (i % 10000000 == 0) {fprintf(stderr,"%s %ld/%ld                       \r",str,i/10000000,n/10000000);  fflush(stderr); }
 
@@ -163,16 +165,16 @@ int fast_hgt2(suf_t *ISA, suf_t *SA, uchar *T, suf_t *H, i64 n)
 }
 
 
-int outputtree(uchar *fname, suf_t *H, i64 n)
+int outputtree(char *fname, suf_t *H, i64 n)
 {
   i64 i,j,h,h2;
   suf_t *s;
   suf_t *L,*R;
   FILE *f;
 
-  s = malloc((n+2) * sizeof(*s));
-  L = malloc((n+2) * sizeof(*L));
-  R = malloc((n+2) * sizeof(*R));
+  s = (suf_t*) malloc((n+2) * sizeof(*s));
+  L = (suf_t*) malloc((n+2) * sizeof(*L));
+  R = (suf_t*) malloc((n+2) * sizeof(*R));
 
   if (s == NULL || L == NULL || R == NULL) {
     printf("not enough memory. s=%p L=%p R=%p\n",s,L,R);
@@ -244,16 +246,16 @@ int outputtree(uchar *fname, suf_t *H, i64 n)
   free(s);
 }
 
-int outputtree2(uchar *fname, suf_t *H, i64 n)
+int outputtree2(char *fname, suf_t *H, i64 n)
 {
   i64 i,j,h,h2;
   suf_t *s;
   suf_t *L,*R;
   FILE *f;
 
-  s = malloc((n+2) * sizeof(*s));
-  L = malloc((n+2) * sizeof(*L));
-  R = malloc((n+2) * sizeof(*R));
+  s = (suf_t*) malloc((n+2) * sizeof(*s));
+  L = (suf_t*) malloc((n+2) * sizeof(*L));
+  R = (suf_t*) malloc((n+2) * sizeof(*R));
 
   if (s == NULL || L == NULL || R == NULL) {
     printf("not enough memory. s=%p L=%p R=%p\n",s,L,R);
@@ -431,7 +433,9 @@ int main(int argc, char *argv[])
     printf("H[%ld] = %d\n",i,H[i]);
   }
 #endif
-  outputtree("output.bp", H, n);
+	char file[20];
+	strcpy(file, "output.bp" );
+	outputtree(file, H, n);
 
   fast_hgt2(isa, sa, T, H, n);
 #if 1
@@ -439,6 +443,7 @@ int main(int argc, char *argv[])
     printf("H[%ld] = %d\n",i,H[i]);
   }
 #endif
-  outputtree2("output.bp2", H, n);
+	strcpy(file, "output.bp2" );
+  outputtree2(file, H, n);
 
 }

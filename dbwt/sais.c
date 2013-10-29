@@ -1,18 +1,18 @@
 #include "sais.h"
 
-static unsigned int get2(unsigned short *B, unsigned long i, int d)
+static uint32_t get2(uint16_t *B, unsigned long i, int d)
 {
-  unsigned short *b;
+  uint16_t *b;
 
   b = B + (i>>4)*d;
   i = (i % 16)*d;
-  return (unsigned int)getbits(b,i,d);
+  return (uint32_t)getbits(b,i,d);
 }
 
 /* find the start or end of each bucket */
 static
 void
-getCounts(const unsigned short *T, int *C, int n, int k, int cs) {
+getCounts(const uint16_t *T, int *C, int n, int k, int cs) {
   int i;
   for(i = 0; i < k; ++i) { C[i] = 0; }
   for(i = 0; i < n; ++i) { ++C[chr(i)]; }
@@ -28,7 +28,7 @@ getBuckets(const int *C, int *B, int k, int end) {
 /* compute SA */
 static
 void
-induceSA(const unsigned short *T, int *SA, int *C, int *B, int n, int k, int cs) {
+induceSA(const uint16_t *T, int *SA, int *C, int *B, int n, int k, int cs) {
   int *b, i, j;
   int c0, c1;
   /* compute SAl */
@@ -63,7 +63,7 @@ induceSA(const unsigned short *T, int *SA, int *C, int *B, int n, int k, int cs)
    use a working space (excluding T and SA) of at most 2n+O(1) for a constant alphabet */
 //static
 int
-sais_main(const unsigned short *T, int *SA, int fs, int n, int k, int cs) {
+sais_main(const uint16_t *T, int *SA, int fs, int n, int k, int cs) {
   int *C, *B, *RA;
   int i, j, c, m, p, q, plen, qlen, name;
   int c0, c1;
@@ -120,7 +120,7 @@ sais_main(const unsigned short *T, int *SA, int fs, int n, int k, int cs) {
     for(i = n - 1, j = m - 1; m <= i; --i) {
       if(SA[i] != 0) { RA[j--] = SA[i] - 1; }
     }
-    if(sais_main((unsigned short *)RA, SA, fs + n - m * 2, m, name, sizeof(int)) != 0) { return -2; }
+    if(sais_main((uint16_t *)RA, SA, fs + n - m * 2, m, name, sizeof(int)) != 0) { return -2; }
     for(i = n - 2, j = m - 1, c = 0, c1 = chr(n - 1); 0 <= i; --i, c1 = c0) {
       if((c0 = chr(i)) < (c1 + c)) { c = 1; }
       else if(c != 0) { RA[j--] = i + 1, c = 0; } /* get p1 */
@@ -146,7 +146,7 @@ sais_main(const unsigned short *T, int *SA, int fs, int n, int k, int cs) {
 }
 
 int
-sais(const unsigned short *T, int *SA, int n) {
+sais(const uint16_t *T, int *SA, int n) {
   if((T == NULL) || (SA == NULL) || (n < 0)) { return -1; }
   if(n <= 1) { if(n == 1) { SA[0] = 0; } return 0; }
   return sais_main(T, SA, 0, n, 256, sizeof(unsigned char));
@@ -156,7 +156,7 @@ int
 sais_int(const int *T, int *SA, int n, int k) {
   if((T == NULL) || (SA == NULL) || (n < 0) || (k <= 0)) { return -1; }
   if(n <= 1) { if(n == 1) { SA[0] = 0; } return 0; }
-  return sais_main((const unsigned short *)T, SA, 0, n, k, sizeof(int));
+  return sais_main((const uint16_t *)T, SA, 0, n, k, sizeof(int));
 }
 
 /*

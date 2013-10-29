@@ -29,9 +29,6 @@
 #endif
 
 
-static int msize=0;
-#define mymalloc(p,n,f) {p = malloc((n)*sizeof(*p)); msize += (f)*(n)*sizeof(*p); /* if (f) printf("malloc %d bytes at line %d total %d\n",(n)*sizeof(*p),__LINE__,msize);  */ if ((p)==NULL) {printf("not enough memory (%d bytes) in line %d\n",msize,__LINE__); exit(1);};}
-
 static void writeuint(int k,u64 x,FILE *f)
 {
   int i;
@@ -154,7 +151,7 @@ i64 densearray_sb_construct(densearray_sb *da, i64 n, bitvec_t *buf, int opt)
 // select index
   if (opt & SDARRAY_SELECT1) {
     nl = (m-1) / L + 1;
-    mymalloc(da->s,nl+1,1);  size += sizeof(*(da->s))*(nl+1);
+    da->s = (word *) mymalloc((nl+1) * sizeof(word));  size += sizeof(*(da->s))*(nl+1);
 //    printf("densearray_sb-size:2 %ld\n",size);
 
     p1 = -1;
@@ -170,7 +167,7 @@ i64 densearray_sb_construct(densearray_sb *da, i64 n, bitvec_t *buf, int opt)
 
 // rank index
   if (opt & SDARRAY_RANK1) {
-    mymalloc(da->r,n/R+1,1);  size += sizeof(*(da->r))*(n/R+1);
+    da->r = (word *) mymalloc((n/R+1) * sizeof(word));  size += sizeof(*(da->r))*(n/R+1);
 //    printf("densearray_sb-size:3 %ld\n",size);
     m = 0;
     for (j=0; j<n; j+=R) {

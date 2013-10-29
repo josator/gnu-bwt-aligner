@@ -222,7 +222,7 @@ void psi1_options(CSA *csa, char *p)
   psi1 *ps;
   int opt;
 
-  csa->psi_struc = ps = mymalloc(sizeof(psi1));
+  csa->psi_struc = ps = (psi1 *) mymalloc(sizeof(psi1));
   ps->id = csa->id;
   ps->L = 128;
   if (p[0] == 0) goto end;
@@ -790,10 +790,10 @@ int mm;
   id2 = id & 0x3f;
 
   k = strlen(fname);
-  fbw = mymalloc(k+5);
-  flst = mymalloc(k+5);
-  fpsi = mymalloc(k+5);
-  fpsd = mymalloc(k+5);
+  fbw = (char *) mymalloc(k+5);
+  flst = (char *) mymalloc(k+5);
+  fpsi = (char *) mymalloc(k+5);
+  fpsd = (char *) mymalloc(k+5);
   sprintf(fbw,"%s.bw",fname);
   sprintf(flst,"%s.lst",fname);
 
@@ -998,10 +998,10 @@ int mm;
   id2 = id & 0x3f;
 
   k = strlen(fname);
-  fbw = mymalloc(k+5);
-  flst = mymalloc(k+5);
-  fpsi = mymalloc(k+5);
-  fpsd = mymalloc(k+5);
+  fbw = (char *) mymalloc(k+5);
+  flst = (char *) mymalloc(k+5);
+  fpsi = (char *) mymalloc(k+5);
+  fpsd = (char *) mymalloc(k+5);
   sprintf(fbw,"%s.bw",fname);
   sprintf(flst,"%s.lst",fname);
 
@@ -1174,10 +1174,10 @@ i64 psi1_read(CSA *csa, char *fname)
   psi1 *ps;
   uchar *p,*q;
   
-  csa->psi_struc = ps = mymalloc(sizeof(psi1));
+  csa->psi_struc = ps = (psi1 *) mymalloc(sizeof(psi1));
 
   k = strlen(fname);
-  fname2 = mymalloc(k-4+1);
+  fname2 = (char *) mymalloc(k-4+1);
   strncpy(fname2,fname,k-4);
   fname2[k-4] = 0;
   k -= 5;
@@ -1185,7 +1185,7 @@ i64 psi1_read(CSA *csa, char *fname)
   initranktables();
   mkdecodetable();
 
-  fpsi = mymalloc(k+5+1);
+  fpsi = (char *) mymalloc(k+5+1);
 //  fpsd = mymalloc(k+5);
 
 //  sprintf(fpsd,"%s.psd",fname2);
@@ -1241,8 +1241,8 @@ i64 psi1_read(CSA *csa, char *fname)
 
   if (id & ID_COMPPTR) {
     printf("COMPPTR\n");
-    ps->sx = mymalloc(sizeof(SPARSEARRAY));
-    ps->sb = mymalloc(sizeof(SPARSEARRAY));
+    ps->sx = (sparsearray *) mymalloc(sizeof(SPARSEARRAY));
+    ps->sb = (sparsearray *) mymalloc(sizeof(SPARSEARRAY));
     SPARSEARRAY_read(ps->sx, &p);
     SPARSEARRAY_read(ps->sb, &p);
   } else {
@@ -1315,8 +1315,8 @@ psi1_iterator *psi1_iterator_new(psi1 *ps, i64 start)
   psi1_iterator *pi;
 
   L = ps->L;
-  pi = mymalloc(sizeof(*pi));
-  pi->buf = mymalloc(L*sizeof(i64));
+  pi = (psi1_iterator *) mymalloc(sizeof(*pi));
+  pi->buf = (i64 *) mymalloc(L*sizeof(i64));
 
   pi->ps = ps;
   pi->n = ps->n + 1;

@@ -322,7 +322,7 @@ void write_blocked_results(blocked_results_lists *r_list, exome* ex, comp_vector
 
 		for (uintmax_t i=0; i<r_list->num_results[k]; i++) {
 			r = &r_list->results[k*max_results + i];
-			manage_single_result(r, ex, S, Si, C, O, Oi, search, nW, type, fp, block_read_index + k, &found);
+			manage_single_result(r, ex, S, Si, C, O, Oi, search, type, fp, block_read_index + k, &found);
 		}
 
 	}

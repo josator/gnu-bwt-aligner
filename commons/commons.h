@@ -100,4 +100,11 @@ extern double mean_batch_size;
     exit(1);\
   }
 
+void *mymalloc(size_t n);
+void *myrealloc(void *ptr, size_t next, size_t last);
+void myfree(void *p, size_t s);
+void report_mem(const char *s);
+
+extern size_t cur_alloc, max_alloc;
+
 #endif

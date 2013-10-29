@@ -7,6 +7,7 @@
 #ifndef _DENSEARRAY_H_
 #define _DENSEARRAY_H_
 
+#include "csa.h"
 #include "typedef.h"
 #include "mman.h"
 

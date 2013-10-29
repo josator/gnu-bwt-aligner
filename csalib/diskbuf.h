@@ -7,6 +7,8 @@
 #ifndef _DISKBUF_H_
 #define _DISKBUF_H_
 
+#include <unistd.h>
+#include <stdio.h>
 
 #define PAGESIZE (1<<16)
 

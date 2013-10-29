@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "typedef.h"
 #include "mman.h"
 #include "csa.h"
 #include "lf_dna.h"
@@ -63,8 +62,6 @@ static void writeuint(int k,u64 x,FILE *f)
   }
 }
 
-
-
 static int setbit(bitvec_t *B, i64 i,bitvec_t x)
 {
   i64 j,l;
@@ -88,7 +85,6 @@ static int setbits(bitvec_t *B, i64 i, bitvec_t x, int w)
   }
   return 0;
 }
-
 
 static int lf_dna_BW_sub(lf_dna *lf,i64 i)
 {
@@ -221,8 +217,8 @@ static void make_tbl(lf_dna *lf)
   BW = lf->BW;
   mb = 1 << lf->lmb;
 
-  lf->RL = mymalloc(k*((n+LB-1)/LB+1)*SIGMADNA);
-  lf->RM = mymalloc(sizeof(lf->RM[0])*((n+mb-1)/mb+1)*(SIGMADNA-1));
+  lf->RL = (uchar *) mymalloc(k*((n+LB-1)/LB+1)*SIGMADNA);
+  lf->RM = (u16 *) mymalloc(sizeof(lf->RM[0])*((n+mb-1)/mb+1)*(SIGMADNA-1));
 
   for (i=0;i<((n+LB-1)/LB)*SIGMADNA;i++) {
     putuint(lf->RL,i,0,k);
@@ -257,7 +253,7 @@ static void make_tbl(lf_dna *lf)
 void lf_dna_options(CSA *csa, char *p)
 {
   lf_dna *lf;
-  csa->psi_struc = lf = mymalloc(sizeof(lf_dna));
+  csa->psi_struc = lf = (lf_dna *) mymalloc(sizeof(lf_dna));
   lf->l = 128;
   if (p[0] == 0) goto end;
   p++;
@@ -292,7 +288,7 @@ static i64 lf_dna_rankc(CSA *csa, i64 i, int c)
 }
 
 
-i64 lf_dna_makeindex(CSA *csa, char *fname)
+i64 lf_dna_makeindex(CSA *csa, char *fname, bool coded)
 {
   i64 last;
   FILE *in,*out;
@@ -313,10 +309,11 @@ i64 lf_dna_makeindex(CSA *csa, char *fname)
   lf->l = L;
 
   k = strlen(fname);
-  fbw = mymalloc(k+5);
-  flst = mymalloc(k+5);
-  fbw2 = mymalloc(k+5);
-  fidx = mymalloc(k+5);
+  fbw = (char *) mymalloc(k+5);
+  flst = (char *) mymalloc(k+5);
+  fbw2 = (char *) mymalloc(k+5);
+  fidx = (char *) mymalloc(k+5);
+
   sprintf(fbw,"%s.bw",fname);
   sprintf(flst,"%s.lst",fname);
   sprintf(fbw2,"%s.bw2",fname);
@@ -345,7 +342,7 @@ i64 lf_dna_makeindex(CSA *csa, char *fname)
 
   for (i=0; i<SIGMA; i++) csa->C[i] = 0;
 
-  BW = mymalloc(sizeof(*BW) * (n/(DD/logSIGMADNA)+1));
+  BW = (bitvec_t *) mymalloc(sizeof(*BW) * (n/(DD/logSIGMADNA)+1));
   lf->BW = BW;
 
   fprintf(stderr,"packing...\n");
@@ -356,8 +353,12 @@ i64 lf_dna_makeindex(CSA *csa, char *fname)
     }
     c = fgetc(in);
     csa->C[c]++;
-    c2 = convertchar(c);
-    setbits(BW,i*logSIGMADNA,c2,logSIGMADNA);
+		if (coded==false) {
+    	c2 = convertchar(c);
+			setbits(BW,i*logSIGMADNA,c2,logSIGMADNA);
+		} else {
+    	setbits(BW,i*logSIGMADNA,c,logSIGMADNA);
+		}
   }
   fclose(in);
 
@@ -413,7 +414,6 @@ i64 lf_dna_makeindex(CSA *csa, char *fname)
   return size;
 }
 
-
 void lf_dna_read(CSA *csa, char *fname)
 {
   char *fbw, *fbwi, *fname2;
@@ -427,13 +427,13 @@ void lf_dna_read(CSA *csa, char *fname)
   csa->psi_struc = lf = (lf_dna *)mymalloc(sizeof(lf_dna));
 
   k = strlen(fname);
-  fname2 = mymalloc(k-4+1);
+  fname2 = (char *) mymalloc(k-4+1);
   strncpy(fname2,fname,k-4);
   fname2[k-4] = 0;
   k -= 5;
 
-  fbw = mymalloc(k+5+1);
-  fbwi = mymalloc(k+5+1);
+  fbw = (char *) mymalloc(k+5+1);
+  fbwi = (char *) mymalloc(k+5+1);
 
   sprintf(fbwi,"%s.bwd",fname2);
 
@@ -513,4 +513,3 @@ void lf_dna_read(CSA *csa, char *fname)
   csa->searchsub = csa_searchsub_lf;
 
 }
-

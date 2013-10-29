@@ -4,29 +4,30 @@
    This software may be used freely for any purpose.
    No warranty is given regarding the quality of this software.
 */
+
 #ifndef _TYPEDEF_H_
 #define _TYPEDEF_H_
 
+#include <inttypes.h>
+
 #ifndef i32
-typedef int i32;
+typedef int32_t i32;
 #endif
 #ifndef u32
-typedef unsigned int u32;
+typedef uint32_t u32;
 #endif
 #ifndef i64
-typedef long i64;
-/*typedef long long i64;*/  /*  for 32-bit gcc */
+typedef int64_t i64;
 #endif
 #ifndef u64
-typedef unsigned long u64;
-#endif
-#ifndef u16
-typedef unsigned short u16;
+typedef uint64_t u64;
 #endif
 #ifndef i16
-typedef short i16;
+typedef int16_t i16;
 #endif
-
+#ifndef u16
+typedef uint16_t u16;
+#endif
 
 
 #ifndef uchar
@@ -45,18 +46,17 @@ typedef unsigned int uint;
 typedef unsigned long ulong;
 #endif
 
-
 #ifndef byte
-typedef unsigned char byte;
+typedef uint8_t byte;
 #endif
 #ifndef word
-typedef unsigned short word;
+typedef uint16_t word;
 #endif
 #ifndef dword
-typedef unsigned int dword;
+typedef uint32_t dword;
 #endif
 #ifndef qword
-typedef unsigned long qword;
+typedef uint64_t qword;
 #endif
 
 #ifndef _BITVEC_T_

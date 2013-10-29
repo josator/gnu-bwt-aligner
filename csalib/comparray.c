@@ -33,8 +33,6 @@ static bitvec_t *nCkDEC[NCK+1];
 
 #define MAXGRP 8
 
-#define mymalloc(p,n) {p = malloc((n)*sizeof(*p)); if ((p)==NULL) {printf("not enough memory in line %d\n",__LINE__); exit(1);};}
-
 //static bitvec_t nCk[NCK+1][NCK+1];
 static bitvec_t nCk[NCK*MAXGRP+1][NCK*MAXGRP+1];
 static int nCk_len[NCK+1];
@@ -346,7 +344,7 @@ static bitvec_t *mkenumdecodetable(int n, int m)
   bitvec_t *p;
   bitvec_t x,y,w;
 
-  mymalloc(p,nCk[m][n]);
+  p = (bitvec_t*) mymalloc(nCk[m][n] * sizeof(bitvec_t));
 
   for (i=0; i<nCk[m][n]; i++) {
     x = i;
@@ -951,8 +949,8 @@ int f;
       n = nCk[k-1][w+k-1]; // n: 合計wのk個組の数
       if (n > 0 && n <= (1<<16)) {
 //        printf("[k=%ld w=%ld n=%ld] ",k,w,n);
-        if (enumtbl_w[k][w]==NULL) mymalloc(enumtbl_w[k][w],n*k); // (k,w) のときの各重み(1の数)(先頭からi個の和 (i=0,...,k-1)
-        if (enumtbl_p[k][w]==NULL) mymalloc(enumtbl_p[k][w],n*k); // (k,w) のときの各符号のオフセット
+        if (enumtbl_w[k][w]==NULL) enumtbl_w[k][w] = (int *) mymalloc((n*k) * sizeof(int)); // (k,w) のときの各重み(1の数)(先頭からi個の和 (i=0,...,k-1)
+        if (enumtbl_p[k][w]==NULL) enumtbl_p[k][w] = (int *) mymalloc((n*k) * sizeof(int)); // (k,w) のときの各符号のオフセット
         l_max = -1;
         l_min = 1 << 30;
         for (x = 0; x < n; x++) { // x: パタン
@@ -1110,12 +1108,12 @@ void comparray_construct(comparray *da, i64 n, bitvec_t *buf, ushort L, int opt)
 
 // rank index
   if (opt & SDARRAY_COMPRANK) {
-    mymalloc(da->rsa,1);
+    da->rsa = (sparsearray * ) mymalloc((1) * sizeof(sparsearray));
     sparsearray_construct_init(da->rsa, n, (n+L-1)/L);
   } else {
-    mymalloc(da->rl,da->k2*((n+RR-1)/RR));
+    da->rl = (uchar *) mymalloc((da->k2*((n+RR-1)/RR)) * sizeof(uchar));
             size += da->k2 * ((n+RR-1)/RR);
-    mymalloc(da->rs,(n+L-1)/L);
+    da->rs = (word *) mymalloc(((n+L-1)/L) * sizeof(word));
             size += sizeof(*(da->rs))*((n+L-1)/L);
   }
   r = 0;
@@ -1147,9 +1145,9 @@ void comparray_construct(comparray *da, i64 n, bitvec_t *buf, ushort L, int opt)
   for (i=0; i<D+1; i++) freq[i] = 0;
 
   if (opt & SDARRAY_SUC) {
-    mymalloc(num_ones,L/D+1);
-    mymalloc(num_blk,L/D+1);
-    mymalloc(w_blk,L/D+1);
+    num_ones = (int *) mymalloc((L/D+1) * sizeof(int));
+    num_blk = (int *) mymalloc((L/D+1) * sizeof(int));
+    w_blk = (int *) mymalloc((L/D+1) * sizeof(int));
   }
 
   for (pass = 1; pass <= 2; pass++) {
@@ -1391,17 +1389,17 @@ void comparray_construct(comparray *da, i64 n, bitvec_t *buf, ushort L, int opt)
         }
       }
       bs = (bs+D-1)/D;
-      mymalloc(da->buf,bs);
+      da->buf = (bitvec_t *) mymalloc(bs * sizeof(bitvec_t));
       da->bufsize = bs;
       size += sizeof(*(da->buf)) * bs;
       if (opt & SDARRAY_COMPPTR) {
-        mymalloc(da->psa,1);
+        da->psa = (sparsearray *) mymalloc(1 * sizeof(sparsearray));
         sparsearray_construct_init(da->psa, bs*D, (n+L-1)/L);
       } else {
         da->k1 = ((blog(sizeof(*(da->buf)) * bs*8)+1)+7)/8;
-        mymalloc(da->pl,da->k1 * ((n+RR-1)/RR));
+        da->pl = (uchar *) mymalloc((da->k1 * ((n+RR-1)/RR)) * sizeof(uchar));
         size += da->k1 * ((n+RR-1)/RR);
-        mymalloc(da->ps,(n+L-1)/L);
+        da->ps = (word *) mymalloc(((n+L-1)/L) * sizeof(word));
         size += sizeof(*(da->ps))*((n+L-1)/L);
       }
     }
@@ -1531,7 +1529,7 @@ void comparray_read(comparray *da, uchar **map)
   }
 
   if (da->opt & SDARRAY_COMPRANK) {
-    mymalloc(da->rsa,1);
+    da->rsa = (sparsearray *) mymalloc(1 * sizeof(sparsearray));
     *map = p;
     sparsearray_read(da->rsa, map);
     p = *map;
@@ -1542,7 +1540,7 @@ void comparray_read(comparray *da, uchar **map)
     p += sizeof(*da->rs) * ((da->n+L-1)/L);
   }
   if (da->opt & SDARRAY_COMPPTR) {
-    mymalloc(da->psa,1);
+    da->psa = (sparsearray *) mymalloc(1 * sizeof(sparsearray));
     *map = p;
     sparsearray_read(da->psa, map);
     p = *map;
@@ -1559,8 +1557,6 @@ void comparray_read(comparray *da, uchar **map)
   da->size = p - q;
 
 }
-
-
 
 int comparray_getbit(comparray *da, i64 i)
 {
@@ -1887,7 +1883,7 @@ int comparray_construct_init(comparray *da, i64 n)
   i64 i;
 
   da->n = n;
-  mymalloc(da->buf, (n+D-1)/D);
+  da->buf = (bitvec_t *) mymalloc(((n+D-1)/D) * sizeof(bitvec_t));
   for (i=0; i<(n+D-1)/D; i++) da->buf[i] = 0;
 
   return 0;

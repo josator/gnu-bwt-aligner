@@ -184,8 +184,8 @@ static void make_tbl(lf_bit *lf)
   BW = lf->BW;
   mb = 1 << lf->lmb;
 
-  lf->RL = mymalloc(k*((n+LB-1)/LB+1));
-  lf->RM = mymalloc(sizeof(lf->RM[0])*((n+mb-1)/mb+1));
+  lf->RL = (uchar *) mymalloc(k*((n+LB-1)/LB+1));
+  lf->RM = (u16 *) mymalloc(sizeof(lf->RM[0])*((n+mb-1)/mb+1));
 
   for (i=0;i<((n+LB-1)/LB);i++) {
     putuint(lf->RL,i,0,k);
@@ -215,7 +215,7 @@ static void make_tbl(lf_bit *lf)
 void lf_bit_options(CSA *csa, char *p)
 {
   lf_bit *lf;
-  csa->psi_struc = lf = mymalloc(sizeof(lf_bit));
+  csa->psi_struc = lf = (lf_bit *) mymalloc(sizeof(lf_bit));
   lf->l = 128;
   if (p[0] == 0) goto end;
   p++;
@@ -277,10 +277,10 @@ i64 lf_bit_makeindex(CSA *csa, char *fname)
   lf->l = L;
 
   k = strlen(fname);
-  fbw = mymalloc(k+5);
-  flst = mymalloc(k+5);
-  fbw2 = mymalloc(k+5);
-  fidx = mymalloc(k+5);
+  fbw = (char *) mymalloc(k+5);
+  flst = (char *) mymalloc(k+5);
+  fbw2 = (char *) mymalloc(k+5);
+  fidx = (char *) mymalloc(k+5);
   sprintf(fbw,"%s.bw",fname);
   sprintf(flst,"%s.lst",fname);
   sprintf(fbw2,"%s.bw1",fname);
@@ -309,7 +309,7 @@ i64 lf_bit_makeindex(CSA *csa, char *fname)
 
   for (i=0; i<SIGMA; i++) csa->C[i] = 0;
 
-  BW = mymalloc(sizeof(*BW) * (n/DD+1));
+  BW = (bitvec_t *) mymalloc(sizeof(*BW) * (n/DD+1));
   lf->BW = BW;
 
   fprintf(stderr,"packing...\n");
@@ -382,7 +382,6 @@ void lf_bit_read(CSA *csa, char *fname)
 {
   char *fbw, *fbwi, *fname2;
   int k,l,id;
-  FILE *f1;
   i64 psize1,psize2;
   i64 n;
   lf_bit *lf;
@@ -391,13 +390,13 @@ void lf_bit_read(CSA *csa, char *fname)
   csa->psi_struc = lf = (lf_bit *)mymalloc(sizeof(lf_bit));
 
   k = strlen(fname);
-  fname2 = mymalloc(k-4+1);
+  fname2 = (char *) mymalloc(k-4+1);
   strncpy(fname2,fname,k-4);
   fname2[k-4] = 0;
   k -= 5;
 
-  fbw = mymalloc(k+5+1);
-  fbwi = mymalloc(k+5+1);
+  fbw = (char *) mymalloc(k+5+1);
+  fbwi = (char *) mymalloc(k+5+1);
 
   sprintf(fbwi,"%s.bwb",fname2);
 

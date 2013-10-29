@@ -23,7 +23,7 @@ cst_node cst_root(CSA *csa)
 uchar *cst_pathlabel(cst_node node)
 {
   uchar *buf;
-  buf = mymalloc(node.depth+1);
+  buf = (uchar *) mymalloc(node.depth+1);
   node.csa->substring(buf, node.csa, node.l, node.depth);
   buf[node.depth] = 0;
   return buf;

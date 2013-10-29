@@ -8,7 +8,7 @@
 //#define chr(i) (cs == sizeof(int) ? ((const int *)T)[i]:((const unsigned char *)T)[i])
 #define chr(i) ((cs == sizeof(int)) ? (((const int *)T)[i]):(get2((unsigned short *)T,i+1,-cs)))
 
-int sais_main(const unsigned short *T, int *SA, int fs, int n, int k, int cs);
+int sais_main(const uint16_t *T, int *SA, int fs, int n, int k, int cs);
 
 #endif
 

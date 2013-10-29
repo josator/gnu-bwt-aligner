@@ -45,16 +45,9 @@
 #define DA2_LB (1<<DA2_logLB)
 #define DA2_K 4
 
-
-
-
 #ifndef min
  #define min(x,y) ((x)<(y)?(x):(y))
 #endif
-
-
-static int msize=0;
-#define mymalloc(p,n,f) {p = malloc((n)*sizeof(*p)); msize += (f)*(n)*sizeof(*p); /* if (f) printf("malloc %d bytes at line %d total %d\n",(n)*sizeof(*p),__LINE__,msize);  */ if ((p)==NULL) {printf("not enough memory (%d bytes) in line %d\n",msize,__LINE__); exit(1);};}
 
 static int blog(i64 x)
 {
@@ -260,7 +253,7 @@ int densearray_construct_init(densearray *da, i64 n)
   i64 i;
 
   da->n = n;
-  mymalloc(da->buf, (n+D-1)/D, 0);
+  da->buf = (bitvec_t *) mymalloc(((n+D-1)/D) * sizeof(bitvec_t));
   for (i=0; i<(n+D-1)/D; i++) da->buf[i] = 0;
 
   return 0;
@@ -333,8 +326,8 @@ void densearray_construct(densearray *da, i64 n, bitvec_t *buf, int opt)
 
   if (opt & SDARRAY_SELECT1) {
     nl = (m-1) / L + 1;
-    mymalloc(da->lp,nl+1,1);  size += sizeof(*(da->lp))*(nl+1);
-    mymalloc(da->p,nl+1,1);  size += sizeof(*(da->p))*(nl+1);
+    da->lp = (dword *) mymalloc((nl+1) * sizeof(dword));  size += sizeof(*(da->lp))*(nl+1);
+    da->p  = (i64 *) mymalloc((nl+1) * sizeof(i64));  size += sizeof(*(da->p))*(nl+1);
 //    printf("densearray-size:1 %ld\n",size);
 
     for (r = 0; r < 2; r++) {
@@ -386,8 +379,8 @@ void densearray_construct(densearray *da, i64 n, bitvec_t *buf, int opt)
       }
       if (r == 0) {
         da->ml = ml;  da->ms = ms;
-        mymalloc(da->sl,ml*L+1,1);  size += sizeof(*(da->sl))*(ml*L+1);
-        mymalloc(da->ss,ms*(L/LLL)+1,1);  
+        da->sl = (dword *) mymalloc((ml*L+1) * sizeof(dword));  size += sizeof(*(da->sl))*(ml*L+1);
+        da->ss = (word *) mymalloc((ms*(L/LLL)+1) * sizeof(word));  
         size += sizeof(*(da->ss))*(ms*(L/LLL)+1);
 //        printf("densearray-size:2 %ld\n",size);
       }
@@ -401,9 +394,9 @@ void densearray_construct(densearray *da, i64 n, bitvec_t *buf, int opt)
   if (opt & SDARRAY_RANK1) {
 //    mymalloc(da->rl,(n+RR-1)/RR,1);  
 //      size += sizeof(*(da->rl))*((n+RR-1)/RR);
-    mymalloc(da->rl,(n+RR-1)/RR*k,1);  
+    da->rl = (uchar *) mymalloc(((n+RR-1)/RR*k) * sizeof(uchar));  
       size += sizeof(*(da->rl))*((n+RR-1)/RR)*k;
-    mymalloc(da->rs,(n+rrr-1)/rrr,1);
+    da->rs = (word *) mymalloc(((n+rrr-1)/rrr) * sizeof(word));
       size += sizeof(*(da->rs))*((n+rrr-1)/rrr);
 //  printf("densearray-size:3 %ld\n",size);
     r = 0;
@@ -884,8 +877,8 @@ void densearray2_construct(densearray2 *da, i64 n, bitvec_t *buf, int opt)
   da->leaf_ofs = ofs;
   nl2 = nl + ofs;
 
-  mymalloc(da->rs,ns,1);  size += sizeof(*(da->rs))*ns;
-  mymalloc(da->rl,nl2,1);  size += sizeof(*(da->rl))*nl2;
+  da->rs = (word *) mymalloc(ns * sizeof(word));  size += sizeof(*(da->rs))*ns;
+  da->rl = (dword *) mymalloc(nl2 * sizeof(dword));  size += sizeof(*(da->rl))*nl2;
   printf("densearray2-size:1 %ld\n",size);
 
 #if 0

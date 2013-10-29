@@ -7,6 +7,9 @@
 #ifndef _LF_DNA_H_
 #define _LF_DNA_H_
 
+#include <stdbool.h>
+#include "typedef.h"
+
 #ifdef __SSE4_2__
 #include <smmintrin.h>
 #define POPCOUNT2(x) _mm_popcnt_u64(x)
@@ -45,7 +48,7 @@ typedef struct {
   MMAP *mapbwt,*mapidx;
 } lf_dna;
 
-i64 lf_dna_makeindex(CSA *csa, char *fname);
+i64 lf_dna_makeindex(CSA *csa, char *fname, bool coded);
 void lf_dna_read(CSA *sa, char *fname);
 //static int lf_dna_BW_sub(lf_dna *lf,i64 i);
 //static int lf_dna_BW(CSA *csa,i64 i);

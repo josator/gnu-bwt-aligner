@@ -3,8 +3,8 @@
 
 #include <cuda.h>
 
-#include"BW_search.h" //Remove after cleanup and method repositioning
-#include"BW_results.h"
+#include "BW_search.h" //Remove after cleanup and method repositioning
+#include "BW_results.h"
 
 #if defined FM_COMP_32 || FM_COMP_64
 

@@ -10,6 +10,7 @@
 
 #ifdef WIN32
 #include <windows.h>
+#include <inttypes.h>
 #else
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +18,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <unistd.h>
+#include <inttypes.h>
 #endif
 
 #ifdef WIN32
@@ -27,7 +30,7 @@
 
 typedef struct {
   void *addr;
-  i64 len;
+  int64_t len;
 #ifdef WIN32
   HANDLE h1,h2;
 #else

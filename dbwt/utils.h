@@ -3,47 +3,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "utils.h"
 
-#ifndef uchar
-typedef unsigned char uchar;
-#endif
+#include "../csalib/typedef.h"
+#include "../commons/commons.h"
 
-#ifndef uint
-typedef unsigned int uint;
-#endif
-
-#ifndef ulong
-typedef unsigned long ulong;
-#endif
-
-#ifndef byte
-typedef unsigned char byte;
-#endif
-#ifndef word
-typedef unsigned short word;
-#endif
-#ifndef dword
-typedef unsigned int dword;
-#endif
-
-#if 1
-typedef unsigned int qword;
 typedef word pb;
-#define logD 4
-#else
-typedef unsigned long long qword;
-typedef dword pb;
-#define logD 5
-#endif
-#define PBS (sizeof(pb)*8)
-#define D (1<<logD)
+#define _logD_ 4
 
-void *mymalloc(size_t n);
-void *myrealloc(void *ptr, size_t next, size_t last);
-void myfree(void *p, size_t s);
-void report_mem(const char *s);
-extern size_t cur_alloc, max_alloc;
+#define PBS (sizeof(pb)*8)
+#define _D_ (1<<_logD_)
 
 unsigned int getbits(unsigned short *B, unsigned long i, int d);
 

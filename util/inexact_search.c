@@ -1,7 +1,7 @@
 #include <pthread.h>
 
-#include "BW_search.h"
-#include "BW_io.h"
+#include "../BW_search.h"
+#include "../BW_io.h"
 
 #define MAX_READ_THREAD 1024
 
