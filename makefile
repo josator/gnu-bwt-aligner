@@ -5,7 +5,7 @@ COMMONS_DIR = commons/
 #Debian distro location
 #CUDA_LOCATION=/usr/lib/nvidia-cuda-toolkit
 
-CC = g++
+CC = gcc
 NVCC = nvcc
 CFLAGS = -Wall -g -fopenmp -m64 -DFM_COMP_32 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 #-I $(CUDA_LOCATION)/include/ -L /usr/local/cuda/lib64/ -lcudart -msse4.2 #-DVERBOSE_DBG
 #NVCCFLAGS = --compiler-options -Wall,-fopenmp,-m64 -O3 -Xptxas -v -arch=sm_13 -DFM_COMP_32 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 #-DVERBOSE_DBG

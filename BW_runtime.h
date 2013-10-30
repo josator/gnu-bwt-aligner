@@ -24,3 +24,21 @@ typedef struct {
 #endif
 
 } suffix_array;
+
+#if defined FM_COMP_32 || FM_COMP_64
+
+#define BWiteration(k_in,l_in, k_out, l_out, b, C, C1, O)\
+	do {\
+		(k_out) = (C1)->vector[(b)] + getOcompValue((b), (k_in)  , (O));\
+		(l_out) = (C)->vector[(b)]  + getOcompValue((b), (l_in)+1, (O));\
+	} while (0);
+//printf("k-> %lu, l-> %lu, O(k) -> %u, O(l) -> %u, C -> %u, C1 -> %u\n", (k_out), (l_out), getOcompValue((b), (k_in), (O)), getOcompValue((b), (l_in)+1, (O)), (C)->vector[(b)], (C1)->vector[(b)]);
+#else
+
+#define BWiteration(k_in, l_in, k_out, l_out, b, C, C1, O)\
+	do {\
+		(k_out) = (C1)->vector[(b)] + (O)->desp[(b)][(k_in)];\
+		(l_out) = (C)->vector[(b)]  + (O)->desp[(b)][(l_in)+1];\
+	} while(0);
+//printf("k-> %lu, l-> %lu, O(k) -> %u, O(l) -> %u, C -> %u, C1 -> %u\n", k_out, l_out, (O)->desp[(b)][(k_in)], (O)->desp[(b)][(l_in)+1], (C)->vector[(b)], (C1)->vector[(b)]);
+#endif

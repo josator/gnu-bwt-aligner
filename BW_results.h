@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "BW_runtime.h"
 #include "BW_csafm.h"
 #include "BW_io.h"
 
