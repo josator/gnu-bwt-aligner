@@ -44,35 +44,44 @@ void load_exome_file(exome *ex, const char *directory) {
 
 }
 
-void save_exome_file(exome *ex, const char *directory) {
+void save_exome_file(exome *ex, bool reverse, const char *directory) {
 
-  FILE *fp;
+	FILE *fp;
 
-  char path[500];
+	char path[500];
   path[0]='\0';
   strcat(path, directory);
   strcat(path, "/index");
 
-  fp  = fopen(path, "w");
+	fp  = fopen(path, "w");
   check_file_open(fp, path);
 
-  for(SA_TYPE i=0; i<ex->size; i++) {
+	for(int i=0; i<ex->size; i++) {
     fprintf(fp, ">%s %ju %ju\n", ex->chromosome + i*IDMAX, (uintmax_t) ex->start[i], (uintmax_t) ex->end[i]);
   }
 
+	if(reverse) {
+		for(int i=ex->size-1; i>=0; i--) {
+    	fprintf(fp, ">%s %ju %ju\n", ex->chromosome + i*IDMAX, (uintmax_t) ex->start[i], (uintmax_t) ex->end[i]);
+  	}
+	}
+
 }
 
-void encode_reference(ref_vector *X, exome *ex, const char *ref_path) {
+void encode_reference(ref_vector *X, exome *ex, bool reverse, const char *ref_path) {
 
 	FILE *ref_file;
 	ref_file = fopen(ref_path, "r");
 	check_file_open(ref_file, ref_path);
 
-	size_t size;
+	size_t read, size;
 
 	fseek(ref_file, 0, SEEK_END);
-	size = ftell(ref_file) + 1; //Valgrind errors on dbwt
+	read = ftell(ref_file); //Valgrind errors on dbwt
 	fseek(ref_file, 0, SEEK_SET);
+
+	if (reverse) size = read*2 + 1;
+	else         size = read   + 1;
 
 	X->vector = (REF_TYPE *) malloc( size * sizeof(REF_TYPE) );
 	check_malloc(X->vector, ref_path);
@@ -137,7 +146,14 @@ void encode_reference(ref_vector *X, exome *ex, const char *ref_path) {
 	}
 
 	encode_bases(X->vector, reference, total_length);
-	X->n = total_length;
+
+	if (reverse) {
+		duplicate_reverse(X->vector, total_length);
+		X->n = total_length * 2;
+	} else {
+		X->n = total_length;
+	}
+
 	X->dollar = 0;
 	X->vector[X->n] = 0; //Valgrind errors on dbwt
 

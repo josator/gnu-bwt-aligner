@@ -33,4 +33,4 @@ commons:
 	make -C $(COMMONS_DIR) depen
 
 clean:
-	rm -f *~ \#*\# bwt *.o bin/dbwt
+	rm -f *~ \#*\# *.o

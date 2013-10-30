@@ -353,7 +353,7 @@ uchar **sort_LMS(int n, htbl *h)
 
 #define SIGMA (256+1)
 
-void direct_bwt(uchar *T, long n, const char *directory, const char *name) {
+void direct_bwt(uchar *T, long n, const char *directory, const char *name, bool compat) {
 
 	FILE *fp;
 
@@ -718,13 +718,17 @@ void direct_bwt(uchar *T, long n, const char *directory, const char *name) {
 		strcat(path, "output.bw");
 	} else {
 		strcat(path, name);
-		strcat(path, ".vec");
+		if (compat) {
+			strcat(path, ".vec");
+		} else {
+			strcat(path, ".bw");
+		}
 	}
 
 	fp = fopen(path,"wb");
 	check_file_open(fp, path);
 
-	if (name != NULL) {
+	if (compat) {
 		fwrite(&n, sizeof(uint32_t), 1, fp);
 		fwrite(&last, sizeof(uint32_t), 1, fp);
 	}
@@ -757,14 +761,20 @@ void direct_bwt(uchar *T, long n, const char *directory, const char *name) {
 
   fclose(fp);
 
-	if (name == NULL) {
+	if (compat == false) {
 		path[0]='\0';
 		if (directory==NULL) {
 			strcat(path, ".");
 		} else {
 			strcat(path, directory);
 		}
-		strcat(path, "/output.lst");
+		strcat(path, "/");
+		if (name == NULL) {
+			strcat(path, "output.lst");
+		} else {
+			strcat(path, name);
+			strcat(path, ".lst");
+		}
 
 		fp = fopen(path,"w");
 		check_file_open(fp, path);
@@ -775,7 +785,7 @@ void direct_bwt(uchar *T, long n, const char *directory, const char *name) {
 
 	free(bw);
 
-  report_mem("done");
+	report_mem("done");
   printf("%.2f bpc\n",(double)max_alloc/n);
   //printf("end");  getchar();
 

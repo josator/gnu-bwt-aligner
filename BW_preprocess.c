@@ -1,13 +1,13 @@
 #include "BW_preprocess.h"
 
 void calculate_and_save_B(ref_vector *X, const char *directory, const char *name) {
-  direct_bwt(X->vector, X->n, directory, name);
+  direct_bwt(X->vector, X->n, directory, name, true);
 }
 
 void calculate_S_and_R(comp_vector *S, comp_vector *R, ref_vector *B, vector *C, comp_matrix *O, SA_TYPE ratio) {
 
 	SA_TYPE i,j;
-  REF_TYPE b_aux;
+ 	REF_TYPE b_aux;
 
 	S->siz = B->n + 1;
 	R->siz = B->n + 1;

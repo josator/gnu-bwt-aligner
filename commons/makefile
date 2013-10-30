@@ -13,4 +13,4 @@ string_utils.o: string_utils.c string_utils.h
 	$(CC) $(CFLAGS) -c string_utils.c
 
 clean:
-	rm -f *~ \#*\# bwt *.o bin/dbwt
+	rm -f *~ \#*\# bwt *.o

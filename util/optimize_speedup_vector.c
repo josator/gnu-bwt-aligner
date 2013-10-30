@@ -4,11 +4,11 @@
 #include <sys/time.h>
 #include <cuda_runtime_api.h>
 
-#include "commons/commons.h"
-#include "BW_io.h"
-#include "BW_search.h"
+#include "../commons/commons.h"
+#include "../BW_io.h"
+#include "../BW_search.h"
 
-#include "BW_gpu.cuh"
+#include "../BW_gpu.cuh"
 
 #define TAM_BLOQUE_GPU 32
 

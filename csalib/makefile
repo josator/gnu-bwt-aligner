@@ -32,4 +32,4 @@ commons:
 	make -C $(COMMONS_DIR) depen
 
 clean:
-	rm -f $(OFILES) csa.a bin/mkcsa bin/csa bin/unbwt bin/mkcst bin/approx
+	rm -f *~ \#*\# *.o *.a

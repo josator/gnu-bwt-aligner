@@ -1,5 +1,5 @@
 #include "BW_search.h"
-
+#if 0
 bool BWExactFinalResultsBackward(REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, results_list *rl_prev, results_list *rl_next_i, int16_t block_size, int16_t last_block) {
 
 	SA_TYPE k, l;
@@ -1709,3 +1709,4 @@ void BWExactSearchVectorForward(REF_TYPE *W, int16_t start, int16_t end, SA_TYPE
 	}
 
 }
+#endif

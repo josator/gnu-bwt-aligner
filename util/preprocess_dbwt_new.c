@@ -1,4 +1,6 @@
 #include "../BW_io.h"
+#include "../BW_csafm.h"
+
 #include "../commons/commons.h"
 #include "../dbwt/dbwt.h"
 #include "../csalib/csa.h"
@@ -6,7 +8,7 @@
 int main(int argc, char **argv)
 {
 
-	ref_vector X;
+	ref_vector X, Xi;
 
 	exome ex;
 
@@ -15,15 +17,33 @@ int main(int argc, char **argv)
 	timevars();
   init_replace_table(argv[3]);
 
-	//encode_reference(&X, &ex, argv[1]);
-	//save_exome_file(&ex, argv[2]);
+	encode_reference(&X, &ex, true, argv[1]);
+	save_ref_vector(&X, argv[2], "X");
+	save_exome_file(&ex, true, argv[2]);
 
-	tic("Calc. Burrows-Wheeler Transform -> Sadakane direct SAIS");
-	//direct_bwt(X.vector, X.n, argv[2], NULL);
+	tic("Calc. Backward Burrows-Wheeler Transform -> Sadakane direct SAIS");
+	direct_bwt(X.vector, X.n, argv[2], "backward", false);
 	toc();
 
-	tic("Calc. Suffix Array -> CSALIB DNA");
-	csa_new_from_bwt_gnu_bwt_wrapper(argv[2], NULL);
+	tic("Calc. Backward Suffix Array -> CSALIB DNA");
+	csa_new_from_bwt_gnu_bwt_wrapper(argv[2], "backward");
+	toc();
+
+	read_ref_vector(&Xi, argv[2], "X");
+	puts("1");
+	revstring(Xi.vector, Xi.n / 2);
+	puts("2");
+	revstring(Xi.vector + (Xi.n / 2), Xi.n / 2);
+	puts("3");
+	save_ref_vector(&Xi, argv[2], "Xi");
+	puts("4");
+
+	tic("Calc. Forward Burrows-Wheeler Transform -> Sadakane direct SAIS");
+	direct_bwt(Xi.vector, Xi.n, argv[2], "forward", false);
+	toc();
+
+	tic("Calc. Forward Suffix Array -> CSALIB DNA");
+	csa_new_from_bwt_gnu_bwt_wrapper(argv[2], "forward");
 	toc();
 
 	return 0;

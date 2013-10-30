@@ -44,7 +44,7 @@ inline void BWExactSearchBackward(REF_TYPE *W, vector *C, vector *C1, comp_matri
 	r->pos = i;
 }
 
-inline void BWExactSearchForward(REF_TYPE *W, vector *C, vector *C1, comp_matrix *Oi, result *r) {
+inline void BWExactSearchForward(REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, result *r) {
 
 	SA_TYPE k2, l2;
 	int16_t i;
@@ -56,7 +56,7 @@ inline void BWExactSearchForward(REF_TYPE *W, vector *C, vector *C1, comp_matrix
 
 	for(i=r->pos; i<=r->end; i++) {
 
-		BWiteration(k2, l2, k2, l2, W[i], C, C1, Oi);
+		BWiteration(k2, l2, k2, l2, W[i], C, C1, O);
 		//printf("F-> %d -> %lu - %lu\n", i, k2, l2);
 		if (k2 > l2) break;
 
@@ -69,6 +69,7 @@ inline void BWExactSearchForward(REF_TYPE *W, vector *C, vector *C1, comp_matrix
 
 }
 
+#if 0
 inline bool BWExactFinalResultBackward(REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, result *r_iterator, results_list *rl_final, int16_t block_size, int16_t last_block) {
 
 	SA_TYPE k, l;
@@ -232,5 +233,5 @@ void BWExactSearchVectorForward(REF_TYPE *W, int16_t start, int16_t end, SA_TYPE
 /********************************/
 
 bool nextFASTAToken(FILE *queries_file, char *uncoded, REF_TYPE *coded, SA_TYPE *nquery); 
-
+#endif
 #endif

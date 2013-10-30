@@ -15,7 +15,8 @@ extern REF_TYPE nA;
 extern REF_TYPE AA, CC, GG, TT;
 
 extern REF_TYPE table[128];
-extern char *rev_table;
+extern char rev_table[4];
+extern char reserve[4];
 
 /**
  *  @brief Inits table for nucleotide coding/decoding 
@@ -47,5 +48,7 @@ void encode_bases(REF_TYPE* dest, char* src, uintmax_t length);
 void decode_bases(char* dest, REF_TYPE* src, uintmax_t length);
 
 void revstring(REF_TYPE *X, uintmax_t nX);
+
+void duplicate_reverse(REF_TYPE *X, uintmax_t nX);
 
 #endif

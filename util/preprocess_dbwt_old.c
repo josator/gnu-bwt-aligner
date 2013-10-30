@@ -19,9 +19,9 @@ int main(int argc, char **argv)
 
 	SA_TYPE ratio = atoi(argv[3]);
 
-	encode_reference(&X, &ex, argv[1]);
+	encode_reference(&X, &ex, false, argv[1]);
 	save_ref_vector(&X, argv[2], "X");
-	save_exome_file(&ex, argv[2]);
+	save_exome_file(&ex, false, argv[2]);
   print_vector(X.vector, X.n);
 
 	tic("Calc. Suffix Array -> Sadakane direct SAIS");
@@ -36,7 +36,7 @@ int main(int argc, char **argv)
   print_vector(C1.vector, C1.n);
 	save_vector(&C, argv[2], "C");
   save_vector(&C1,argv[2], "C1");
-  
+
 	calculate_O(&O, &B);
  	print_comp_matrix(O);
 	save_comp_matrix(&O, argv[2], "O");

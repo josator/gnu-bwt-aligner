@@ -38,8 +38,7 @@ void bwt_wrapper(char *fname)
 #endif
 ///////////////////////////////////////////////
 
-direct_bwt(T, n, NULL, NULL);
-
+	direct_bwt(T, n, NULL, NULL, false);
 }
 
 int main(int argc, char *argv[])

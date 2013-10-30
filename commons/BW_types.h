@@ -4,6 +4,10 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
+#if defined CSALIB_SEARCH
+#include "../csalib/csa.h"
+#else
+
 #if   defined SA_64
 
 typedef uint64_t SA_TYPE;
@@ -84,5 +88,30 @@ typedef struct {
 	SA_TYPE dollar; //Position ending with the $ symbol (the first in the reference)
 
 } ref_vector;
+
+//Data structure for chromosome or exome separation positions in the reference
+#define INDEX_EXOME 24000
+#define IDMAX 100
+
+typedef struct {
+  char chromosome[INDEX_EXOME*IDMAX];
+  SA_TYPE start[INDEX_EXOME];
+  SA_TYPE end[INDEX_EXOME];
+  SA_TYPE offset[INDEX_EXOME];
+  SA_TYPE size;
+} exome;
+
+typedef struct {	
+
+#if defined CSALIB_SEARCH
+	CSA backward, forward;
+#else
+	BWT 
+	vector C, C1;
+  comp_matrix O;
+  comp_vector S, R;
+#endif
+
+} bwt_index;
 
 #endif

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#include <stdbool.h>
 
 //#include "mman.h"
 #include "utils.h"
@@ -25,7 +26,7 @@ typedef struct {
   int bufsiz;
 } htbl;
 
-void direct_bwt(uchar *T, long n, const char *directory, const char *name);
+void direct_bwt(uchar *T, long n, const char *directory, const char *name, bool compat);
 
 #endif
 

@@ -139,5 +139,4 @@ int csa_head_rank(CSA *csa,rank_t i);
 
 void bw_to_psi(FILE *out, CSA *csa, char *fbw, char *flst, int *k);
 
-
 #endif // _CSA_H_

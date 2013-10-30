@@ -4,14 +4,14 @@
 #include <sys/time.h>
 
 #include "../commons/commons.h"
-#include "BW_search.h"
-#include "BW_csafm.h"
-#include "BW_results.h"
+#include "../BW_search.h"
+#include "../BW_csafm.h"
+#include "../BW_results.h"
 
 int main(int argc, char **argv) {
 
 	char *Worig;
-  byte_vector W;
+  ref_vector W;
   vector C, C1;
   vector rC, rC1;
   comp_matrix O, Oi;
@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
   results_list rl_prev, rl_next, rl_prev_i, rl_next_i, rl_final;
   uintmax_t read_index=0;
 
-  VECTOR_TYPE RESULTS, FRAGSIZE;
+  SA_TYPE RESULTS, FRAGSIZE;
   exome ex;
 
   FILE *queries_file, *output_file;
@@ -80,10 +80,10 @@ int main(int argc, char **argv) {
 
   toc();
 
-  VECTOR_TYPE *k = (VECTOR_TYPE*)malloc(RESULTS * sizeof(VECTOR_TYPE));
-  VECTOR_TYPE *l = (VECTOR_TYPE*)malloc(RESULTS * sizeof(VECTOR_TYPE));
+  SA_TYPE *k = (SA_TYPE*)malloc(RESULTS * sizeof(SA_TYPE));
+  SA_TYPE *l = (SA_TYPE*)malloc(RESULTS * sizeof(SA_TYPE));
 
-  VECTOR_TYPE nW_aux;
+  SA_TYPE nW_aux;
 
   tic("Sequence mapping");
 
@@ -140,5 +140,4 @@ int main(int argc, char **argv) {
   fclose(output_file);
 
   return 0;
-
 }

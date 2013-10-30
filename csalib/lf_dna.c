@@ -372,11 +372,11 @@ i64 lf_dna_makeindex(CSA *csa, char *fname, bool coded)
   }
   fclose(out);
 
-  lf->k = k = (blog(n+1)+1+8-1)/8;
+	lf->k = k = (blog(n+1)+1+8-1)/8;
 
-  make_tbl(lf);
+	make_tbl(lf);
 
-  out = fopen(fidx,"w");
+	out = fopen(fidx,"w");
   if (out == NULL) {
     printf("lf_dna_makeindex: cannot open %s\n",fidx);
   }
