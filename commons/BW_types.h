@@ -4,10 +4,6 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-#if defined CSALIB_SEARCH
-#include "../csalib/csa.h"
-#else
-
 #if   defined SA_64
 
 typedef uint64_t SA_TYPE;
@@ -100,18 +96,5 @@ typedef struct {
   SA_TYPE offset[INDEX_EXOME];
   SA_TYPE size;
 } exome;
-
-typedef struct {	
-
-#if defined CSALIB_SEARCH
-	CSA backward, forward;
-#else
-	BWT 
-	vector C, C1;
-  comp_matrix O;
-  comp_vector S, R;
-#endif
-
-} bwt_index;
 
 #endif
