@@ -20,14 +20,3 @@ http://dx.doi.org/10.1109/TCBB.2012.49
 Contact:
 
 http://www.grycap.upv.es/view.php/GRyCAP/Organizacion/jsalavert
-
-
-===============
-
-The code from CSALIB library included in this project is provided by "National Institute of Informatics" Tokyo, Japan under the MIT license: 
-
-https://code.google.com/p/csalib/
-
-Contact:
-
-http://researchmap.jp/sada/english/
