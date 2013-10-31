@@ -1,7 +1,10 @@
+#ifndef _SEARCH_RUNTIME_
+#define _SEARCH_RUNTIME_
+
 #if defined CSALIB_SEARCH
 #include "csalib/csa.h"
 #else
-#include "commons/BW_types.h"
+#include "BW_types.h"
 #endif
 
 typedef struct {
@@ -41,4 +44,6 @@ typedef struct {
 		(l_out) = (C)->vector[(b)]  + (O)->desp[(b)][(l_in)+1];\
 	} while(0);
 //printf("k-> %lu, l-> %lu, O(k) -> %u, O(l) -> %u, C -> %u, C1 -> %u\n", k_out, l_out, (O)->desp[(b)][(k_in)], (O)->desp[(b)][(l_in)+1], (C)->vector[(b)], (C1)->vector[(b)]);
+#endif
+
 #endif

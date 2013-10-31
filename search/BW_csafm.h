@@ -9,7 +9,7 @@
 #include "commons/commons.h"
 #include "commons/string_utils.h"
 
-#include "commons/BW_types.h"
+#include "BW_types.h"
 
 void reverse_strand_C(vector *r_C, vector *s_C, vector *r_C1, vector *s_C1);
 void reverse_strand_O(comp_matrix *r_O, comp_matrix *s_O);

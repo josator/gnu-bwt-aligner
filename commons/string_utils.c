@@ -1,11 +1,11 @@
 #include "string_utils.h"
 
-REF_TYPE nA;
-REF_TYPE AA = -1, CC = -1, GG = -1, TT = -1;
+uint8_t nA;
+uint8_t AA = -1, CC = -1, GG = -1, TT = -1;
 
-REF_TYPE table[128];
+uint8_t table[128];
 char rev_table[4];
-REF_TYPE reverse[4];
+uint8_t reverse[4];
 
 void init_replace_table(const char *str) {
 
@@ -30,7 +30,7 @@ void init_replace_table(const char *str) {
 
 		nA = strlen(str);
 
-    for (REF_TYPE i = 0; i < nA; i++) {
+    for (uint8_t i = 0; i < nA; i++) {
       rev_table[i] = toupper(str[i]);
 
       table[toupper(str[i])] = i;
@@ -55,18 +55,18 @@ void init_table() {
   init_replace_table(NULL);
 }
 
-void encode_bases(REF_TYPE* dest, char* src, uintmax_t length) {
+void encode_bases(uint8_t* dest, char* src, uintmax_t length) {
   for (uintmax_t i=0; i<length; i++)
     dest[i] = table[(uintmax_t)src[i]];
 }
 
-void decode_bases(char* dest, REF_TYPE* src, uintmax_t length) {
+void decode_bases(char* dest, uint8_t* src, uintmax_t length) {
   for (uintmax_t i=0; i<length; i++)
     dest[i] = rev_table[(uintmax_t)src[i]];
   dest[length] = '\0';
 }
 
-void revstring(REF_TYPE *X, uintmax_t nX) {
+void revstring(uint8_t *X, uintmax_t nX) {
 
   char tmp;
   uintmax_t i, j;
@@ -81,7 +81,7 @@ void revstring(REF_TYPE *X, uintmax_t nX) {
 
 }
 
-void duplicate_reverse(REF_TYPE *X, uintmax_t nX) {
+void duplicate_reverse(uint8_t *X, uintmax_t nX) {
 
   uintmax_t i, j;
 

@@ -2,7 +2,6 @@
 #define _SEARCH_SEARCH_
 
 #include "BW_results.h"
-#include "BW_runtime.h"
 
 inline void BWExactSearchBackward(REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, result *r) {
 

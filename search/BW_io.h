@@ -6,7 +6,19 @@
 
 #include "commons/commons.h"
 #include "commons/string_utils.h"
-#include "commons/BW_types.h"
+#include "BW_runtime.h"
+
+//Data structure for chromosome or exome separation positions in the reference
+#define INDEX_EXOME 24000
+#define IDMAX 100
+
+typedef struct {
+  char chromosome[INDEX_EXOME*IDMAX];
+  SA_TYPE start[INDEX_EXOME];
+  SA_TYPE end[INDEX_EXOME];
+  SA_TYPE offset[INDEX_EXOME];
+  SA_TYPE size;
+} exome;
 
 void load_exome_file(exome *ex, const char *directory);
 void save_exome_file(exome *ex, bool reverse, const char *directory);

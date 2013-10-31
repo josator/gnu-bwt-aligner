@@ -12,7 +12,6 @@
 #include "queue.h"
 #include "sais.h"
 
-#include "../commons/BW_types.h"
 #include "../commons/commons.h"
 
 #define HSIZ 67777

@@ -1,9 +1,7 @@
 *.o
 *.test
-bin/*
-dbwt/bin
-csalib/bin
-csalib/csa.a
+*.a
+bin
 *~
 \#*\#
 .*.swp

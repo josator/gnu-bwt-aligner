@@ -1,4 +1,4 @@
-#include "BW_preprocess.h"
+#include "../BW_preprocess.h"
 
 int main(int argc, char **argv)
 {

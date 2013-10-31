@@ -1,5 +1,5 @@
-#ifndef _COMMON_TYPES_
-#define _COMMON_TYPES_
+#ifndef _SEARCH_TYPES_
+#define _SEARCH_TYPES_
 
 #include <inttypes.h>
 #include <stdbool.h>
@@ -84,17 +84,5 @@ typedef struct {
 	SA_TYPE dollar; //Position ending with the $ symbol (the first in the reference)
 
 } ref_vector;
-
-//Data structure for chromosome or exome separation positions in the reference
-#define INDEX_EXOME 24000
-#define IDMAX 100
-
-typedef struct {
-  char chromosome[INDEX_EXOME*IDMAX];
-  SA_TYPE start[INDEX_EXOME];
-  SA_TYPE end[INDEX_EXOME];
-  SA_TYPE offset[INDEX_EXOME];
-  SA_TYPE size;
-} exome;
 
 #endif

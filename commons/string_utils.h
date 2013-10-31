@@ -9,12 +9,10 @@
 #include <inttypes.h>
 #include <wchar.h>
 
-#include "BW_types.h"
+extern uint8_t nA;
+extern uint8_t AA, CC, GG, TT;
 
-extern REF_TYPE nA;
-extern REF_TYPE AA, CC, GG, TT;
-
-extern REF_TYPE table[128];
+extern uint8_t table[128];
 extern char rev_table[4];
 extern char reserve[4];
 
@@ -35,7 +33,7 @@ void init_replace_table(const char *str);
  * 
  *  Encodes a sequence of plain nucleotides
  */
-void encode_bases(REF_TYPE* dest, char* src, uintmax_t length);
+void encode_bases(uint8_t* dest, char* src, uintmax_t length);
 
 /**
  *  @brief Decodes a sequence of plain nucleotides
@@ -45,10 +43,10 @@ void encode_bases(REF_TYPE* dest, char* src, uintmax_t length);
  * 
  *  Encodes a sequence of plain nucleotides
  */
-void decode_bases(char* dest, REF_TYPE* src, uintmax_t length);
+void decode_bases(char* dest, uint8_t* src, uintmax_t length);
 
-void revstring(REF_TYPE *X, uintmax_t nX);
+void revstring(uint8_t *X, uintmax_t nX);
 
-void duplicate_reverse(REF_TYPE *X, uintmax_t nX);
+void duplicate_reverse(uint8_t *X, uintmax_t nX);
 
 #endif
