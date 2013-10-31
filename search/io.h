@@ -6,7 +6,17 @@
 
 #include "../commons/commons.h"
 #include "../commons/string_utils.h"
-#include "runtime.h"
+
+typedef struct {
+
+	uint8_t *vector;
+  uint64_t n;
+	uint64_t dollar; //Position ending with the $ symbol (the first in the reference)
+
+} ref_vector;
+
+void read_ref_vector(ref_vector *vector, const char *directory, const char *name);
+void save_ref_vector(ref_vector *vector, const char *directory, const char *name);
 
 //Data structure for chromosome or exome separation positions in the reference
 #define INDEX_EXOME 24000
@@ -23,7 +33,7 @@ typedef struct {
 void load_exome_file(exome *ex, const char *directory);
 void save_exome_file(exome *ex, bool reverse, const char *directory);
 
-void encode_reference(uint8_t *X, uintmax_t *nX, uintmax_t *dollar, exome *ex, bool reverse, const char *ref_path);
+void encode_reference(ref_vector *X, exome *ex, bool reverse, const char *ref_path);
 bool nextFASTAToken(FILE *queries_file, char *uncoded, uint8_t *coded, uintmax_t *nquery);
 
 inline uintmax_t binsearch(uintmax_t *array, uintmax_t size, uintmax_t key) {

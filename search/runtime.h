@@ -4,7 +4,6 @@
 #if defined CSALIB_SEARCH
 #include "../csalib/csa.h"
 #else
-#include "types.h"
 #include "csafm.h"
 #endif
 
@@ -48,106 +47,12 @@ typedef struct {
 
 #if defined CSALIB_SEARCH
 #define size_SA(index) ((index)->csa->n+1)
+#define get_SA(m, index) csa_lookup((index)->csa, (m))
+#define get_ISA(m, index) csa_inverse((index)->csa, (m))
 #else
 #define size_SA(index) ((index)->S->siz)
+#define get_SA(m, index) getScompValue((m), (index)->S, (index)->C, (index)->O)
+#define get_ISA(m, index) getRcompValue((m), (index)->R, (index)->C, (index)->O)
 #endif
-
-inline uintmax_t get_SA(uintmax_t m, bwt_index *index) {
-
-#if defined CSALIB_SEARCH
-
-	return csa_lookup(index->csa, m);
-
-#else
-
-	if (index->S->ratio==1) {
-
-		return index->S->vector[m];
-
-	} else {
-
-		SA_TYPE i,j;
-		uint8_t b_aux;
-
-		i=m; j=0;
-
-		while (i % index->S->ratio) {
-
-			b_aux = get_B_from_O(i, index->O);
-
-			if (b_aux == (uint8_t) -1) {
-
-				i=0;
-
-			} else {
-
-				i = index->C->vector[b_aux] + get_O(b_aux, i+1/*0 is -1*/, index->O);
-
-			}
-
-			j++;
-
-		}
-
-		return (index->S->vector[i / index->S->ratio] + j) % (index->O->siz-1);
-
-	}
-
-#endif
-
-}
-
-inline uintmax_t get_ISA(uintmax_t m, bwt_index *index) {
-
-#if defined CSALIB_SEARCH
-
-		return csa_inverse(index->csa, m);
-
-#else
-
-	if (index->R->ratio==1) {
-
-		return index->R->vector[m];
-
-	} else {
-
-		SA_TYPE i, j, k;
-		uint8_t b_aux;
-
-		i = (index->R->ratio - (m % index->R->ratio)) % index->R->ratio;
-		k = m + i;
-
-		if (k < index->R->siz) {
-			j = index->R->vector[k / index->R->ratio];
-		} else {
-			j = index->R->vector[0];
-			i = index->R->siz - m;
-		}
-
-		while (i) {
-
-			b_aux = get_B_from_O(j, index->O);
-
-			if (b_aux == (uint8_t) -1) {
-
-				j=0;
-
-			} else {
-
-				j = index->C->vector[b_aux] + get_O(b_aux, j+1/*0 is -1*/, index->O);
-
-			}
-
-			i--;
-
-		}
-
-		return j;
-
-	}
-
-#endif
-
-}
 
 #endif

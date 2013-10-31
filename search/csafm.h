@@ -5,40 +5,96 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#include <stdbool.h>
 
 #include "../commons/commons.h"
 #include "../commons/string_utils.h"
 
-#include "types.h"
+#if   defined SA_64
+
+typedef uint64_t SA_TYPE;
+typedef int64_t S_SA_TYPE;
+
+#elif defined SA_32
+
+typedef uint32_t SA_TYPE;
+typedef int32_t S_SA_TYPE;
+
+#elif defined SA_16
+
+typedef uint16_t SA_TYPE;
+typedef int16_t S_SA_TYPE;
+
+#elif defined SA_8
+
+typedef uint8_t SA_TYPE;
+typedef int8_t S_SA_TYPE;
+
+#else
+
+typedef uint32_t SA_TYPE;
+typedef int32_t S_SA_TYPE;
+
+#endif
+
+#if   defined FM_COMP_64
+
+typedef uint64_t FM_COMP_TYPE;
+#define FM_COMP_VALUE 64
+
+#elif defined FM_COMP_32
+
+typedef uint32_t FM_COMP_TYPE;
+#define FM_COMP_VALUE 32
+
+#endif
+
+typedef struct {
+
+	SA_TYPE **desp; // nA
+	SA_TYPE siz; //Real number of columns of the uncompressed matrix
+  SA_TYPE n_desp;
+  SA_TYPE m_desp;
+
+#if defined FM_COMP_32 || FM_COMP_64
+  FM_COMP_TYPE **count; // nA
+  SA_TYPE n_count;
+  SA_TYPE m_count;
+#endif
+
+} comp_matrix;
+
+typedef struct {
+
+	SA_TYPE *vector;
+  SA_TYPE n;
+
+} vector;
+
+typedef struct {
+
+	SA_TYPE *vector;
+
+  SA_TYPE siz; //Real size of the uncompressed vector
+	SA_TYPE n;
+  SA_TYPE ratio;
+
+} comp_vector;
 
 void reverse_strand_C(vector *r_C, vector *s_C, vector *r_C1, vector *s_C1);
 void reverse_strand_O(comp_matrix *r_O, comp_matrix *s_O);
 
 void read_vector(vector *vector, const char *directory, const char *name);
 void read_comp_vector(comp_vector *vector, const char *directory, const char *name);
-void read_ref_vector(ref_vector *vector, const char *directory, const char *name);
 void read_comp_matrix(comp_matrix *matrix, const char *directory, const char *name);
 
 void save_vector(vector *vector, const char *directory, const char *name);
 void save_comp_vector(comp_vector *vector, const char *directory, const char *name);
-void save_ref_vector(ref_vector *vector, const char *directory, const char *name);
 void save_comp_matrix(comp_matrix *matrix, const char *directory, const char *name);
 
 void free_comp_matrix(comp_matrix *reverse, comp_matrix *strand);
 
 #ifdef VERBOSE_DBG
-
-#define print_matrix(M,n,m)\
-{\
-  printf("Matrix " #M ":\n");\
-  for (SA_TYPE i_=0; i_<((SA_TYPE) (n)); i_++) {\
-    printf("%ju: ", (uintmax_t) i_);\
-    for (SA_TYPE j_=0; j_<((SA_TYPE) (m)); j_++) {\
-      printf("%ju ", (uintmax_t) (M)[i_][j_]);\
-    }\
-    printf("\n");\
-  }\
-}
 
 #define print_comp_matrix_count(M,n,m,siz)\
 {\
@@ -71,26 +127,10 @@ void free_comp_matrix(comp_matrix *reverse, comp_matrix *strand);
  
 #endif
 
-#define print_vector(V,n)\
-{\
-  printf("Vector " #V ":\n");\
-  for (SA_TYPE i_=0; i_<((SA_TYPE) (n)); i_++) {\
-		printf("%ju ", (uintmax_t) (V)[i_]);\
-  }\
-  printf("\n");\
-}
-
-#define print_string(S)\
-	printf("String " #S ":\n%s\n", S);
-
 #else
 
-#define print_matrix(M,n,m);
-#define print_comp_matrix_count_32(M,n,m,siz);
-#define print_comp_matrix_count_64(M,n,m,siz);
+#define print_comp_matrix_count(M,n,m,siz);
 #define print_comp_matrix(O);
-#define print_vector(V,n);
-#define print_string(S);
 
 #endif
 
@@ -163,6 +203,72 @@ inline uint8_t get_B_from_O(SA_TYPE m, comp_matrix *O) {
 #endif
 
 	return (uint8_t) -1;
+
+}
+
+inline SA_TYPE getScompValue(SA_TYPE m, comp_vector *Scomp, vector *C, comp_matrix *O) {
+
+  SA_TYPE i,j;
+  uint8_t b_aux;
+  
+  i=m; j=0;
+  
+  while (i % Scomp->ratio) {
+    
+    b_aux = get_B_from_O(i, O);
+    
+    if (b_aux == (uint8_t) -1) {
+      
+      i=0;
+
+    } else {
+
+      i = C->vector[b_aux] + get_O(b_aux, i+1, O);
+
+    }
+    
+    j++;
+
+  }
+
+  return (Scomp->vector[i / Scomp->ratio] + j) % (O->siz-1);
+
+}
+
+inline SA_TYPE getRcompValue(SA_TYPE m, comp_vector *Rcomp, vector *C, comp_matrix *O) {
+
+	SA_TYPE i, j, k;
+	uint8_t b_aux;
+
+	i = (Rcomp->ratio - (m % Rcomp->ratio)) % Rcomp->ratio;
+	k = m + i;
+
+	if (k < Rcomp->siz) {
+		j = Rcomp->vector[k / Rcomp->ratio];
+	} else {
+		j = Rcomp->vector[0];
+		i = Rcomp->siz - m;
+	}
+
+	while (i) {
+
+		b_aux = get_B_from_O(j, O);
+
+		if (b_aux == (uint8_t) -1) {
+
+			j=0;
+
+		} else {
+
+			j = C->vector[b_aux] + get_O(b_aux, j+1, O);
+
+		}
+
+		i--;
+
+	}
+
+	return j;
 
 }
 

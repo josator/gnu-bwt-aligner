@@ -4,9 +4,8 @@
 #include <sys/time.h>
 
 #include "../commons/commons.h"
-#include "../BW_search.h"
-#include "../BW_csafm.h"
-#include "../BW_results.h"
+#include "../search/search.h"
+#include "../search/io.h"
 
 int main(int argc, char **argv) {
 
@@ -22,7 +21,7 @@ int main(int argc, char **argv) {
   results_list rl_prev, rl_next, rl_prev_i, rl_next_i, rl_final;
   uintmax_t read_index=0;
 
-  SA_TYPE RESULTS, FRAGSIZE;
+  uintmax_t RESULTS, FRAGSIZE;
   exome ex;
 
   FILE *queries_file, *output_file;
@@ -80,10 +79,10 @@ int main(int argc, char **argv) {
 
   toc();
 
-  SA_TYPE *k = (SA_TYPE*)malloc(RESULTS * sizeof(SA_TYPE));
-  SA_TYPE *l = (SA_TYPE*)malloc(RESULTS * sizeof(SA_TYPE));
+  uintmax_t *k = (uintmax_t*)malloc(RESULTS * sizeof(uintmax_t));
+  uintmax_t *l = (uintmax_t*)malloc(RESULTS * sizeof(uintmax_t));
 
-  SA_TYPE nW_aux;
+  uintmax_t nW_aux;
 
   tic("Sequence mapping");
 

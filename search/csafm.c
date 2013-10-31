@@ -167,41 +167,6 @@ void read_comp_vector(comp_vector *vector, const char *directory, const char *na
   fclose(fp);
 }
 
-void read_ref_vector(ref_vector *vector, const char *directory, const char *name) {
-
-  size_t err=0;
-  FILE *fp;
-
-  char path[500];
-
-  path[0]='\0';
-  strcat(path, directory);
-  strcat(path, "/");
-  strcat(path, name);
-  strcat(path, ".vec");
-
-  fp  = fopen(path,  "rb+");
-  check_file_open(fp, path);
-
-  err = fread(&vector->n, sizeof(uint64_t),  1, fp);
-  check_file_read(err, 1, path);
-
-  err = fread(&vector->dollar, sizeof(uint64_t),  1, fp);
-  check_file_read(err, 1, path);
-
-	check_file_read(err, 1, path);
-  vector->vector = (uint8_t *) malloc((vector->n + 1) * sizeof(uint8_t)); //Valgrind errors on dbwt
-  check_malloc(vector->vector, path);
-
-	err = fread(vector->vector, sizeof(uint8_t), vector->n, fp);
-  check_file_read(err, vector->n, path);
-
-	vector->vector[vector->n] = 0; //Valgrind errors on dbwt
-
-	fclose(fp);
-
-}
-
 void read_comp_matrix(comp_matrix *matrix, const char *directory, const char *name) {
 
 	size_t err=0;
@@ -328,35 +293,6 @@ void save_comp_vector(comp_vector *vector, const char *directory, const char *na
   check_file_write(err, vector->n, path);
 
   fclose(fp);
-
-}
-
-void save_ref_vector(ref_vector *vector, const char *directory, const char *name) {
-
-  size_t err=0;
-  FILE *fp;
-
-  char path[500];
-
-  path[0]='\0';
-  strcat(path, directory);
-  strcat(path, "/");
-  strcat(path, name);
-  strcat(path, ".vec");
-
-  fp  = fopen(path,  "wb+");
-  check_file_open(fp, path);
-
-  err = fwrite(&vector->n,      sizeof(uint64_t), 1, fp);
-  check_file_write(err, 1, path);
-
-  err = fwrite(&vector->dollar, sizeof(uint64_t), 1, fp);
-  check_file_write(err, 1, path);
-
-	err = fwrite(vector->vector, sizeof(uint8_t), vector->n, fp);
-  check_file_write(err, vector->n, path);
-
-	fclose(fp);
 
 }
 

@@ -100,6 +100,40 @@ extern double mean_batch_size;
     exit(1);\
   }
 
+#ifdef VERBOSE_DBG
+
+#define print_matrix(M,n,m)\
+{\
+  printf("Matrix " #M ":\n");\
+  for (SA_TYPE i_=0; i_<((SA_TYPE) (n)); i_++) {\
+    printf("%ju: ", (uintmax_t) i_);\
+    for (SA_TYPE j_=0; j_<((SA_TYPE) (m)); j_++) {\
+      printf("%ju ", (uintmax_t) (M)[i_][j_]);\
+    }\
+    printf("\n");\
+  }\
+}
+
+#define print_vector(V,n)\
+{\
+  printf("Vector " #V ":\n");\
+  for (SA_TYPE i_=0; i_<((SA_TYPE) (n)); i_++) {\
+		printf("%ju ", (uintmax_t) (V)[i_]);\
+  }\
+  printf("\n");\
+}
+
+#define print_string(S)\
+	printf("String " #S ":\n%s\n", S);
+
+#else
+
+#define print_matrix(M,n,m);
+#define print_vector(V,n);
+#define print_string(S);
+
+#endif
+
 void *mymalloc(size_t n);
 void *myrealloc(void *ptr, size_t next, size_t last);
 void myfree(void *p, size_t s);

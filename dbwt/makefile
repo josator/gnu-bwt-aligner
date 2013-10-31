@@ -1,36 +1,22 @@
 COMMONS_DIR = ../commons/
 
 CC = gcc
-CFLAGS = -m64 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -O3 -std=c99
+CFLAGS = -m64 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -O3 -std=c99 -fPIC
 DEPEN = queue.o utils.o sais.o dbwt.o
 OBJECTS = $(DEPEN) main.o
 
-.PHONY: clean all depen
+.PHONY: clean all
 
-all: commons ../bin/dbwt
+all: ../bin/dbwt
 
-depen: $(DEPEN)
+dbwt.a: $(DEPEN)
+	ar rc dbwt.a $(DEPEN)
 
-../bin/dbwt: $(OBJECTS) queue.h utils.h sais.h dbwt.h
-	$(CC) $(CFLAGS) $(COMMONS_DIR)/commons.o $(OBJECTS) -o ../bin/dbwt
-
-queue.o: queue.c queue.h utils.h
-	$(CC) $(CFLAGS) -c queue.c
-
-utils.o: utils.c utils.h
-	$(CC) $(CFLAGS) -c utils.c
-
-sais.o: sais.c sais.h
-	$(CC) $(CFLAGS) -c sais.c
-
-dbwt.o: dbwt.c dbwt.h queue.h utils.h sais.h
-	$(CC) $(CFLAGS) -c dbwt.c
-
-main.o: main.c dbwt.h
-	$(CC) $(CFLAGS) -c main.c
+../bin/dbwt: main.c dbwt.a commons
+	$(CC) $(CFLAGS) -o $@ main.c $(COMMONS_DIR)/commons.a dbwt.a
 
 commons:
-	make -C $(COMMONS_DIR) depen
+	make -C $(COMMONS_DIR) commons.a
 
 clean:
 	rm -f *~ \#*\# .*.swp *.o *.a

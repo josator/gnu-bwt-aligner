@@ -68,7 +68,7 @@ void save_exome_file(exome *ex, bool reverse, const char *directory) {
 
 }
 
-void encode_reference(uint8_t *X, uintmax_t *nX, uintmax_t *dollar, exome *ex, bool reverse, const char *ref_path) {
+void encode_reference(ref_vector *X, exome *ex, bool reverse, const char *ref_path) {
 
 	FILE *ref_file;
 	ref_file = fopen(ref_path, "r");
@@ -83,7 +83,7 @@ void encode_reference(uint8_t *X, uintmax_t *nX, uintmax_t *dollar, exome *ex, b
 	if (reverse) size = read*2 + 1;
 	else         size = read   + 1;
 
-	X = (uint8_t *) malloc( size * sizeof(uint8_t) );
+	X->vector = (uint8_t *) malloc( size * sizeof(uint8_t) );
 	check_malloc(X, ref_path);
 
 	char *reference = (char *) X;
@@ -145,17 +145,17 @@ void encode_reference(uint8_t *X, uintmax_t *nX, uintmax_t *dollar, exome *ex, b
 		ex->size++;
 	}
 
-	encode_bases(X, reference, total_length);
+	encode_bases(X->vector, reference, total_length);
 
 	if (reverse) {
-		duplicate_reverse(X, total_length);
-		*nX = total_length * 2;
+		duplicate_reverse(X->vector, total_length);
+		X->n = total_length * 2;
 	} else {
-		*nX = total_length;
+		X->n = total_length;
 	}
 
-	dollar = 0;
-	X[*nX] = 0; //Valgrind errors on dbwt
+	X->dollar = 0;
+	X->vector[X->n] = 0; //Valgrind errors on dbwt
 
 	fclose(ref_file);
 
@@ -198,5 +198,69 @@ bool nextFASTAToken(FILE *queries_file, char *uncoded, uint8_t *coded, uintmax_t
 		return false;
 
 	}
+
+}
+
+void read_ref_vector(ref_vector *vector, const char *directory, const char *name) {
+
+  size_t err=0;
+  FILE *fp;
+
+  char path[500];
+
+  path[0]='\0';
+  strcat(path, directory);
+  strcat(path, "/");
+  strcat(path, name);
+  strcat(path, ".vec");
+
+  fp  = fopen(path,  "rb+");
+  check_file_open(fp, path);
+
+  err = fread(&vector->n, sizeof(uint64_t),  1, fp);
+  check_file_read(err, 1, path);
+
+  err = fread(&vector->dollar, sizeof(uint64_t),  1, fp);
+  check_file_read(err, 1, path);
+
+	check_file_read(err, 1, path);
+  vector->vector = (uint8_t *) malloc((vector->n + 1) * sizeof(uint8_t)); //Valgrind errors on dbwt
+  check_malloc(vector->vector, path);
+
+	err = fread(vector->vector, sizeof(uint8_t), vector->n, fp);
+  check_file_read(err, vector->n, path);
+
+	vector->vector[vector->n] = 0; //Valgrind errors on dbwt
+
+	fclose(fp);
+
+}
+
+void save_ref_vector(ref_vector *vector, const char *directory, const char *name) {
+
+  size_t err=0;
+  FILE *fp;
+
+  char path[500];
+
+  path[0]='\0';
+  strcat(path, directory);
+  strcat(path, "/");
+  strcat(path, name);
+  strcat(path, ".vec");
+
+  fp  = fopen(path,  "wb+");
+  check_file_open(fp, path);
+
+  err = fwrite(&vector->n,      sizeof(uint64_t), 1, fp);
+  check_file_write(err, 1, path);
+
+  err = fwrite(&vector->dollar, sizeof(uint64_t), 1, fp);
+  check_file_write(err, 1, path);
+
+	err = fwrite(vector->vector, sizeof(uint8_t), vector->n, fp);
+  check_file_write(err, vector->n, path);
+
+	fclose(fp);
 
 }
