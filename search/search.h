@@ -1,9 +1,9 @@
 #ifndef _SEARCH_SEARCH_
 #define _SEARCH_SEARCH_
 
-#include "BW_results.h"
+#include "results.h"
 
-inline void BWExactSearchBackward(REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, result *r) {
+inline void BWExactSearchBackward(uint8_t *W, vector *C, vector *C1, comp_matrix *O, result *r) {
 
 	SA_TYPE k2, l2;
 	int16_t i;
@@ -26,7 +26,7 @@ inline void BWExactSearchBackward(REF_TYPE *W, vector *C, vector *C1, comp_matri
 	r->pos = i;
 }
 
-inline void BWExactSearchForward(REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, result *r) {
+inline void BWExactSearchForward(uint8_t *W, vector *C, vector *C1, comp_matrix *O, result *r) {
 
 	SA_TYPE k2, l2;
 	int16_t i;
@@ -52,7 +52,7 @@ inline void BWExactSearchForward(REF_TYPE *W, vector *C, vector *C1, comp_matrix
 }
 
 #if 0
-inline bool BWExactFinalResultBackward(REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, result *r_iterator, results_list *rl_final, int16_t block_size, int16_t last_block) {
+inline bool BWExactFinalResultBackward(uint8_t *W, vector *C, vector *C1, comp_matrix *O, result *r_iterator, results_list *rl_final, int16_t block_size, int16_t last_block) {
 
 	SA_TYPE k, l;
 	int16_t start, pos;
@@ -99,7 +99,7 @@ inline bool BWExactFinalResultBackward(REF_TYPE *W, vector *C, vector *C1, comp_
 
 }
 
-inline bool BWExactFinalResultForward(REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, result *r_iterator, results_list *rl_final, int16_t block_size, int16_t last_block) {
+inline bool BWExactFinalResultForward(uint8_t *W, vector *C, vector *C1, comp_matrix *O, result *r_iterator, results_list *rl_final, int16_t block_size, int16_t last_block) {
 
 	SA_TYPE k, l;
 	int16_t pos, end;
@@ -201,19 +201,19 @@ inline void change_direction(comp_vector *S, comp_vector *Ri, vector *C, comp_ma
 
 }
 
-bool BWSearchCPU(REF_TYPE *W, SA_TYPE nW, vector *C, vector *C1, comp_matrix *O, comp_matrix *Oi, comp_vector *S, comp_vector *R, comp_vector *Si, comp_vector *Ri, results_list *rl_prev, results_list *rl_next, results_list *rl_prev_i, results_list *rl_next_i, results_list *rl_final, int16_t fragsize, bool type);
+bool BWSearchCPU(uint8_t *W, SA_TYPE nW, vector *C, vector *C1, comp_matrix *O, comp_matrix *Oi, comp_vector *S, comp_vector *R, comp_vector *Si, comp_vector *Ri, results_list *rl_prev, results_list *rl_next, results_list *rl_prev_i, results_list *rl_next_i, results_list *rl_final, int16_t fragsize, bool type);
 
-bool BWSearch1GPUHelper(REF_TYPE *W, int16_t start, int16_t end, SA_TYPE *vec_k, SA_TYPE *vec_l, SA_TYPE *vec_ki, SA_TYPE *vec_li, vector *C, vector *C1, comp_matrix *O, comp_matrix *Oi, results_list *r_list);
+bool BWSearch1GPUHelper(uint8_t *W, int16_t start, int16_t end, SA_TYPE *vec_k, SA_TYPE *vec_l, SA_TYPE *vec_ki, SA_TYPE *vec_li, vector *C, vector *C1, comp_matrix *O, comp_matrix *Oi, results_list *r_list);
 
 /******DEPRECATED FUNCTIONS******/
-bool BWSearch1CPU(REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, comp_matrix *Oi, result *res, results_list *r_list);
-bool BWSimpleSearch1Backward(REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, result *res, results_list *r_list);
-bool BWSimpleSearch1Forward(REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, result *res, results_list *r_list);
+bool BWSearch1CPU(uint8_t *W, vector *C, vector *C1, comp_matrix *O, comp_matrix *Oi, result *res, results_list *r_list);
+bool BWSimpleSearch1Backward(uint8_t *W, vector *C, vector *C1, comp_matrix *O, result *res, results_list *r_list);
+bool BWSimpleSearch1Forward(uint8_t *W, vector *C, vector *C1, comp_matrix *O, result *res, results_list *r_list);
 
-void BWExactSearchVectorBackward(REF_TYPE *W, int16_t start, int16_t end, SA_TYPE k, SA_TYPE l, SA_TYPE *vec_k, SA_TYPE *vec_l, vector *C, vector *C1, comp_matrix *O);
-void BWExactSearchVectorForward(REF_TYPE *W, int16_t start, int16_t end, SA_TYPE k, SA_TYPE l, SA_TYPE *vec_k, SA_TYPE *vec_l, vector *C, vector *C1, comp_matrix *O);
+void BWExactSearchVectorBackward(uint8_t *W, int16_t start, int16_t end, SA_TYPE k, SA_TYPE l, SA_TYPE *vec_k, SA_TYPE *vec_l, vector *C, vector *C1, comp_matrix *O);
+void BWExactSearchVectorForward(uint8_t *W, int16_t start, int16_t end, SA_TYPE k, SA_TYPE l, SA_TYPE *vec_k, SA_TYPE *vec_l, vector *C, vector *C1, comp_matrix *O);
 /********************************/
 
-bool nextFASTAToken(FILE *queries_file, char *uncoded, REF_TYPE *coded, SA_TYPE *nquery); 
+bool nextFASTAToken(FILE *queries_file, char *uncoded, uint8_t *coded, SA_TYPE *nquery); 
 #endif
 #endif

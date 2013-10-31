@@ -43,8 +43,6 @@ typedef uint32_t FM_COMP_TYPE;
 
 #endif
 
-typedef uint8_t REF_TYPE;
-
 typedef struct {
 
 	SA_TYPE **desp; // nA
@@ -79,7 +77,7 @@ typedef struct {
 
 typedef struct {
 
-	REF_TYPE *vector;
+	uint8_t *vector;
   SA_TYPE n;
 	SA_TYPE dollar; //Position ending with the $ symbol (the first in the reference)
 

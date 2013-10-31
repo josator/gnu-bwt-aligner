@@ -1,4 +1,4 @@
-#include "BW_csafm.h"
+#include "csafm.h"
 
 void free_comp_matrix(comp_matrix *reverse, comp_matrix *strand) {
 
@@ -29,21 +29,21 @@ void reverse_strand_C(vector *r_C, vector *s_C, vector *r_C1, vector *s_C1) {
 	r_C1->vector = (SA_TYPE *)malloc(r_C1->n * sizeof(SA_TYPE));
 	check_malloc(r_C1->vector, "reverseStrandC r_C1");
 
-  if (AA != (REF_TYPE) -1 && TT != (REF_TYPE) -1) {
+  if (AA != (uint8_t) -1 && TT != (uint8_t) -1) {
     r_C->vector[AA] = s_C->vector[TT]; r_C1->vector[AA] = s_C1->vector[TT];
     r_C->vector[TT] = s_C->vector[AA]; r_C1->vector[TT] = s_C1->vector[AA];
-  } else if (AA != (REF_TYPE) -1) {
+  } else if (AA != (uint8_t) -1) {
     r_C->vector[AA] = s_C->vector[AA]; r_C1->vector[AA] = s_C1->vector[AA];
-  } else if (TT != (REF_TYPE) -1) {
+  } else if (TT != (uint8_t) -1) {
     r_C->vector[TT] = s_C->vector[TT]; r_C1->vector[TT] = s_C1->vector[TT];
   }
 
-  if (CC != (REF_TYPE) -1 && GG != (REF_TYPE) -1) {
+  if (CC != (uint8_t) -1 && GG != (uint8_t) -1) {
     r_C->vector[CC] = s_C->vector[GG]; r_C1->vector[CC] = s_C1->vector[GG];
     r_C->vector[GG] = s_C->vector[CC]; r_C1->vector[GG] = s_C1->vector[CC];
-  } else if (CC != (REF_TYPE) -1) {
+  } else if (CC != (uint8_t) -1) {
     r_C->vector[CC] = s_C->vector[CC]; r_C1->vector[CC] = s_C1->vector[CC];
-  } else if (GG != (REF_TYPE) -1) {
+  } else if (GG != (uint8_t) -1) {
     r_C->vector[GG] = s_C->vector[GG]; r_C1->vector[GG] = s_C1->vector[GG];
   }
 
@@ -59,21 +59,21 @@ void reverse_strand_O(comp_matrix *r_O, comp_matrix *s_O) {
 	r_O->desp = (SA_TYPE **) malloc(r_O->n_desp * sizeof(SA_TYPE *));
 	check_malloc(r_O->desp, "reverse_strand_O");
 
-  if (AA != (REF_TYPE) -1 && TT != (REF_TYPE) -1) {
+  if (AA != (uint8_t) -1 && TT != (uint8_t) -1) {
     r_O->desp[AA] = s_O->desp[TT];
     r_O->desp[TT] = s_O->desp[AA];
-  } else if (AA != (REF_TYPE) -1) {
+  } else if (AA != (uint8_t) -1) {
     r_O->desp[AA] = s_O->desp[AA];
-  } else if (TT != (REF_TYPE) -1) {
+  } else if (TT != (uint8_t) -1) {
     r_O->desp[TT] = s_O->desp[TT];
   }
 
-  if (CC != (REF_TYPE) -1 && GG != (REF_TYPE) -1) {
+  if (CC != (uint8_t) -1 && GG != (uint8_t) -1) {
     r_O->desp[CC] = s_O->desp[GG];
     r_O->desp[GG] = s_O->desp[CC];
-  } else if (CC != (REF_TYPE) -1) {
+  } else if (CC != (uint8_t) -1) {
     r_O->desp[CC] = s_O->desp[CC];
-  } else if (GG != (REF_TYPE) -1) {
+  } else if (GG != (uint8_t) -1) {
     r_O->desp[GG] = s_O->desp[GG];
   }
 
@@ -85,21 +85,21 @@ void reverse_strand_O(comp_matrix *r_O, comp_matrix *s_O) {
 	r_O->count = (FM_COMP_TYPE **) malloc(r_O->n_count * sizeof(FM_COMP_TYPE *));
 	check_malloc(r_O->count, "reverse_strand_O");
 
-  if (AA != (REF_TYPE) -1 && TT != (REF_TYPE) -1) {
+  if (AA != (uint8_t) -1 && TT != (uint8_t) -1) {
     r_O->count[AA] = s_O->count[TT];
     r_O->count[TT] = s_O->count[AA];
-  } else if (AA != (REF_TYPE) -1) {
+  } else if (AA != (uint8_t) -1) {
     r_O->count[AA] = s_O->count[AA];
-  } else if (TT != (REF_TYPE) -1) {
+  } else if (TT != (uint8_t) -1) {
     r_O->count[TT] = s_O->count[TT];
   }
 
-if (CC != (REF_TYPE) -1 && GG != (REF_TYPE) -1) {
+if (CC != (uint8_t) -1 && GG != (uint8_t) -1) {
     r_O->count[CC] = s_O->count[GG];
     r_O->count[GG] = s_O->count[CC];
-  } else if (CC != (REF_TYPE) -1) {
+  } else if (CC != (uint8_t) -1) {
     r_O->count[CC] = s_O->count[CC];
-  } else if (GG != (REF_TYPE) -1) {
+  } else if (GG != (uint8_t) -1) {
     r_O->count[GG] = s_O->count[GG];
   }
 
@@ -190,10 +190,10 @@ void read_ref_vector(ref_vector *vector, const char *directory, const char *name
   check_file_read(err, 1, path);
 
 	check_file_read(err, 1, path);
-  vector->vector = (REF_TYPE *) malloc((vector->n + 1) * sizeof(REF_TYPE)); //Valgrind errors on dbwt
+  vector->vector = (uint8_t *) malloc((vector->n + 1) * sizeof(uint8_t)); //Valgrind errors on dbwt
   check_malloc(vector->vector, path);
 
-	err = fread(vector->vector, sizeof(REF_TYPE), vector->n, fp);
+	err = fread(vector->vector, sizeof(uint8_t), vector->n, fp);
   check_file_read(err, vector->n, path);
 
 	vector->vector[vector->n] = 0; //Valgrind errors on dbwt
@@ -353,7 +353,7 @@ void save_ref_vector(ref_vector *vector, const char *directory, const char *name
   err = fwrite(&vector->dollar, sizeof(SA_TYPE), 1, fp);
   check_file_write(err, 1, path);
 
-	err = fwrite(vector->vector, sizeof(REF_TYPE), vector->n, fp);
+	err = fwrite(vector->vector, sizeof(uint8_t), vector->n, fp);
   check_file_write(err, vector->n, path);
 
 	fclose(fp);

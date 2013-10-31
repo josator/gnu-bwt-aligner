@@ -1,4 +1,4 @@
-#include "BW_results.h"
+#include "results.h"
 
 bool write_results(results_list *r_list, SA_TYPE *k, SA_TYPE *l, exome* ex, comp_vector *S, comp_vector *Si, vector *C, comp_matrix *O, comp_matrix *Oi, char *mapping, SA_TYPE nW, bool type, FILE *fp) {
 

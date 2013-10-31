@@ -3,8 +3,8 @@
 
 #include <cuda.h>
 
-#include "BW_search.h" //Remove after cleanup and method repositioning
-#include "BW_results.h"
+#include "search.h" //Remove after cleanup and method repositioning
+#include "results.h"
 
 #if defined FM_COMP_32 || FM_COMP_64
 
@@ -62,11 +62,11 @@ void free_comp_matrix_gpu_device(comp_matrix *reverse, comp_matrix *strand);
 
 void reverse_strand_gpu_O(comp_matrix *r_O, comp_matrix *s_O);
 
-void BWExactSearchBackwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O);
-void BWExactSearchForwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O);
-void BWExactSearchBackwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O);
-void BWExactSearchForwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O);
+void BWExactSearchBackwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O);
+void BWExactSearchForwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O);
+void BWExactSearchBackwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O);
+void BWExactSearchForwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O);
 
-void BWSearchGPU(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE *W, char *h_W, SA_TYPE nW, vector *C, vector *h_C, vector *C1, vector *h_C1, comp_matrix *O, comp_matrix *h_O, comp_matrix *Oi, comp_matrix *h_Oi, comp_vector *S, comp_vector *R, comp_vector *Si, comp_vector *Ri, blocked_results_lists *rl_prev_cpu, blocked_results_lists *rl_next_cpu, blocked_results_lists *rl_prev_i_cpu, blocked_results_lists *rl_next_i_cpu, blocked_results_lists *rl_final_cpu, blocked_results_lists *rl_prev_gpu, blocked_results_lists *rl_next_gpu, blocked_results_lists *rl_prev_i_gpu, blocked_results_lists *rl_next_i_gpu, blocked_results_lists *rl_final_gpu, int16_t fragsize, uintmax_t max_results);
+void BWSearchGPU(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t *W, char *h_W, SA_TYPE nW, vector *C, vector *h_C, vector *C1, vector *h_C1, comp_matrix *O, comp_matrix *h_O, comp_matrix *Oi, comp_matrix *h_Oi, comp_vector *S, comp_vector *R, comp_vector *Si, comp_vector *Ri, blocked_results_lists *rl_prev_cpu, blocked_results_lists *rl_next_cpu, blocked_results_lists *rl_prev_i_cpu, blocked_results_lists *rl_next_i_cpu, blocked_results_lists *rl_final_cpu, blocked_results_lists *rl_prev_gpu, blocked_results_lists *rl_next_gpu, blocked_results_lists *rl_prev_i_gpu, blocked_results_lists *rl_next_i_gpu, blocked_results_lists *rl_final_gpu, int16_t fragsize, uintmax_t max_results);
 
 #endif

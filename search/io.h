@@ -4,9 +4,9 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "commons/commons.h"
-#include "commons/string_utils.h"
-#include "BW_runtime.h"
+#include "../commons/commons.h"
+#include "../commons/string_utils.h"
+#include "runtime.h"
 
 //Data structure for chromosome or exome separation positions in the reference
 #define INDEX_EXOME 24000
@@ -24,7 +24,7 @@ void load_exome_file(exome *ex, const char *directory);
 void save_exome_file(exome *ex, bool reverse, const char *directory);
 
 void encode_reference(ref_vector *X, exome *ex, bool reverse, const char *ref_path);
-bool nextFASTAToken(FILE *queries_file, char *uncoded, REF_TYPE *coded, SA_TYPE *nquery);
+bool nextFASTAToken(FILE *queries_file, char *uncoded, uint8_t *coded, SA_TYPE *nquery);
 
 inline SA_TYPE binsearch(SA_TYPE *array, SA_TYPE size, SA_TYPE key) {
 

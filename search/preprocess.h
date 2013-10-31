@@ -1,10 +1,9 @@
 #ifndef _SEARCH_PREPROCESS_
 #define _SEARCH_PREPROCESS_
 
-#include "dbwt/dbwt.h"
-
-#include "commons/string_utils.h"
-#include "BW_csafm.h"
+#include "../dbwt/dbwt.h"
+#include "../commons/string_utils.h"
+#include "csafm.h"
 
 void calculate_and_save_B(ref_vector *X, const char *directory, const char *name);
 void calculate_C(vector *C, vector *C1, ref_vector *B);

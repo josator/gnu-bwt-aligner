@@ -6,10 +6,10 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "commons/commons.h"
-#include "commons/string_utils.h"
+#include "../commons/commons.h"
+#include "../commons/string_utils.h"
 
-#include "BW_types.h"
+#include "types.h"
 
 void reverse_strand_C(vector *r_C, vector *s_C, vector *r_C1, vector *s_C1);
 void reverse_strand_O(comp_matrix *r_O, comp_matrix *s_O);
@@ -124,46 +124,52 @@ inline SA_TYPE popcount(uint64_t i) {
 
 #endif
 
+inline SA_TYPE getO(SA_TYPE n, SA_TYPE m, comp_matrix *O) {
+
 #if defined FM_COMP_32 || FM_COMP_64
 
-inline SA_TYPE getOcompValue(SA_TYPE n, SA_TYPE m, comp_matrix *O) {
   SA_TYPE pos, desp;
   pos  = m / FM_COMP_VALUE;
   desp = m % FM_COMP_VALUE;
   return O->desp[n][pos] + popcount( O->count[n][pos] << (FM_COMP_VALUE - (desp + 1)) );
-}
+
+#else
+
+  return O->desp[n][m];
 
 #endif
 
-inline REF_TYPE getBfromO(SA_TYPE m, comp_matrix *O) {
+}
+
+inline uint8_t getBfromO(SA_TYPE m, comp_matrix *O) {
 
 #if defined FM_COMP_32 || FM_COMP_64
 
-  m++;
+	m++;
 
-  SA_TYPE pos, desp;
+	SA_TYPE pos, desp;
   pos  = m / FM_COMP_VALUE;
   desp = m % FM_COMP_VALUE;
 
-  for(REF_TYPE i=0; i<O->n_count; i++) {
+	for(uint8_t i=0; i<O->n_count; i++) {
     if ( ( (O->count[i][pos] >> desp) & ((FM_COMP_TYPE) 1)) != 0) return i;
   }
 
 #else
 
-  for(REF_TYPE i=0; i<O->n_desp; i++)
+	for(uint8_t i=0; i<O->n_desp; i++)
     if ( (O->desp[i][m] < O->desp[i][m+1]) ) return i;
 
 #endif
 
-	return (REF_TYPE) -1;
+	return (uint8_t) -1;
 
 }
 
 inline SA_TYPE getScompValue(SA_TYPE m, comp_vector *Scomp, vector *C, comp_matrix *O) {
 
   SA_TYPE i,j;
-  REF_TYPE b_aux;
+  uint8_t b_aux;
   
   i=m; j=0;
   
@@ -171,17 +177,13 @@ inline SA_TYPE getScompValue(SA_TYPE m, comp_vector *Scomp, vector *C, comp_matr
     
     b_aux = getBfromO(i, O);
     
-    if (b_aux == (REF_TYPE) -1) {
+    if (b_aux == (uint8_t) -1) {
       
       i=0;
 
     } else {
 
-#if defined FM_COMP_32 || FM_COMP_64
-      i = C->vector[b_aux] + getOcompValue(b_aux, i+1/*0 is -1*/, O);
-#else
-      i = C->vector[b_aux] + O->desp[b_aux][i+1/*0 is -1*/];
-#endif
+      i = C->vector[b_aux] + getO(b_aux, i+1/*0 is -1*/, O);
 
     }
     
@@ -196,7 +198,7 @@ inline SA_TYPE getScompValue(SA_TYPE m, comp_vector *Scomp, vector *C, comp_matr
 inline SA_TYPE getScompValueB(SA_TYPE m, comp_vector *Scomp, vector *C, comp_matrix *O, ref_vector *B) {
   
   SA_TYPE i, j;
-  REF_TYPE b_aux;
+  uint8_t b_aux;
   
   i=m; j=0;
 
@@ -213,11 +215,7 @@ inline SA_TYPE getScompValueB(SA_TYPE m, comp_vector *Scomp, vector *C, comp_mat
 			else
 				b_aux = B->vector[i];
 
-#if defined FM_COMP_32 || FM_COMP_64
-      i = C->vector[b_aux] + getOcompValue(b_aux, i+1/*0 is -1*/, O);
-#else
-      i = C->vector[b_aux] + O->desp[b_aux][i+1/*0 is -1*/];
-#endif
+      i = C->vector[b_aux] + getO(b_aux, i+1/*0 is -1*/, O);
 
     }
 
@@ -232,7 +230,7 @@ inline SA_TYPE getScompValueB(SA_TYPE m, comp_vector *Scomp, vector *C, comp_mat
 inline SA_TYPE getRcompValue(SA_TYPE m, comp_vector *Rcomp, vector *C, comp_matrix *O) {
 
   SA_TYPE i, j, k;
-  REF_TYPE b_aux;
+  uint8_t b_aux;
 
   i = (Rcomp->ratio - (m % Rcomp->ratio)) % Rcomp->ratio;
   k = m + i;
@@ -248,17 +246,13 @@ inline SA_TYPE getRcompValue(SA_TYPE m, comp_vector *Rcomp, vector *C, comp_matr
 
     b_aux = getBfromO(j, O);
 
-    if (b_aux == (REF_TYPE) -1) {
+    if (b_aux == (uint8_t) -1) {
 
       j=0;
 
     } else {
 
-#if defined FM_COMP_32 || FM_COMP_64
-			j = C->vector[b_aux] + getOcompValue(b_aux, j+1/*0 is -1*/, O);
-#else
-			j = C->vector[b_aux] + O->desp[b_aux][j+1/*0 is -1*/];
-#endif
+			j = C->vector[b_aux] + getO(b_aux, j+1/*0 is -1*/, O);
 
 		}
 
@@ -272,7 +266,7 @@ inline SA_TYPE getRcompValue(SA_TYPE m, comp_vector *Rcomp, vector *C, comp_matr
 
 inline SA_TYPE getRcompValueB(SA_TYPE m, comp_vector *Rcomp, vector *C, comp_matrix *O, ref_vector *B) {
   SA_TYPE i, j, k;
-  REF_TYPE b_aux;
+  uint8_t b_aux;
 
   i = (Rcomp->ratio - (m % Rcomp->ratio)) % Rcomp->ratio;
   k = m + i;
@@ -298,11 +292,7 @@ inline SA_TYPE getRcompValueB(SA_TYPE m, comp_vector *Rcomp, vector *C, comp_mat
 			else
 				b_aux = B->vector[j];
 
-#if defined FM_COMP_32 || FM_COMP_64
-      j = C->vector[b_aux] + getOcompValue(b_aux, j+1/*0 is -1*/, O);
-#else
-      j = C->vector[b_aux] + O->desp[b_aux][j+1/*0 is -1*/];
-#endif
+      j = C->vector[b_aux] + getO(b_aux, j+1/*0 is -1*/, O);
 
     }
 

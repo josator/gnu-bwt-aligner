@@ -7,12 +7,12 @@ OBJECTS = $(DEPEN) main.o
 
 .PHONY: clean all depen
 
-all: commons bin/dbwt
+all: commons ../bin/dbwt
 
 depen: $(DEPEN)
 
-bin/dbwt: $(OBJECTS) queue.h utils.h sais.h dbwt.h
-	$(CC) $(CFLAGS) $(COMMONS_DIR)/commons.o $(OBJECTS) -o bin/dbwt
+../bin/dbwt: $(OBJECTS) queue.h utils.h sais.h dbwt.h
+	$(CC) $(CFLAGS) $(COMMONS_DIR)/commons.o $(OBJECTS) -o ../bin/dbwt
 
 queue.o: queue.c queue.h utils.h
 	$(CC) $(CFLAGS) -c queue.c
@@ -33,4 +33,4 @@ commons:
 	make -C $(COMMONS_DIR) depen
 
 clean:
-	rm -f *~ \#*\# *.o
+	rm -f *~ \#*\# .*.swp *.o *.a

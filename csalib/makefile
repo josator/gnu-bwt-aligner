@@ -17,11 +17,11 @@ depen: $(OFILES)
 csa.a: $(OFILES)
 	ar rc csa.a $(OFILES)
 
-../bin/mkcsa: mkarray2.c $(OFILES)
+../bin/mkcsa: mkarray2.c csa.a
 	$(CC)  $(CFLAGS) -o ../bin/mkcsa mkarray2.c csa.a
-../bin/csa: test_csa.c $(OFILES)
+../bin/csa: test_csa.c csa.a
 	$(CC)  $(CFLAGS) -o ../bin/csa test_csa.c csa.a
-../bin/unbwt: unbwt.c $(OFILES)
+../bin/unbwt: unbwt.c csa.a
 	$(CC)  $(CFLAGS) -o ../bin/unbwt unbwt.c csa.a
 ../bin/mkcst: mkcst.c
 	$(CC)  $(CFLAGS) -o ../bin/mkcst mkcst.c

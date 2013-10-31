@@ -1,4 +1,4 @@
-#include "BW_io.h"
+#include "io.h"
 
 void load_exome_file(exome *ex, const char *directory) {
 
@@ -83,7 +83,7 @@ void encode_reference(ref_vector *X, exome *ex, bool reverse, const char *ref_pa
 	if (reverse) size = read*2 + 1;
 	else         size = read   + 1;
 
-	X->vector = (REF_TYPE *) malloc( size * sizeof(REF_TYPE) );
+	X->vector = (uint8_t *) malloc( size * sizeof(uint8_t) );
 	check_malloc(X->vector, ref_path);
 
 	char *reference = (char *) X->vector;
@@ -161,7 +161,7 @@ void encode_reference(ref_vector *X, exome *ex, bool reverse, const char *ref_pa
 
 }
 
-bool nextFASTAToken(FILE *queries_file, char *uncoded, REF_TYPE *coded, SA_TYPE *nquery) {
+bool nextFASTAToken(FILE *queries_file, char *uncoded, uint8_t *coded, SA_TYPE *nquery) {
 
 	char line[MAXLINE];
 	size_t length=0;

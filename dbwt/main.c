@@ -3,7 +3,7 @@
 void bwt_wrapper(char *fname)
 {
   uchar *T;
-  SA_TYPE n;
+  long n;
   FILE *fp;
 //  MMAP *map;
 

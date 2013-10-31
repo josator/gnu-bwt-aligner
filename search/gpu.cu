@@ -1,4 +1,4 @@
-#include "BW_gpu.cuh"
+#include "gpu.cuh"
 
 __device__ SA_TYPE getOcompValueGPU(SA_TYPE n, SA_TYPE m, comp_matrix O) {
 	SA_TYPE pos, desp;
@@ -28,21 +28,21 @@ void reverse_strand_gpu_O(comp_matrix *r_O, comp_matrix *s_O) {
 	cudaMemcpy(s_desp, s_O->desp, s_O->n_desp * sizeof(SA_TYPE *), cudaMemcpyDeviceToHost);
 	manageCudaError();
 
-	if (AA != ((REF_TYPE) -1) && TT !=((REF_TYPE) -1)) {
+	if (AA != ((uint8_t) -1) && TT !=((uint8_t) -1)) {
 		r_desp[AA] = s_desp[TT];
 		r_desp[TT] = s_desp[AA];
-	} else if (AA != ((REF_TYPE) -1)) {
+	} else if (AA != ((uint8_t) -1)) {
 		r_desp[AA] = s_desp[AA];
-	} else if (TT != ((REF_TYPE) -1)) {
+	} else if (TT != ((uint8_t) -1)) {
 		r_desp[TT] = s_desp[TT];
 	}
 
-	if (CC != ((REF_TYPE) -1) && GG !=((REF_TYPE) -1)) {
+	if (CC != ((uint8_t) -1) && GG !=((uint8_t) -1)) {
 		r_desp[CC] = s_desp[GG];
 		r_desp[GG] = s_desp[CC];
-	} else if (CC != ((REF_TYPE) -1)) {
+	} else if (CC != ((uint8_t) -1)) {
 		r_desp[CC] = s_desp[CC];
-	} else if (GG != ((REF_TYPE) -1)) {
+	} else if (GG != ((uint8_t) -1)) {
 		r_desp[GG] = s_desp[GG];
 	}
 
@@ -67,21 +67,21 @@ void reverse_strand_gpu_O(comp_matrix *r_O, comp_matrix *s_O) {
 	cudaMemcpy(s_count, s_O->count, s_O->n_count * sizeof(FM_COMP_TYPE *), cudaMemcpyDeviceToHost);
 	manageCudaError();
 
-	if (AA != ((REF_TYPE) -1) && TT !=((REF_TYPE) -1)) {
+	if (AA != ((uint8_t) -1) && TT !=((uint8_t) -1)) {
 		r_count[AA] = s_count[TT];
 		r_count[TT] = s_count[AA];
-	} else if (AA != ((REF_TYPE) -1)) {
+	} else if (AA != ((uint8_t) -1)) {
 		r_count[AA] = s_count[AA];
-	} else if (TT != ((REF_TYPE) -1)) {
+	} else if (TT != ((uint8_t) -1)) {
 		r_count[TT] = s_count[TT];
 	}
 
-	if (CC != ((REF_TYPE) -1) && GG !=((REF_TYPE) -1)) {
+	if (CC != ((uint8_t) -1) && GG !=((uint8_t) -1)) {
 		r_count[CC] = s_count[GG];
 		r_count[GG] = s_count[CC];
-	} else if (CC != ((REF_TYPE) -1)) {
+	} else if (CC != ((uint8_t) -1)) {
 		r_count[CC] = s_count[CC];
-	} else if (GG != ((REF_TYPE) -1)) {
+	} else if (GG != ((uint8_t) -1)) {
 		r_count[GG] = s_count[GG];
 	}
 
@@ -329,7 +329,7 @@ void write_blocked_results(blocked_results_lists *r_list, exome* ex, comp_vector
 
 }
 
-__global__ void BWExactSearchBackwardGPU(REF_TYPE *W, SA_TYPE *nW, SA_TYPE *k, SA_TYPE *l, SA_TYPE k_ini, SA_TYPE l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
+__global__ void BWExactSearchBackwardGPU(uint8_t *W, SA_TYPE *nW, SA_TYPE *k, SA_TYPE *l, SA_TYPE k_ini, SA_TYPE l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
 
 	intmax_t i;
 	SA_TYPE k2, l2;
@@ -355,7 +355,7 @@ __global__ void BWExactSearchBackwardGPU(REF_TYPE *W, SA_TYPE *nW, SA_TYPE *k, S
 
 }
 
-__global__ void BWExactSearchForwardGPU(REF_TYPE *W, SA_TYPE *nW, SA_TYPE *k, SA_TYPE *l, SA_TYPE k_ini, SA_TYPE l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
+__global__ void BWExactSearchForwardGPU(uint8_t *W, SA_TYPE *nW, SA_TYPE *k, SA_TYPE *l, SA_TYPE k_ini, SA_TYPE l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
 
 	intmax_t i;
 	SA_TYPE k2, l2;
@@ -381,7 +381,7 @@ __global__ void BWExactSearchForwardGPU(REF_TYPE *W, SA_TYPE *nW, SA_TYPE *k, SA
 
 }
 
-__global__ void BWExactSearchBackwardVectorGPU(REF_TYPE *W, SA_TYPE *nW, SA_TYPE *k, SA_TYPE *l, SA_TYPE k_ini, SA_TYPE l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
+__global__ void BWExactSearchBackwardVectorGPU(uint8_t *W, SA_TYPE *nW, SA_TYPE *k, SA_TYPE *l, SA_TYPE k_ini, SA_TYPE l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
 
 	intmax_t i;
 	SA_TYPE k2, l2;
@@ -420,7 +420,7 @@ __global__ void BWExactSearchBackwardVectorGPU(REF_TYPE *W, SA_TYPE *nW, SA_TYPE
 
 }
 
-__global__ void BWExactSearchForwardVectorGPU(REF_TYPE *W, SA_TYPE *nW, SA_TYPE *k, SA_TYPE *l, SA_TYPE k_ini, SA_TYPE l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
+__global__ void BWExactSearchForwardVectorGPU(uint8_t *W, SA_TYPE *nW, SA_TYPE *k, SA_TYPE *l, SA_TYPE k_ini, SA_TYPE l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
 
 	intmax_t i;
 	SA_TYPE k2, l2;
@@ -450,7 +450,7 @@ __global__ void BWExactSearchForwardVectorGPU(REF_TYPE *W, SA_TYPE *nW, SA_TYPE 
 }
 
 //SOME TESTS:
-/* __global__ void BWExactFinalResultsBackwardGPU(REF_TYPE *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, results_list rl_prev, results_list rl_next, SA_TYPE chunk_size, SA_TYPE *stack_size) { */
+/* __global__ void BWExactFinalResultsBackwardGPU(uint8_t *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, results_list rl_prev, results_list rl_next, SA_TYPE chunk_size, SA_TYPE *stack_size) { */
 /*   SA_TYPE k, l; */
 /*   int16_t start, pos, pos_start, end; */
 /*   unsigned read_index, read_offset; */
@@ -514,7 +514,7 @@ __global__ void init_listsGPU(blocked_results_lists rl_prev, blocked_results_lis
 
 }
 
-__global__ void BWExactSearchBackwardBlockedGPU(REF_TYPE *W, SA_TYPE nW, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, result r, blocked_results_lists rl_prev, uintmax_t max_results) {
+__global__ void BWExactSearchBackwardBlockedGPU(uint8_t *W, SA_TYPE nW, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, result r, blocked_results_lists rl_prev, uintmax_t max_results) {
 
 	SA_TYPE offset  = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -552,7 +552,7 @@ __global__ void BWExactSearchBackwardBlockedGPU(REF_TYPE *W, SA_TYPE nW, SA_TYPE
 
 }
 
-__global__ void BWExactSearchForwardBlockedGPU(REF_TYPE *W, SA_TYPE nW, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, result r, blocked_results_lists rl_prev, uintmax_t max_results) {
+__global__ void BWExactSearchForwardBlockedGPU(uint8_t *W, SA_TYPE nW, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, result r, blocked_results_lists rl_prev, uintmax_t max_results) {
 
 	SA_TYPE offset  = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -590,7 +590,7 @@ __global__ void BWExactSearchForwardBlockedGPU(REF_TYPE *W, SA_TYPE nW, SA_TYPE 
 
 }
 
-__global__ void BWExactFinalResultsBackwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next_i, int16_t block_size, int16_t last_block, uintmax_t max_results) {
+__global__ void BWExactFinalResultsBackwardBlockedGPU(uint8_t *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next_i, int16_t block_size, int16_t last_block, uintmax_t max_results) {
 
 	SA_TYPE offset  = blockIdx.x * blockDim.x + threadIdx.x;
 	result *rl_next_i_results = rl_next_i.results + offset * max_results;
@@ -658,7 +658,7 @@ __global__ void BWExactFinalResultsBackwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, S
 
 }
 
-__global__ void BWExactFinalResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next_i, int16_t block_size, int16_t last_block, uintmax_t max_results) {
+__global__ void BWExactFinalResultsForwardBlockedGPU(uint8_t *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next_i, int16_t block_size, int16_t last_block, uintmax_t max_results) {
 
 	SA_TYPE offset  = blockIdx.x * blockDim.x + threadIdx.x;
 	result *rl_next_i_results = rl_next_i.results + offset * max_results;
@@ -727,7 +727,7 @@ __global__ void BWExactFinalResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, SA
 
 }
 
-__device__ uintmax_t BWExactFinalResultForwardGPU(REF_TYPE *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix *O, result *r_iterator, result *rl_next_i_results, uintmax_t rl_next_i_num_results, int16_t block_size, int16_t last_block, uintmax_t max_results) {
+__device__ uintmax_t BWExactFinalResultForwardGPU(uint8_t *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix *O, result *r_iterator, result *rl_next_i_results, uintmax_t rl_next_i_num_results, int16_t block_size, int16_t last_block, uintmax_t max_results) {
 
 	SA_TYPE k, l;
 	int16_t pos, end;
@@ -774,7 +774,7 @@ __device__ uintmax_t BWExactFinalResultForwardGPU(REF_TYPE *W, SA_TYPE *C, SA_TY
 
 }
 
-__global__ void BWBranchFinalResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next, int16_t block_size, int16_t last_block, intmax_t max_results, REF_TYPE nA) {
+__global__ void BWBranchFinalResultsForwardBlockedGPU(uint8_t *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next, int16_t block_size, int16_t last_block, intmax_t max_results, uint8_t nA) {
 
 	SA_TYPE offset  = blockIdx.x * blockDim.x + threadIdx.x;
 	result *rl_next_results = rl_next.results + offset * max_results;
@@ -786,7 +786,7 @@ __global__ void BWBranchFinalResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, S
 	bool no_previous;
 	int16_t last_err_pos;
 	uint8_t last_err_kind;
-	REF_TYPE last_err_base;
+	uint8_t last_err_base;
 
 	result *r_iterator;
 
@@ -813,13 +813,13 @@ __global__ void BWBranchFinalResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, S
 		} else {
 			last_err_pos  = -10;
 			last_err_kind = 0;
-			last_err_base = (REF_TYPE) -1;
+			last_err_base = (uint8_t) -1;
 		}
 
 		k = r_iterator->k;
 		l = r_iterator->l;
 
-		add_mismatch(r_iterator, DELETION, (REF_TYPE) -1, pos);
+		add_mismatch(r_iterator, DELETION, (uint8_t) -1, pos);
 
 		if (last_err_pos == pos - 1) { //Previous MISMATCH or DELETION
 
@@ -831,7 +831,7 @@ __global__ void BWBranchFinalResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, S
 					rl_next_num_results = BWExactFinalResultForwardGPU(W, C, C1, &O, r_iterator, rl_next_results, rl_next_num_results, block_size, last_block, max_results);
 				}
 
-				for (REF_TYPE b=0;b<nA;b++) {
+				for (uint8_t b=0;b<nA;b++) {
 
 					BWiterationGPU(k, l, k_aux, l_aux, b, C, C1, O);
 
@@ -861,7 +861,7 @@ __global__ void BWBranchFinalResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, S
 				change_result(r_iterator, k, l, pos+1);
 				rl_next_num_results = BWExactFinalResultForwardGPU(W, C, C1, &O, r_iterator, rl_next_results, rl_next_num_results, block_size, last_block, max_results);
 
-				for (REF_TYPE b=0;b<nA;b++) {
+				for (uint8_t b=0;b<nA;b++) {
 
 					BWiterationGPU(k, l, k_aux, l_aux, b, C, C1, O);
 
@@ -890,7 +890,7 @@ __global__ void BWBranchFinalResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, S
 
 			//NO DELETION
 
-			for (REF_TYPE b=0;b<nA;b++) {
+			for (uint8_t b=0;b<nA;b++) {
 
 				BWiterationGPU(k, l, k_aux, l_aux, b, C, C1, O);
 
@@ -924,7 +924,7 @@ __global__ void BWBranchFinalResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, S
 			change_result(r_iterator, k, l, pos+1);
 			rl_next_num_results = BWExactFinalResultForwardGPU(W, C, C1, &O, r_iterator, rl_next_results, rl_next_num_results, block_size, last_block, max_results);
 
-			for (REF_TYPE b=0;b<nA;b++) {
+			for (uint8_t b=0;b<nA;b++) {
 
 				BWiterationGPU(k, l, k_aux, l_aux, b, C, C1, O);
 
@@ -952,7 +952,7 @@ __global__ void BWBranchFinalResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, S
 
 }
 
-uintmax_t BWExactFinalResultForwardCPU(REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, result *r_iterator, result *rl_next_i_results, uintmax_t rl_next_i_num_results, int16_t block_size, int16_t last_block, uintmax_t max_results) {
+uintmax_t BWExactFinalResultForwardCPU(uint8_t *W, vector *C, vector *C1, comp_matrix *O, result *r_iterator, result *rl_next_i_results, uintmax_t rl_next_i_num_results, int16_t block_size, int16_t last_block, uintmax_t max_results) {
 
 	SA_TYPE k, l;
 	int16_t pos, end;
@@ -999,7 +999,7 @@ uintmax_t BWExactFinalResultForwardCPU(REF_TYPE *W, vector *C, vector *C1, comp_
 
 }
 
-void BWBranchFinalResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, blocked_results_lists rl_prev, blocked_results_lists rl_next, int16_t block_size, int16_t last_block, uintmax_t max_results, REF_TYPE nA) {
+void BWBranchFinalResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t *W, vector *C, vector *C1, comp_matrix *O, blocked_results_lists rl_prev, blocked_results_lists rl_next, int16_t block_size, int16_t last_block, uintmax_t max_results, uint8_t nA) {
 
 	//#pragma omp parallel for
 	for(SA_TYPE offset=0; offset < num_bloques*tam_bloques; offset++) {
@@ -1013,7 +1013,7 @@ void BWBranchFinalResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t tam_
 		bool no_previous;
 		int16_t last_err_pos;
 		uint8_t last_err_kind;
-		REF_TYPE last_err_base;
+		uint8_t last_err_base;
 
 		result *r_iterator;
 
@@ -1040,13 +1040,13 @@ void BWBranchFinalResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t tam_
 			} else {
 				last_err_pos  = -10;
 				last_err_kind = 0;
-				last_err_base = (REF_TYPE) -1;
+				last_err_base = (uint8_t) -1;
 			}
 
 			k = r_iterator->k;
 			l = r_iterator->l;
 
-			add_mismatch(r_iterator, DELETION, (REF_TYPE) -1, pos);
+			add_mismatch(r_iterator, DELETION, (uint8_t) -1, pos);
 
 			if (last_err_pos == pos - 1) { //Previous MISMATCH or DELETION
 
@@ -1058,7 +1058,7 @@ void BWBranchFinalResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t tam_
 						rl_next_num_results = BWExactFinalResultForwardCPU(W, C, C1, O, r_iterator, rl_next_results, rl_next_num_results, block_size, last_block, max_results);
 					}
 
-					for (REF_TYPE b=0;b<nA;b++) {
+					for (uint8_t b=0;b<nA;b++) {
 
 						BWiteration(k, l, k_aux, l_aux, b, C, C1, O);
 
@@ -1088,7 +1088,7 @@ void BWBranchFinalResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t tam_
 					change_result(r_iterator, k, l, pos+1);
 					rl_next_num_results = BWExactFinalResultForwardCPU(W, C, C1, O, r_iterator, rl_next_results, rl_next_num_results, block_size, last_block, max_results);
 
-					for (REF_TYPE b=0;b<nA;b++) {
+					for (uint8_t b=0;b<nA;b++) {
 
 						BWiteration(k, l, k_aux, l_aux, b, C, C1, O);
 
@@ -1117,7 +1117,7 @@ void BWBranchFinalResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t tam_
 
 				//NO DELETION
 
-				for (REF_TYPE b=0;b<nA;b++) {
+				for (uint8_t b=0;b<nA;b++) {
 
 					BWiteration(k, l, k_aux, l_aux, b, C, C1, O);
 
@@ -1151,7 +1151,7 @@ void BWBranchFinalResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t tam_
 				change_result(r_iterator, k, l, pos+1);
 				rl_next_num_results = BWExactFinalResultForwardCPU(W, C, C1, O, r_iterator, rl_next_results, rl_next_num_results, block_size, last_block, max_results);
 
-				for (REF_TYPE b=0;b<nA;b++) {
+				for (uint8_t b=0;b<nA;b++) {
 
 					BWiteration(k, l, k_aux, l_aux, b, C, C1, O);
 
@@ -1181,7 +1181,7 @@ void BWBranchFinalResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t tam_
 
 }
 
-__global__ void BWExactPartialResultsBackwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next, blocked_results_lists rl_next_i, int16_t block_size, int16_t last_block, uintmax_t max_results) {
+__global__ void BWExactPartialResultsBackwardBlockedGPU(uint8_t *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next, blocked_results_lists rl_next_i, int16_t block_size, int16_t last_block, uintmax_t max_results) {
 
 	SA_TYPE offset  = blockIdx.x * blockDim.x + threadIdx.x;
 	result *rl_next_results = rl_next.results + offset * max_results;
@@ -1280,7 +1280,7 @@ __global__ void BWExactPartialResultsBackwardBlockedGPU(REF_TYPE *W, SA_TYPE *C,
 
 }
 
-__global__ void BWExactPartialResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next, blocked_results_lists rl_next_i, int16_t block_size, int16_t last_block, uintmax_t max_results) {
+__global__ void BWExactPartialResultsForwardBlockedGPU(uint8_t *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next, blocked_results_lists rl_next_i, int16_t block_size, int16_t last_block, uintmax_t max_results) {
 
 	SA_TYPE offset  = blockIdx.x * blockDim.x + threadIdx.x;
 	result *rl_next_results = rl_next.results + offset * max_results;
@@ -1379,7 +1379,7 @@ __global__ void BWExactPartialResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, 
 
 }
 
-__global__ void BWBranchPartialResultsBackwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next, uintmax_t max_results, REF_TYPE nA) {
+__global__ void BWBranchPartialResultsBackwardBlockedGPU(uint8_t *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next, uintmax_t max_results, uint8_t nA) {
 
 	SA_TYPE offset  = blockIdx.x * blockDim.x + threadIdx.x;
 	result *rl_next_results = rl_next.results + offset * max_results;
@@ -1391,7 +1391,7 @@ __global__ void BWBranchPartialResultsBackwardBlockedGPU(REF_TYPE *W, SA_TYPE *C
 	bool no_previous;
 	int16_t last_err_pos;
 	uint8_t last_err_kind;
-	REF_TYPE last_err_base;
+	uint8_t last_err_base;
 
 	__shared__ SA_TYPE Cshared[4];
 	__shared__ SA_TYPE C1shared[4];
@@ -1426,13 +1426,13 @@ __global__ void BWBranchPartialResultsBackwardBlockedGPU(REF_TYPE *W, SA_TYPE *C
 		} else {
 			last_err_pos  = -10;
 			last_err_kind = 0;
-			last_err_base = (REF_TYPE) -1;
+			last_err_base = (uint8_t) -1;
 		}
 
 		k = r_iterator->k;
 		l = r_iterator->l;
 
-		add_mismatch(r_iterator, DELETION, (REF_TYPE) -1, pos);
+		add_mismatch(r_iterator, DELETION, (uint8_t) -1, pos);
 
 		__syncthreads();
 
@@ -1446,7 +1446,7 @@ __global__ void BWBranchPartialResultsBackwardBlockedGPU(REF_TYPE *W, SA_TYPE *C
 					add_resultGPU(r_iterator, rl_next_results, rl_next_num_results, max_results);
 				}
 
-				for (REF_TYPE b=0;b<nA;b++) {
+				for (uint8_t b=0;b<nA;b++) {
 
 					BWiterationGPU(k, l, k_aux, l_aux, b, Cshared, C1shared, O);
 
@@ -1476,7 +1476,7 @@ __global__ void BWBranchPartialResultsBackwardBlockedGPU(REF_TYPE *W, SA_TYPE *C
 				change_result(r_iterator, k, l, pos-1);
 				add_resultGPU(r_iterator, rl_next_results, rl_next_num_results, max_results);
 
-				for (REF_TYPE b=0;b<nA;b++) {
+				for (uint8_t b=0;b<nA;b++) {
 
 					BWiterationGPU(k, l, k_aux, l_aux, b, Cshared, C1shared, O);
 
@@ -1504,7 +1504,7 @@ __global__ void BWBranchPartialResultsBackwardBlockedGPU(REF_TYPE *W, SA_TYPE *C
 
 			//NO DELETION
 
-			for (REF_TYPE b=0;b<nA;b++) {
+			for (uint8_t b=0;b<nA;b++) {
 
 				BWiterationGPU(k, l, k_aux, l_aux, b, Cshared, C1shared, O);
 
@@ -1538,7 +1538,7 @@ __global__ void BWBranchPartialResultsBackwardBlockedGPU(REF_TYPE *W, SA_TYPE *C
 			change_result(r_iterator, k, l, pos-1);
 			add_resultGPU(r_iterator, rl_next_results, rl_next_num_results, max_results);
 
-			for (REF_TYPE b=0;b<nA;b++) {
+			for (uint8_t b=0;b<nA;b++) {
 
 				BWiterationGPU(k, l, k_aux, l_aux, b, Cshared, C1shared, O);
 
@@ -1566,7 +1566,7 @@ __global__ void BWBranchPartialResultsBackwardBlockedGPU(REF_TYPE *W, SA_TYPE *C
 
 }
 
-__global__ void BWBranchPartialResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next, uintmax_t max_results, REF_TYPE nA) {
+__global__ void BWBranchPartialResultsForwardBlockedGPU(uint8_t *W, SA_TYPE *C, SA_TYPE *C1, comp_matrix O, blocked_results_lists rl_prev, blocked_results_lists rl_next, uintmax_t max_results, uint8_t nA) {
 
 	SA_TYPE offset  = blockIdx.x * blockDim.x + threadIdx.x;
 	result *rl_next_results = rl_next.results + offset * max_results;
@@ -1578,7 +1578,7 @@ __global__ void BWBranchPartialResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C,
 	bool no_previous;
 	int16_t last_err_pos;
 	uint8_t last_err_kind;
-	REF_TYPE last_err_base;
+	uint8_t last_err_base;
 
 	__shared__ SA_TYPE Cshared[4];
 	__shared__ SA_TYPE C1shared[4];
@@ -1615,13 +1615,13 @@ __global__ void BWBranchPartialResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C,
 		} else {
 			last_err_pos  = -10;
 			last_err_kind = 0;
-			last_err_base = (REF_TYPE) -1;
+			last_err_base = (uint8_t) -1;
 		}
 
 		k = r_iterator->k;
 		l = r_iterator->l;
 
-		add_mismatch(r_iterator, DELETION, (REF_TYPE) -1, pos);
+		add_mismatch(r_iterator, DELETION, (uint8_t) -1, pos);
 
 		__syncthreads();
 
@@ -1635,7 +1635,7 @@ __global__ void BWBranchPartialResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C,
 					add_resultGPU(r_iterator, rl_next_results, rl_next_num_results, max_results);
 				}
 
-				for (REF_TYPE b=0;b<nA;b++) {
+				for (uint8_t b=0;b<nA;b++) {
 
 					BWiterationGPU(k, l, k_aux, l_aux, b, Cshared, C1shared, O);
 
@@ -1665,7 +1665,7 @@ __global__ void BWBranchPartialResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C,
 				change_result(r_iterator, k, l, pos+1);
 				add_resultGPU(r_iterator, rl_next_results, rl_next_num_results, max_results);
 
-				for (REF_TYPE b=0;b<nA;b++) {
+				for (uint8_t b=0;b<nA;b++) {
 
 					BWiterationGPU(k, l, k_aux, l_aux, b, Cshared, C1shared, O);
 
@@ -1694,7 +1694,7 @@ __global__ void BWBranchPartialResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C,
 
 			//NO DELETION
 
-			for (REF_TYPE b=0;b<nA;b++) {
+			for (uint8_t b=0;b<nA;b++) {
 
 				BWiterationGPU(k, l, k_aux, l_aux, b, Cshared, C1shared, O);
 
@@ -1728,7 +1728,7 @@ __global__ void BWBranchPartialResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C,
 			change_result(r_iterator, k, l, pos+1);
 			add_resultGPU(r_iterator, rl_next_results, rl_next_num_results, max_results);
 
-			for (REF_TYPE b=0;b<nA;b++) {
+			for (uint8_t b=0;b<nA;b++) {
 
 				BWiterationGPU(k, l, k_aux, l_aux, b, Cshared, C1shared, O);
 
@@ -1756,7 +1756,7 @@ __global__ void BWBranchPartialResultsForwardBlockedGPU(REF_TYPE *W, SA_TYPE *C,
 
 }
 
-void BWBranchPartialResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE *W, vector *C, vector *C1, comp_matrix *O, blocked_results_lists rl_prev, blocked_results_lists rl_next, uintmax_t max_results, REF_TYPE nA) {
+void BWBranchPartialResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t *W, vector *C, vector *C1, comp_matrix *O, blocked_results_lists rl_prev, blocked_results_lists rl_next, uintmax_t max_results, uint8_t nA) {
 
 	//#pragma omp parallel for
 	for(SA_TYPE offset=0; offset < num_bloques*tam_bloques; offset++) {
@@ -1767,7 +1767,7 @@ void BWBranchPartialResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t ta
 		bool no_previous;
 		int16_t last_err_pos;
 		uint8_t last_err_kind;
-		REF_TYPE last_err_base;
+		uint8_t last_err_base;
 
 		result *r_iterator;
 
@@ -1797,13 +1797,13 @@ void BWBranchPartialResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t ta
 			} else {
 				last_err_pos  = -10;
 				last_err_kind = 0;
-				last_err_base = (REF_TYPE) -1;
+				last_err_base = (uint8_t) -1;
 			}
 
 			k = r_iterator->k;
 			l = r_iterator->l;
 
-			add_mismatch(r_iterator, DELETION, (REF_TYPE) -1, pos);
+			add_mismatch(r_iterator, DELETION, (uint8_t) -1, pos);
 
 			if (last_err_pos == pos - 1) { //Previous MISMATCH or DELETION
 
@@ -1815,7 +1815,7 @@ void BWBranchPartialResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t ta
 						add_resultGPU(r_iterator, rl_next_results, rl_next_num_results, max_results);
 					}
 
-					for (REF_TYPE b=0;b<nA;b++) {
+					for (uint8_t b=0;b<nA;b++) {
 
 						BWiteration(k, l, k_aux, l_aux, b, C, C1, O);
 
@@ -1845,7 +1845,7 @@ void BWBranchPartialResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t ta
 					change_result(r_iterator, k, l, pos+1);
 					add_resultGPU(r_iterator, rl_next_results, rl_next_num_results, max_results);
 
-					for (REF_TYPE b=0;b<nA;b++) {
+					for (uint8_t b=0;b<nA;b++) {
 
 						BWiteration(k, l, k_aux, l_aux, b, C, C1, O);
 
@@ -1874,7 +1874,7 @@ void BWBranchPartialResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t ta
 
 				//NO DELETION
 
-				for (REF_TYPE b=0;b<nA;b++) {
+				for (uint8_t b=0;b<nA;b++) {
 
 					BWiteration(k, l, k_aux, l_aux, b, C, C1, O);
 
@@ -1908,7 +1908,7 @@ void BWBranchPartialResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t ta
 				change_result(r_iterator, k, l, pos+1);
 				add_resultGPU(r_iterator, rl_next_results, rl_next_num_results, max_results);
 
-				for (REF_TYPE b=0;b<nA;b++) {
+				for (uint8_t b=0;b<nA;b++) {
 
 					BWiteration(k, l, k_aux, l_aux, b, C, C1, O);
 
@@ -1936,7 +1936,7 @@ void BWBranchPartialResultsForwardBlockedCPU(uintmax_t num_bloques, uintmax_t ta
 
 }
 
-void BWSearchGPU(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE *W, char *h_W, SA_TYPE nW, vector *C, vector *h_C, vector *C1, vector *h_C1, comp_matrix *O, comp_matrix *h_O, comp_matrix *Oi, comp_matrix *h_Oi, comp_vector *S, comp_vector *R, comp_vector *Si, comp_vector *Ri, blocked_results_lists *rl_prev_cpu, blocked_results_lists *rl_next_cpu, blocked_results_lists *rl_prev_i_cpu, blocked_results_lists *rl_next_i_cpu, blocked_results_lists *rl_final_cpu, blocked_results_lists *rl_prev_gpu, blocked_results_lists *rl_next_gpu, blocked_results_lists *rl_prev_i_gpu, blocked_results_lists *rl_next_i_gpu, blocked_results_lists *rl_final_gpu, int16_t fragsize, uintmax_t max_results) {
+void BWSearchGPU(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t *W, char *h_W, SA_TYPE nW, vector *C, vector *h_C, vector *C1, vector *h_C1, comp_matrix *O, comp_matrix *h_O, comp_matrix *Oi, comp_matrix *h_Oi, comp_vector *S, comp_vector *R, comp_vector *Si, comp_vector *Ri, blocked_results_lists *rl_prev_cpu, blocked_results_lists *rl_next_cpu, blocked_results_lists *rl_prev_i_cpu, blocked_results_lists *rl_next_i_cpu, blocked_results_lists *rl_final_cpu, blocked_results_lists *rl_prev_gpu, blocked_results_lists *rl_next_gpu, blocked_results_lists *rl_prev_i_gpu, blocked_results_lists *rl_next_i_gpu, blocked_results_lists *rl_final_gpu, int16_t fragsize, uintmax_t max_results) {
 
 	result r;
 
@@ -2092,27 +2092,27 @@ void BWSearchGPU(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE *W, char
 
 }
 
-/* void BWExactSearchBackwardBlockedGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE *W, SA_TYPE nW, vector *C, vector *C1, comp_matrix *O, result *r, blocked_results_lists *rl_prev_gpu, uintmax_t max_results) { */
+/* void BWExactSearchBackwardBlockedGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t *W, SA_TYPE nW, vector *C, vector *C1, comp_matrix *O, result *r, blocked_results_lists *rl_prev_gpu, uintmax_t max_results) { */
 /*   BWExactSearchBackwardBlockedGPU<<<num_bloques,tam_bloques>>>(W, nW, C->vector, C1->vector, *O, *r, *rl_prev_gpu, max_results); */
 /* } */
 
-/* void BWExactSearchForwardBlockedGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE *W, SA_TYPE nW, vector *C, vector *C1, comp_matrix *O, result *r, blocked_results_lists *rl_prev_gpu, uintmax_t max_results) { */
+/* void BWExactSearchForwardBlockedGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t *W, SA_TYPE nW, vector *C, vector *C1, comp_matrix *O, result *r, blocked_results_lists *rl_prev_gpu, uintmax_t max_results) { */
 /*   BWExactSearchForwardBlockedGPU<<<num_bloques,tam_bloques>>>(W, nW, C->vector, C1->vector, *O, *r, *rl_prev_gpu, max_results); */
 /* } */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void BWExactSearchBackwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O) {
+void BWExactSearchBackwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O) {
 	BWExactSearchBackwardGPU<<<num_bloques,tam_bloques>>>(W, nW, k, l, k_ini, l_ini, C->vector, C1->vector, *O);
 }
 
-void BWExactSearchForwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O) {
+void BWExactSearchForwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O) {
 	BWExactSearchForwardGPU<<<num_bloques,tam_bloques>>>(W, nW, k, l, k_ini, l_ini, C->vector, C1->vector, *O);
 }
 
-void BWExactSearchBackwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O) {
+void BWExactSearchBackwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O) {
 	BWExactSearchBackwardVectorGPU<<<num_bloques,tam_bloques>>>(W, nW, k, l, k_ini, l_ini, C->vector, C1->vector, *O);
 }
 
-void BWExactSearchForwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, REF_TYPE* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O) {
+void BWExactSearchForwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, SA_TYPE* nW, SA_TYPE* k, SA_TYPE* l, SA_TYPE k_ini, SA_TYPE l_ini, vector* C, vector* C1, comp_matrix* O) {
 	BWExactSearchForwardVectorGPU<<<num_bloques,tam_bloques>>>(W, nW, k, l, k_ini, l_ini, C->vector, C1->vector, *O);
 }

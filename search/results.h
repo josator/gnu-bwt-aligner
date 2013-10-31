@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "BW_runtime.h"
-#include "BW_io.h"
+#include "runtime.h"
+#include "io.h"
 
 #define MAX_MISMATCHES 10
 
@@ -16,7 +16,7 @@ typedef struct {
 	bool dir;                      //0 - Backward, 1 - Forward
 	uint8_t num_mismatches;
 	uint8_t err_kind[MAX_MISMATCHES];
-	REF_TYPE err_base[MAX_MISMATCHES];
+	uint8_t err_base[MAX_MISMATCHES];
 	int16_t err_pos[MAX_MISMATCHES];
 } result;
 
