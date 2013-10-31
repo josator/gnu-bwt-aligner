@@ -1,5 +1,5 @@
-#include "../BW_io.h"
-#include "../BW_csafm.h"
+#include "../search/io.h"
+#include "../search/csafm.h"
 
 #include "../commons/commons.h"
 #include "../dbwt/dbwt.h"
@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 	timevars();
   init_replace_table(argv[3]);
 
-	encode_reference(&X, &ex, true, argv[1]);
+	encode_reference(X.vector, &X.n, &X.dollar, &ex, true, argv[1]);
 	save_ref_vector(&X, argv[2], "X");
 	save_exome_file(&ex, true, argv[2]);
 

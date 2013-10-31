@@ -1,12 +1,12 @@
 #include "results.h"
 
-bool write_results(results_list *r_list, SA_TYPE *k, SA_TYPE *l, exome* ex, comp_vector *S, comp_vector *Si, vector *C, comp_matrix *O, comp_matrix *Oi, char *mapping, SA_TYPE nW, bool type, FILE *fp) {
+bool write_results(results_list *r_list, uintmax_t *k, uintmax_t *l, exome* ex, bwt_index *backward, bwt_index *forward, char *mapping, uintmax_t nW, bool type, FILE *fp) {
 
-  result *r;
+	result *r;
 
-  bool found = false;
+	bool found = false;
 
-  char search[MAXLINE+1];
+	char search[MAXLINE+1];
 
   search[0] = '\0';
   strncat(search, mapping, nW);
@@ -33,7 +33,7 @@ bool write_results(results_list *r_list, SA_TYPE *k, SA_TYPE *l, exome* ex, comp
 			k[kl] = r->k;
 			l[kl] = r->l;
 			kl_count++;
-			manage_single_result(r, ex, S, Si, C, O, Oi, search, type, fp, r_list->read_index, &found);
+			manage_single_result(r, ex, backward, forward, search, type, fp, r_list->read_index, &found);
 		}
 
 	}

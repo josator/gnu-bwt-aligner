@@ -124,7 +124,7 @@ inline SA_TYPE popcount(uint64_t i) {
 
 #endif
 
-inline SA_TYPE getO(SA_TYPE n, SA_TYPE m, comp_matrix *O) {
+inline SA_TYPE get_O(SA_TYPE n, SA_TYPE m, comp_matrix *O) {
 
 #if defined FM_COMP_32 || FM_COMP_64
 
@@ -141,7 +141,7 @@ inline SA_TYPE getO(SA_TYPE n, SA_TYPE m, comp_matrix *O) {
 
 }
 
-inline uint8_t getBfromO(SA_TYPE m, comp_matrix *O) {
+inline uint8_t get_B_from_O(SA_TYPE m, comp_matrix *O) {
 
 #if defined FM_COMP_32 || FM_COMP_64
 
@@ -163,144 +163,6 @@ inline uint8_t getBfromO(SA_TYPE m, comp_matrix *O) {
 #endif
 
 	return (uint8_t) -1;
-
-}
-
-inline SA_TYPE getScompValue(SA_TYPE m, comp_vector *Scomp, vector *C, comp_matrix *O) {
-
-  SA_TYPE i,j;
-  uint8_t b_aux;
-  
-  i=m; j=0;
-  
-  while (i % Scomp->ratio) {
-    
-    b_aux = getBfromO(i, O);
-    
-    if (b_aux == (uint8_t) -1) {
-      
-      i=0;
-
-    } else {
-
-      i = C->vector[b_aux] + getO(b_aux, i+1/*0 is -1*/, O);
-
-    }
-    
-    j++;
-
-  }
-
-  return (Scomp->vector[i / Scomp->ratio] + j) % (O->siz-1);
-
-}
-
-inline SA_TYPE getScompValueB(SA_TYPE m, comp_vector *Scomp, vector *C, comp_matrix *O, ref_vector *B) {
-  
-  SA_TYPE i, j;
-  uint8_t b_aux;
-  
-  i=m; j=0;
-
-  while (i % Scomp->ratio) {
- 
-    if (i == B->dollar) {
-
-      i=0;
-
-		} else {
-
-			if (i > B->dollar)
-    		b_aux = B->vector[i-1];
-			else
-				b_aux = B->vector[i];
-
-      i = C->vector[b_aux] + getO(b_aux, i+1/*0 is -1*/, O);
-
-    }
-
-    j++;
-
-  }
-
-  return (Scomp->vector[i / Scomp->ratio] + j) % (O->siz-1);
-
-}
-
-inline SA_TYPE getRcompValue(SA_TYPE m, comp_vector *Rcomp, vector *C, comp_matrix *O) {
-
-  SA_TYPE i, j, k;
-  uint8_t b_aux;
-
-  i = (Rcomp->ratio - (m % Rcomp->ratio)) % Rcomp->ratio;
-  k = m + i;
-
-  if (k < Rcomp->siz) {
-    j = Rcomp->vector[k / Rcomp->ratio];
-  } else {
-    j = Rcomp->vector[0];
-    i = Rcomp->siz - m;
-  }
-
-  while (i) {
-
-    b_aux = getBfromO(j, O);
-
-    if (b_aux == (uint8_t) -1) {
-
-      j=0;
-
-    } else {
-
-			j = C->vector[b_aux] + getO(b_aux, j+1/*0 is -1*/, O);
-
-		}
-
-		i--;
-
-	}
-
-	return j;
-
-}
-
-inline SA_TYPE getRcompValueB(SA_TYPE m, comp_vector *Rcomp, vector *C, comp_matrix *O, ref_vector *B) {
-  SA_TYPE i, j, k;
-  uint8_t b_aux;
-
-  i = (Rcomp->ratio - (m % Rcomp->ratio)) % Rcomp->ratio;
-  k = m + i;
-
-  if(k < Rcomp->siz) {
-    j = Rcomp->vector[k / Rcomp->ratio];
-  } else {
-    j = Rcomp->vector[0];
-    i = Rcomp->siz - m;
-  }
-
-  while (i) {
-
-
-    if (j == B->dollar) {
-
-      j=0;
-
-    } else {
-
-			if (j > B->dollar)
-				b_aux = B->vector[j-1];
-			else
-				b_aux = B->vector[j];
-
-      j = C->vector[b_aux] + getO(b_aux, j+1/*0 is -1*/, O);
-
-    }
-
-    i--;
-
-  }
-
-	return j;
 
 }
 

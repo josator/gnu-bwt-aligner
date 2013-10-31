@@ -183,10 +183,10 @@ void read_ref_vector(ref_vector *vector, const char *directory, const char *name
   fp  = fopen(path,  "rb+");
   check_file_open(fp, path);
 
-  err = fread(&vector->n, sizeof(SA_TYPE),  1, fp);
+  err = fread(&vector->n, sizeof(uint64_t),  1, fp);
   check_file_read(err, 1, path);
 
-  err = fread(&vector->dollar, sizeof(SA_TYPE),  1, fp);
+  err = fread(&vector->dollar, sizeof(uint64_t),  1, fp);
   check_file_read(err, 1, path);
 
 	check_file_read(err, 1, path);
@@ -347,10 +347,10 @@ void save_ref_vector(ref_vector *vector, const char *directory, const char *name
   fp  = fopen(path,  "wb+");
   check_file_open(fp, path);
 
-  err = fwrite(&vector->n,      sizeof(SA_TYPE), 1, fp);
+  err = fwrite(&vector->n,      sizeof(uint64_t), 1, fp);
   check_file_write(err, 1, path);
 
-  err = fwrite(&vector->dollar, sizeof(SA_TYPE), 1, fp);
+  err = fwrite(&vector->dollar, sizeof(uint64_t), 1, fp);
   check_file_write(err, 1, path);
 
 	err = fwrite(vector->vector, sizeof(uint8_t), vector->n, fp);

@@ -56,7 +56,7 @@ void save_exome_file(exome *ex, bool reverse, const char *directory) {
 	fp  = fopen(path, "w");
   check_file_open(fp, path);
 
-	for(int i=0; i<ex->size; i++) {
+	for(uintmax_t i=0; i<ex->size; i++) {
     fprintf(fp, ">%s %ju %ju\n", ex->chromosome + i*IDMAX, (uintmax_t) ex->start[i], (uintmax_t) ex->end[i]);
   }
 
@@ -68,7 +68,7 @@ void save_exome_file(exome *ex, bool reverse, const char *directory) {
 
 }
 
-void encode_reference(ref_vector *X, exome *ex, bool reverse, const char *ref_path) {
+void encode_reference(uint8_t *X, uintmax_t *nX, uintmax_t *dollar, exome *ex, bool reverse, const char *ref_path) {
 
 	FILE *ref_file;
 	ref_file = fopen(ref_path, "r");
@@ -83,14 +83,14 @@ void encode_reference(ref_vector *X, exome *ex, bool reverse, const char *ref_pa
 	if (reverse) size = read*2 + 1;
 	else         size = read   + 1;
 
-	X->vector = (uint8_t *) malloc( size * sizeof(uint8_t) );
-	check_malloc(X->vector, ref_path);
+	X = (uint8_t *) malloc( size * sizeof(uint8_t) );
+	check_malloc(X, ref_path);
 
-	char *reference = (char *) X->vector;
+	char *reference = (char *) X;
 
 	if (ex !=NULL) ex->size=0;
 
-	SA_TYPE partial_length=0, total_length=0;
+	uintmax_t partial_length=0, total_length=0;
 
 	while ( fgets(reference + total_length, MAXLINE, ref_file) ) {
 
@@ -145,23 +145,23 @@ void encode_reference(ref_vector *X, exome *ex, bool reverse, const char *ref_pa
 		ex->size++;
 	}
 
-	encode_bases(X->vector, reference, total_length);
+	encode_bases(X, reference, total_length);
 
 	if (reverse) {
-		duplicate_reverse(X->vector, total_length);
-		X->n = total_length * 2;
+		duplicate_reverse(X, total_length);
+		*nX = total_length * 2;
 	} else {
-		X->n = total_length;
+		*nX = total_length;
 	}
 
-	X->dollar = 0;
-	X->vector[X->n] = 0; //Valgrind errors on dbwt
+	dollar = 0;
+	X[*nX] = 0; //Valgrind errors on dbwt
 
 	fclose(ref_file);
 
 }
 
-bool nextFASTAToken(FILE *queries_file, char *uncoded, uint8_t *coded, SA_TYPE *nquery) {
+bool nextFASTAToken(FILE *queries_file, char *uncoded, uint8_t *coded, uintmax_t *nquery) {
 
 	char line[MAXLINE];
 	size_t length=0;

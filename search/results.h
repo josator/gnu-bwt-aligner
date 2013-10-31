@@ -11,7 +11,7 @@
 #define MAX_MISMATCHES 10
 
 typedef struct {
-	SA_TYPE k, l;
+	uintmax_t k, l;
 	int16_t start, pos, end;
 	bool dir;                      //0 - Backward, 1 - Forward
 	uint8_t num_mismatches;
@@ -102,7 +102,7 @@ typedef struct {
 		}\
 	} while(0);
 
-inline void concat_error_string(char *mask, char *mask_aux, result *r, uint8_t rr, SA_TYPE *enW) {
+inline void concat_error_string(char *mask, char *mask_aux, result *r, uint8_t rr, uintmax_t *enW) {
 
 	if      (r->err_kind[rr]==DELETION)
 		(*enW)--;
@@ -122,12 +122,12 @@ inline void concat_error_string(char *mask, char *mask_aux, result *r, uint8_t r
 
 }
 
-inline void manage_single_result(result *r, exome* ex, comp_vector *S, comp_vector *Si, vector *C, comp_matrix *O, comp_matrix *Oi, char *search, bool type, FILE *fp, uintmax_t read_index, bool *found) {
+inline void manage_single_result(result *r, exome* ex, bwt_index *backward, bwt_index *forward, char *search, bool type, FILE *fp, uintmax_t read_index, bool *found) {
 
 	bool direction;
-	SA_TYPE enW;
+	uintmax_t enW;
 	char plusminus[] = "-+";
-	SA_TYPE index, key;
+	uintmax_t index, key;
 
 	char mask[6*(MAXLINE+1)];
 	char mask_aux[6];
@@ -148,29 +148,18 @@ inline void manage_single_result(result *r, exome* ex, comp_vector *S, comp_vect
 
 	//printf("%d %d %d %u %u\n", r->start, r->pos, r->end, r->k, r->l);
 
-	for (SA_TYPE j=r->k; j<=r->l; j++) {
-
-		if (S->ratio==1) {
+	for (uintmax_t j=r->k; j<=r->l; j++) {
 
 			if (direction)
-				key = Si->siz - Si->vector[j] - enW - 1;
+				key = size_SA(forward) - get_SA(j, forward) - enW -1;
 			else
-				key = S->vector[j];
-
-		} else {
-
-			if (direction)
-				key = Si->siz - getScompValue(j, Si, C, Oi) - enW -1;
-			else
-				key = getScompValue(j, S, C, O);
-
-		}
+				key = get_SA(j, backward);
 
 		index = binsearch(ex->offset, ex->size, key);
 
 		if(key + enW <= ex->offset[index]) {
 			//printf("%lu\n", r_list->read_index);
-			fprintf(fp, "read_%ju %c %s %ju %d%s %s\n", (uintmax_t) read_index, plusminus[type], ex->chromosome + (index-1)*IDMAX, (uintmax_t) ex->start[index-1] + (key - ex->offset[index-1]), r->num_mismatches, mask, search);
+			fprintf(fp, "read_%ju %c %s %ju %d%s %s\n", (uintmax_t) read_index, plusminus[type], ex->chromosome + (index-1)*IDMAX, ex->start[index-1] + (key - ex->offset[index-1]), r->num_mismatches, mask, search);
 			//printf("read_%u %c %s %u %d%s\n", r_list->read_index, plusminus[type], ex->chromosome + (index-1)*IDMAX, ex->start[index-1] + (key - ex->offset[index-1]), r->num_mismatches, mask);
 			*found=1;
 		}
@@ -179,6 +168,6 @@ inline void manage_single_result(result *r, exome* ex, comp_vector *S, comp_vect
 
 }
 
-bool write_results(results_list *r_list, SA_TYPE *k, SA_TYPE *l, exome* ex, comp_vector *S, comp_vector *Si, vector *C, comp_matrix *O, comp_matrix *Oi, char *mapping, SA_TYPE nW, bool type, FILE *fp);
+bool write_results(results_list *r_list, uintmax_t *k, uintmax_t *l, exome* ex, bwt_index *backward, bwt_index *forward, char *mapping, uintmax_t nW, bool type, FILE *fp);
 
 #endif

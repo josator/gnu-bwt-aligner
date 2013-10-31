@@ -14,30 +14,30 @@
 
 typedef struct {
   char chromosome[INDEX_EXOME*IDMAX];
-  SA_TYPE start[INDEX_EXOME];
-  SA_TYPE end[INDEX_EXOME];
-  SA_TYPE offset[INDEX_EXOME];
-  SA_TYPE size;
+  uintmax_t start[INDEX_EXOME];
+  uintmax_t end[INDEX_EXOME];
+  uintmax_t offset[INDEX_EXOME];
+  uintmax_t size;
 } exome;
 
 void load_exome_file(exome *ex, const char *directory);
 void save_exome_file(exome *ex, bool reverse, const char *directory);
 
-void encode_reference(ref_vector *X, exome *ex, bool reverse, const char *ref_path);
-bool nextFASTAToken(FILE *queries_file, char *uncoded, uint8_t *coded, SA_TYPE *nquery);
+void encode_reference(uint8_t *X, uintmax_t *nX, uintmax_t *dollar, exome *ex, bool reverse, const char *ref_path);
+bool nextFASTAToken(FILE *queries_file, char *uncoded, uint8_t *coded, uintmax_t *nquery);
 
-inline SA_TYPE binsearch(SA_TYPE *array, SA_TYPE size, SA_TYPE key) {
+inline uintmax_t binsearch(uintmax_t *array, uintmax_t size, uintmax_t key) {
 
-  if( !array ) return 0;
+	if( !array ) return 0;
 
-  SA_TYPE *p = array;
-  SA_TYPE w;
+	uintmax_t *p = array;
+  uintmax_t w;
 
-  while( size > 0 ) {
+	while( size > 0 ) {
 
-    w=size/2;
-    
-    if ( p[w] <= key ) {
+		w=size/2;
+
+		if ( p[w] <= key ) {
       p+=w+1;
       size-=w+1;
     } else {

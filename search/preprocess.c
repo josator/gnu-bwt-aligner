@@ -35,11 +35,7 @@ void calculate_S_and_R(comp_vector *S, comp_vector *R, ref_vector *B, vector *C,
 		if (i > B->dollar) b_aux = B->vector[i-1];
 		else               b_aux = B->vector[i];
 
-#if defined FM_COMP_32 || FM_COMP_64
-		i = C->vector[b_aux] + getOcompValue(b_aux, i+1/*0 is -1*/, O);
-#else
-		i = C->vector[b_aux] + O->desp[b_aux][i+1/*0 is -1*/];
-#endif
+		i = C->vector[b_aux] + get_O(b_aux, i+1/*0 is -1*/, O);
 
 	}
 

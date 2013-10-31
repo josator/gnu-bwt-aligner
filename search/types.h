@@ -78,8 +78,8 @@ typedef struct {
 typedef struct {
 
 	uint8_t *vector;
-  SA_TYPE n;
-	SA_TYPE dollar; //Position ending with the $ symbol (the first in the reference)
+  uint64_t n;
+	uint64_t dollar; //Position ending with the $ symbol (the first in the reference)
 
 } ref_vector;
 
