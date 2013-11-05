@@ -47,8 +47,8 @@ typedef struct {
 
 #if defined CSALIB_SEARCH
 #define size_SA(index) ((index)->csa->n+1)
-#define get_SA(m, index) csa_lookup((index)->csa, (m))
-#define get_ISA(m, index) csa_inverse((index)->csa, (m))
+#define get_SA(m, index) (index)->csa->lookup((index)->csa, (m))
+#define get_ISA(m, index) (index)->csa->inverse((index)->csa, (m))
 #else
 #define size_SA(index) ((index)->S->siz)
 #define get_SA(m, index) getScompValue((m), (index)->S, (index)->C, (index)->O)

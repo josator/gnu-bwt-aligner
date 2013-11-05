@@ -566,12 +566,15 @@ void csa_new_from_bwt_gnu_bwt_wrapper(const char *directory, const char *name) {
 
 	for (i=0; i<SIGMA+2; i++) csa.C[i] = 0;
 
-	idx_id = -1;
-	psi_id =  0;
+	idx_id = 0;
+	psi_id = 0;
 
+	char csa_opt[10];
+	strcpy(csa_opt, ":16:16");
 	char psi_opt[10];
-	strcpy(psi_opt, "3:512");
+	strcpy(psi_opt, "3:16");
 
+	csa_options(&csa, csa_opt);
 	psi_options(&csa, psi_opt);
 
 	fname = (char *) malloc(500 * sizeof(char));
@@ -695,7 +698,7 @@ i64 read_idx(CSA *csa, char *fidx)
 	return isize;
 }
 
-int csa_read(CSA *csa,int argc, char *argv[])
+int csa_read(CSA *csa, int argc, char *argv[])
 {
 	i64 i,m;
 	i64 psize,isize;
@@ -728,15 +731,20 @@ int csa_read(CSA *csa,int argc, char *argv[])
 	isize = 0;  psize = 0;
 
 	for (ac = 0; ac < argc; ac++) {
+
 		fname = argv[ac];
 		//    printf("argv[%d] = %s\n",ac,argv[ac]);
-
 		k = strlen(fname);
-		if (strcmp(fname+k-4,".idx") == 0) {
+
+		printf("%s\n", fname+k-4);
+
+		if (strcmp(fname+k-4,".idx") == 0) {	
+			printf("Hola pepe\n");
 			isize = read_idx(csa,fname);
 		}
 		if (strcmp(fname+k-4,".bwd") == 0) {
 			////       read bw
+			printf("Hola pepe\n");
 			lf_dna_read(csa, fname);
 			lf_d = (lf_dna *) csa->psi_struc;
 			psize = lf_d->psize;
@@ -744,6 +752,7 @@ int csa_read(CSA *csa,int argc, char *argv[])
 		}
 		if (strcmp(fname+k-4,".bwb") == 0) {
 			////       read bw
+			printf("Hola pepe\n");
 			lf_bit_read(csa, fname);
 			lf_d = (lf_dna *) csa->psi_struc;
 			psize = lf_d->psize;
@@ -756,6 +765,7 @@ int csa_read(CSA *csa,int argc, char *argv[])
 				|| strcmp(fname+k-4,".wxd") == 0
 				|| strcmp(fname+k-4,".wsa") == 0) {
 			////       read bw
+			printf("Hola pepe\n");
 			lf_wt_read(csa, fname);
 			lf_w = (lf_wt *) csa->psi_struc;
 			psize = lf_w->psize;
@@ -777,6 +787,7 @@ int csa_read(CSA *csa,int argc, char *argv[])
 				|| strcmp(fname+k-4,".prs") == 0
 				|| strcmp(fname+k-4,".pss") == 0) {
 			////       read psi  
+			printf("Hola pepe\n");
 			psi1_read(csa, fname);
 			ps = (psi1 *) csa->psi_struc;
 			psize = ps->psize;
@@ -785,6 +796,7 @@ int csa_read(CSA *csa,int argc, char *argv[])
 		}
 		if (strcmp(fname+k-4,".pxd") == 0) {
 			////       read psi  
+			printf("Hola pepe\n");
 			psi1_read(csa, fname);
 			ps = (psi1 *) csa->psi_struc;
 			psize = ps->psize;
@@ -793,6 +805,7 @@ int csa_read(CSA *csa,int argc, char *argv[])
 		}
 		if (strcmp(fname+k-4,".psa") == 0) {
 			////       read psi  
+			printf("Hola pepe\n");
 			psi2_read(csa, fname);
 			ps2 = (psi2 *) csa->psi_struc;
 			psize = ps2->psize;
@@ -804,7 +817,6 @@ int csa_read(CSA *csa,int argc, char *argv[])
 
 	if (csa->D == 0) csa->lookup = (rank_t (*)(CSA *, rank_t))csa_error;
 	if (csa->D2 == 0) csa->inverse = (rank_t (*)(CSA *, rank_t))csa_error;
-
 
 	for (i=0; i<SIGMA; i++) csa->CtoA[i] = -1;
 	//  csa->K[-1+1] = 0;

@@ -28,13 +28,9 @@ int main(int argc, char **argv)
 	toc();
 
 	read_ref_vector(&Xi, argv[2], "X");
-	puts("1");
 	revstring(Xi.vector, Xi.n / 2);
-	puts("2");
 	revstring(Xi.vector + (Xi.n / 2), Xi.n / 2);
-	puts("3");
 	save_ref_vector(&Xi, argv[2], "Xi");
-	puts("4");
 
 	tic("Calc. Forward Burrows-Wheeler Transform -> Sadakane direct SAIS");
 	direct_bwt(Xi.vector, Xi.n, argv[2], "forward", false);

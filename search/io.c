@@ -84,9 +84,9 @@ void encode_reference(ref_vector *X, exome *ex, bool reverse, const char *ref_pa
 	else         size = read   + 1;
 
 	X->vector = (uint8_t *) malloc( size * sizeof(uint8_t) );
-	check_malloc(X, ref_path);
+	check_malloc(X->vector, ref_path);
 
-	char *reference = (char *) X;
+	char *reference = (char *) X->vector;
 
 	if (ex !=NULL) ex->size=0;
 
