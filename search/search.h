@@ -148,62 +148,46 @@ inline bool BWExactFinalResultForward(uint8_t *W, bwt_index *index, result *r_it
 
 }
 
-//inline void change_direction(comp_vector *S, comp_vector *Ri, vector *C, comp_matrix *O, comp_matrix *Oi, result *res) {
-//
-//	SA_TYPE k, l, ki, li, aux, aux2;
-//	int16_t start, end, err_offset;
-//
-//	k  = res->k;
-//	l  = res->l;
-//	ki = O->siz-2;
-//	li = 0;
-//
-//	start = res->start;
-//	end   = res->end;
-//
-//	err_offset=0;
-//
-//	for (uint8_t rr=0; rr<res->num_mismatches; rr++) {
-//
-//		if      (res->err_kind[rr]==DELETION)
-//			err_offset--;
-//		else if (res->err_kind[rr]==INSERTION)
-//			err_offset++;
-//
-//	}
-//
-//	if (S->ratio == 1) {
-//
-//		for (SA_TYPE i = k; i <= l; i++) {
-//
-//			aux  = S->siz - S->vector[i] - (end - start + 2) - err_offset;
-//			aux2 = Ri->vector[aux];
-//
-//			if (aux2 < ki) ki = aux2;
-//			if (aux2 > li) li = aux2;
-//
-//		}
-//
-//	} else {
-//
-//		for (SA_TYPE i = k; i <= l; i++) {
-//
-//			aux  = S->siz - getScompValue(i, S, C, O) - (end - start + 2) - err_offset;
-//			aux2 = getRcompValue(aux, Ri, C, Oi);
-//
-//			if (aux2 < ki) ki = aux2;
-//			if (aux2 > li) li = aux2;
-//
-//		}
-//
-//	}
-//
-//	res->k = ki;
-//	res->l = li;
-//
-//}
-//
-//bool BWSearchCPU(uint8_t *W, SA_TYPE nW, vector *C, vector *C1, comp_matrix *O, comp_matrix *Oi, comp_vector *S, comp_vector *R, comp_vector *Si, comp_vector *Ri, results_list *rl_prev, results_list *rl_next, results_list *rl_prev_i, results_list *rl_next_i, results_list *rl_final, int16_t fragsize, bool type);
+inline void change_direction(bwt_index *backward, bwt_index *forward, result *res) {
+
+	intmax_t k, l, ki, li, aux, aux2;
+	int16_t start, end, err_offset;
+
+	k  = res->k;
+	l  = res->l;
+	ki = size_SA(backward)-1;
+	li = 0;
+
+	start = res->start;
+	end   = res->end;
+
+	err_offset=0;
+
+	for (uint8_t rr=0; rr<res->num_mismatches; rr++) {
+
+		if      (res->err_kind[rr]==DELETION)
+			err_offset--;
+		else if (res->err_kind[rr]==INSERTION)
+			err_offset++;
+
+	}
+
+	for (intmax_t i = k; i <= l; i++) {
+
+		aux  = size_SA(backward) - get_SA(i, backward) - (end - start + 2) - err_offset;
+		aux2 = get_ISA(aux, forward);
+
+		if (aux2 < ki) ki = aux2;
+		if (aux2 > li) li = aux2;
+
+	}
+
+	res->k = ki;
+	res->l = li;
+
+}
+
+bool BWSearchCPU(uint8_t *W, uint64_t nW, bwt_index *backward, bwt_index *forward, results_list *rl_prev, results_list *rl_next, results_list *rl_prev_i, results_list *rl_next_i, results_list *rl_final, int16_t fragsize, bool type);
 //
 //bool BWSearch1GPUHelper(uint8_t *W, int16_t start, int16_t end, SA_TYPE *vec_k, SA_TYPE *vec_l, SA_TYPE *vec_ki, SA_TYPE *vec_li, vector *C, vector *C1, comp_matrix *O, comp_matrix *Oi, results_list *r_list);
 //

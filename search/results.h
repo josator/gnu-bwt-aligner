@@ -148,7 +148,7 @@ inline void manage_single_result(result *r, exome* ex, bwt_index *backward, bwt_
 
 	//printf("%d %d %d %u %u\n", r->start, r->pos, r->end, r->k, r->l);
 
-	for (uintmax_t j=r->k; j<=r->l; j++) {
+	for (intmax_t j=r->k; j<=r->l; j++) {
 
 			if (direction)
 				key = size_SA(forward) - get_SA(j, forward) - enW -1;
