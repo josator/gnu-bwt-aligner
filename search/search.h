@@ -8,19 +8,18 @@
 
 inline void BWExactSearchBackward(uint8_t *W, bwt_index *index, result *r) {
 
-	BWiterationVariables();
-	uintmax_t k2, l2;
+	intmax_t k2, l2;
 	int16_t i;
 
 	k2 = r->k;
 	l2 = r->l;
 
-	//printf("B1º -> %lu - %lu\n", k2, l2);
+	printf("B1º -> %lu - %lu\n", k2, l2);
 
 	for(i=r->pos; i>=r->start; i--) {
 
 		BWiteration(k2, l2, k2, l2, W[i], index);
-		//printf("B -> %d -> %lu - %lu\n", i, k2, l2);
+		printf("B -> %d -> %lu - %lu\n", i, k2, l2);
 		if (k2 > l2) break;
 
 	}
@@ -32,8 +31,7 @@ inline void BWExactSearchBackward(uint8_t *W, bwt_index *index, result *r) {
 
 inline void BWExactSearchForward(uint8_t *W, bwt_index *index, result *r) {
 
-	BWiterationVariables();
-	uintmax_t k2, l2;
+	intmax_t k2, l2;
 	int16_t i;
 
 	k2 = r->k;
@@ -58,8 +56,7 @@ inline void BWExactSearchForward(uint8_t *W, bwt_index *index, result *r) {
 
 inline bool BWExactFinalResultBackward(uint8_t *W, bwt_index *index, result *r_iterator, results_list *rl_final, int16_t block_size, int16_t last_block) {
 
-	BWiterationVariables();
-	uintmax_t k, l;
+	intmax_t k, l;
 	int16_t start, pos;
 	int16_t current_block;
 
@@ -106,8 +103,7 @@ inline bool BWExactFinalResultBackward(uint8_t *W, bwt_index *index, result *r_i
 
 inline bool BWExactFinalResultForward(uint8_t *W, bwt_index *index, result *r_iterator, results_list *rl_final, int16_t block_size, int16_t last_block) {
 
-	BWiterationVariables();
-	uintmax_t k, l;
+	intmax_t k, l;
 	int16_t pos, end;
 	int16_t current_block;
 

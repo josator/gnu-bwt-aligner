@@ -97,11 +97,13 @@ int main(int argc, char **argv) {
     rl_next.read_index = read_index; rl_next_i.read_index = read_index;
     rl_final.read_index = read_index;
 
-		long r_k, r_l;
-		
-		backward.csa->search(W.vector, W.n, backward.csa, &r_k, &r_l);
-
-		printf("%ld - %ld : %ld\n", r_k, r_l);
+		result r;
+		init_result(&r, 0);
+		change_result(&r, 0, size_SA(&backward)-1, W.n-1);
+		bound_result(&r, 0, W.n-1);
+		BWExactSearchBackward(W.vector, &backward, &r);
+		//backward.csa->search(W.vector, W.n, backward.csa, &r_k, &r_l);
+		printf("%ld - %ld : %ld\n", r.k, r.l);
 
 		//BWSearchCPU(W.vector, W.n, &C, &C1, &O, &Oi, &S, &R, &Si, &Ri, &rl_prev, &rl_next, &rl_prev_i, &rl_next_i, &rl_final, FRAGSIZE, 1);
     //write_results(&rl_final, k, l, &ex, &S, &Si, &C, &O, &Oi, Worig, nW_aux, 1, output_file);

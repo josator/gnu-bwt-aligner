@@ -1,6 +1,6 @@
-#include "../BW_preprocess.h"
-#include "../BW_csafm.h"
-#include "../BW_io.h"
+#include "../search/preprocess.h"
+#include "../search/csafm.h"
+#include "../search/io.h"
 
 int main(int argc, char **argv)
 {
@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 	save_exome_file(&ex, false, argv[2]);
   print_vector(X.vector, X.n);
 
-	tic("Calc. Suffix Array -> Sadakane direct SAIS");
+	tic("Calc. BWT -> Sadakane direct SAIS");
 	calculate_and_save_B(&X, argv[2], "B");
 	toc();
 
@@ -41,11 +41,13 @@ int main(int argc, char **argv)
  	print_comp_matrix(O);
 	save_comp_matrix(&O, argv[2], "O");
 
+	tic("Calc. Suffix Array -> GNU BWT Aligner");
 	calculate_S_and_R(&S, &R, &B, &C, &O, ratio);
 	print_vector(S.vector, S.n);
 	print_vector(R.vector, S.n);
 	save_comp_vector(&S, argv[2], "S");
 	save_comp_vector(&R, argv[2], "R");
+	toc();
 
 	free(B.vector);
   free_comp_matrix(NULL, &O);
@@ -57,7 +59,7 @@ int main(int argc, char **argv)
 	save_ref_vector(&Xi, argv[2], "Xi");
   print_vector(Xi.vector, Xi.n);
 
-	tic("Calc. Suffix Array -> Sadakane direct SAIS");
+	tic("Calc. BWT of reverse reference -> Sadakane direct SAIS");
 	calculate_and_save_B(&Xi, argv[2], "Bi");
 	toc();
 
@@ -68,11 +70,13 @@ int main(int argc, char **argv)
  	print_comp_matrix(Oi);
 	save_comp_matrix(&Oi, argv[2], "Oi");
 
+	tic("Calc. Suffix Array of reverse reference -> GNU BWT Aligner");
 	calculate_S_and_R(&Si, &Ri, &Bi, &C, &Oi, ratio);
 	print_vector(Si.vector, Si.n);
 	print_vector(Ri.vector, Si.n);
 	save_comp_vector(&Si, argv[2], "Si");
 	save_comp_vector(&Ri, argv[2], "Ri");
+	toc();
 
 	free(Bi.vector);
   free_comp_matrix(NULL, &Oi);

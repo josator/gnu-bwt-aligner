@@ -570,9 +570,9 @@ void csa_new_from_bwt_gnu_bwt_wrapper(const char *directory, const char *name) {
 	psi_id = 0;
 
 	char csa_opt[10];
-	strcpy(csa_opt, ":16:16");
+	strcpy(csa_opt, ":512:512");
 	char psi_opt[10];
-	strcpy(psi_opt, "3:16");
+	strcpy(psi_opt, "3:512");
 
 	csa_options(&csa, csa_opt);
 	psi_options(&csa, psi_opt);
@@ -739,12 +739,10 @@ int csa_read(CSA *csa, int argc, char *argv[])
 		printf("%s\n", fname+k-4);
 
 		if (strcmp(fname+k-4,".idx") == 0) {	
-			printf("Hola pepe\n");
 			isize = read_idx(csa,fname);
 		}
 		if (strcmp(fname+k-4,".bwd") == 0) {
 			////       read bw
-			printf("Hola pepe\n");
 			lf_dna_read(csa, fname);
 			lf_d = (lf_dna *) csa->psi_struc;
 			psize = lf_d->psize;
@@ -752,7 +750,6 @@ int csa_read(CSA *csa, int argc, char *argv[])
 		}
 		if (strcmp(fname+k-4,".bwb") == 0) {
 			////       read bw
-			printf("Hola pepe\n");
 			lf_bit_read(csa, fname);
 			lf_d = (lf_dna *) csa->psi_struc;
 			psize = lf_d->psize;
@@ -765,7 +762,6 @@ int csa_read(CSA *csa, int argc, char *argv[])
 				|| strcmp(fname+k-4,".wxd") == 0
 				|| strcmp(fname+k-4,".wsa") == 0) {
 			////       read bw
-			printf("Hola pepe\n");
 			lf_wt_read(csa, fname);
 			lf_w = (lf_wt *) csa->psi_struc;
 			psize = lf_w->psize;
@@ -787,7 +783,6 @@ int csa_read(CSA *csa, int argc, char *argv[])
 				|| strcmp(fname+k-4,".prs") == 0
 				|| strcmp(fname+k-4,".pss") == 0) {
 			////       read psi  
-			printf("Hola pepe\n");
 			psi1_read(csa, fname);
 			ps = (psi1 *) csa->psi_struc;
 			psize = ps->psize;
@@ -796,7 +791,6 @@ int csa_read(CSA *csa, int argc, char *argv[])
 		}
 		if (strcmp(fname+k-4,".pxd") == 0) {
 			////       read psi  
-			printf("Hola pepe\n");
 			psi1_read(csa, fname);
 			ps = (psi1 *) csa->psi_struc;
 			psize = ps->psize;
@@ -805,7 +799,6 @@ int csa_read(CSA *csa, int argc, char *argv[])
 		}
 		if (strcmp(fname+k-4,".psa") == 0) {
 			////       read psi  
-			printf("Hola pepe\n");
 			psi2_read(csa, fname);
 			ps2 = (psi2 *) csa->psi_struc;
 			psize = ps2->psize;
@@ -1285,8 +1278,6 @@ rank_t csa_BW_LF_by_psi(CSA *csa, rank_t i, int *cc)
 	*cc = c;
 	return x;
 }
-
-
 
 ///////////////////////////////////////////
 //  i64 csa_searchsub_lf(int c, CSA *csa, rank_t *ll, rank_t *rr)

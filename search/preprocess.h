@@ -1,6 +1,8 @@
 #ifndef _SEARCH_PREPROCESS_
 #define _SEARCH_PREPROCESS_
 
+#include <omp.h>
+
 #include "../dbwt/dbwt.h"
 #include "csafm.h"
 #include "io.h"

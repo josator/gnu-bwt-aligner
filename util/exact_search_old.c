@@ -9,6 +9,8 @@
 
 int main(int argc, char **argv) {
 
+	bwt_index backward;
+
 	char *Worig;
   ref_vector W;
   vector C, C1;
@@ -54,16 +56,22 @@ int main(int argc, char **argv) {
   read_comp_matrix(&O, argv[2], "O");
   read_comp_matrix(&Oi, argv[2], "Oi");
 
-  read_comp_vector(&S, argv[2], "Scomp");
-  read_comp_vector(&Si, argv[2], "Scompi");
-  read_comp_vector(&R, argv[2], "Rcomp");
-  read_comp_vector(&Ri, argv[2], "Rcompi");
+  read_comp_vector(&S, argv[2], "S");
+  read_comp_vector(&Si, argv[2], "Si");
+  read_comp_vector(&R, argv[2], "R");
+  read_comp_vector(&Ri, argv[2], "Ri");
 
   reverse_strand_C(&rC, &C, &rC1, &C1);
   reverse_strand_O(&rO, &O);
   reverse_strand_O(&rOi, &Oi);
 
-  toc();
+	backward.C  = &C;
+  backward.C1 = &C1;
+  backward.O  = &O;
+	backward.S  = &S;
+	backward.R  = &R;
+
+	toc();
 
   tic("Preparing search space");
 
@@ -99,8 +107,12 @@ int main(int argc, char **argv) {
     rl_next.read_index = read_index; rl_next_i.read_index = read_index;
     rl_final.read_index = read_index;
 
-    BWSearchCPU(W.vector, W.n, &C, &C1, &O, &Oi, &S, &R, &Si, &Ri, &rl_prev, &rl_next, &rl_prev_i, &rl_next_i, &rl_final, FRAGSIZE, 1);
-    write_results(&rl_final, k, l, &ex, &S, &Si, &C, &O, &Oi, Worig, nW_aux, 1, output_file);
+		result r;
+		init_result(&r, 0);
+		change_result(&r, 0, size_SA(&backward)-1, W.n-1);
+		bound_result(&r, 0, W.n-1);
+		BWExactSearchBackward(W.vector, &backward, &r);
+		printf("%ld - %ld : %ld\n", r.k, r.l);
 
     read_index++;
 

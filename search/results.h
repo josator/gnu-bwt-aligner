@@ -11,7 +11,7 @@
 #define MAX_MISMATCHES 10
 
 typedef struct {
-	uintmax_t k, l;
+	intmax_t k, l;
 	int16_t start, pos, end;
 	bool dir;                      //0 - Backward, 1 - Forward
 	uint8_t num_mismatches;

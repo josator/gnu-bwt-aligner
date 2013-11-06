@@ -729,8 +729,10 @@ void direct_bwt(uchar *T, long n, const char *directory, const char *name, bool 
 	check_file_open(fp, path);
 
 	if (compat) {
-		fwrite(&n, sizeof(uint32_t), 1, fp);
-		fwrite(&last, sizeof(uint32_t), 1, fp);
+		uint64_t n_aux = n;
+		uint64_t last_aux = last;
+		fwrite(&n_aux, sizeof(uint64_t), 1, fp);
+		fwrite(&last_aux, sizeof(uint64_t), 1, fp);
 	}
 
 	{
