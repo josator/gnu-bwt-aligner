@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 	timevars();
   init_replace_table(argv[3]);
 
-	encode_reference(&X, &ex, false, argv[1]);
+	encode_reference(&X, &ex, true, argv[1]);
 	save_ref_vector(&X, argv[2], "X");
 	save_exome_file(&ex, true, argv[2]);
 
@@ -28,9 +28,8 @@ int main(int argc, char **argv)
 	toc();
 
 	read_ref_vector(&Xi, argv[2], "X");
-	revstring(Xi.vector, Xi.n);
-	//revstring(Xi.vector, Xi.n / 2);
-	//revstring(Xi.vector + (Xi.n / 2), Xi.n / 2);
+	revstring(Xi.vector, Xi.n / 2);
+	revstring(Xi.vector + (Xi.n / 2), Xi.n / 2);
 	save_ref_vector(&Xi, argv[2], "Xi");
 
 	tic("Calc. Forward Burrows-Wheeler Transform -> Sadakane direct SAIS");

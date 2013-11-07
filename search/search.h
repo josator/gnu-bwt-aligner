@@ -14,19 +14,21 @@ inline void BWExactSearchBackward(uint8_t *W, bwt_index *index, result *r) {
 	k2 = r->k;
 	l2 = r->l;
 
-	printf("B1º -> %lu - %lu\n", k2, l2);
+	//printf("B1º -> %lu - %lu\n", k2, l2);
 
 	for(i=r->pos; i>=r->start; i--) {
 
 		BWiteration(k2, l2, k2, l2, W[i], index);
-		printf("B -> %d -> %lu - %lu\n", i, k2, l2);
+		//printf("B -> %d -> %lu - %lu\n", i, k2, l2);
 		if (k2 > l2) break;
 
 	}
 
 	r->k = k2;
 	r->l = l2;
+
 	r->pos = i;
+
 }
 
 inline void BWExactSearchForward(uint8_t *W, bwt_index *index, result *r) {

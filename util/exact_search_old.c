@@ -9,18 +9,16 @@
 
 int main(int argc, char **argv) {
 
-	bwt_index backward;
+	bwt_index backward, forward;
 
 	char *Worig;
   ref_vector W;
   vector C, C1;
-  vector rC, rC1;
   comp_matrix O, Oi;
-  comp_matrix rO, rOi;
   comp_vector S, Si;
   comp_vector R, Ri;
 
-  results_list rl_prev, rl_next, rl_prev_i, rl_next_i, rl_final;
+	results_list rl_prev, rl_next, rl_prev_i, rl_next_i, rl_final;
   uintmax_t read_index=0;
 
   uintmax_t RESULTS, FRAGSIZE;
@@ -61,15 +59,17 @@ int main(int argc, char **argv) {
   read_comp_vector(&R, argv[2], "R");
   read_comp_vector(&Ri, argv[2], "Ri");
 
-  reverse_strand_C(&rC, &C, &rC1, &C1);
-  reverse_strand_O(&rO, &O);
-  reverse_strand_O(&rOi, &Oi);
-
 	backward.C  = &C;
   backward.C1 = &C1;
   backward.O  = &O;
 	backward.S  = &S;
 	backward.R  = &R;
+
+	forward.C  = &C;
+  forward.C1 = &C1;
+  forward.O  = &Oi;
+	forward.S  = &Si;
+	forward.R  = &Ri;
 
 	toc();
 
@@ -87,8 +87,8 @@ int main(int argc, char **argv) {
 
   toc();
 
-  uintmax_t *k = (uintmax_t*)malloc(RESULTS * sizeof(uintmax_t));
-  uintmax_t *l = (uintmax_t*)malloc(RESULTS * sizeof(uintmax_t));
+  intmax_t *k = (intmax_t*)malloc(RESULTS * sizeof(intmax_t));
+  intmax_t *l = (intmax_t*)malloc(RESULTS * sizeof(intmax_t));
 
   uintmax_t nW_aux;
 
@@ -103,16 +103,12 @@ int main(int argc, char **argv) {
 
     W.n = nW_aux;
 
-    rl_prev.read_index = read_index; rl_prev_i.read_index = read_index;
+		rl_prev.read_index = read_index; rl_prev_i.read_index = read_index;
     rl_next.read_index = read_index; rl_next_i.read_index = read_index;
     rl_final.read_index = read_index;
 
-		result r;
-		init_result(&r, 0);
-		change_result(&r, 0, size_SA(&backward)-1, W.n-1);
-		bound_result(&r, 0, W.n-1);
-		BWExactSearchBackward(W.vector, &backward, &r);
-		printf("%ld - %ld : %ld\n", r.k, r.l);
+		BWSearchCPU(W.vector, W.n, &backward, &forward, &rl_prev, &rl_next, &rl_prev_i, &rl_next_i, &rl_final, FRAGSIZE, 1);
+    write_results(&rl_final, k, l, &ex, &backward, &forward, Worig, nW_aux, 2, output_file);
 
     read_index++;
 
@@ -127,11 +123,9 @@ int main(int argc, char **argv) {
 
   free(C.vector);
   free(C1.vector);
-  free(rC.vector);
-  free(rC1.vector);
 
-  free_comp_matrix(&rO,&O);
-  free_comp_matrix(&rOi,&Oi);
+  free_comp_matrix(NULL, &O);
+  free_comp_matrix(NULL, &Oi);
 
   free(S.vector);
   free(Si.vector);

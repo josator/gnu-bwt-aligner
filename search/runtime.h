@@ -36,8 +36,11 @@ typedef struct {
 		(k_out) = (index)->C1->vector[(b)] + get_O((b), (k_in) , (index)->O);\
 		(l_out) = (index)->C->vector[(b)] + get_O((b), (l_in)+1, (index)->O);\
 	} while (0);
-//printf("k-> %lu, l-> %lu, O(k) -> %u, O(l) -> %u, C -> %u, C1 -> %u\n", (k_out), (l_out), get_O((b), (k_in), (index)->O), get_O((b), (l_in)+1, (index)->O), (index)->C->vector[(b)], (index)->C1->vector[(b)]);
+
 #endif
+
+//printf("k-> %lu, l-> %lu, O(k) -> %u, O(l) -> %u, C -> %u, C1 -> %u\n", (k_out), (l_out), get_O((b), (k_in), (index)->O), get_O((b), (l_in)+1, (index)->O), (index)->C->vector[(b)], (index)->C1->vector[(b)]);
+
 
 #if defined CSALIB_SEARCH
 #define size_SA(index) ((index)->csa->n+1)

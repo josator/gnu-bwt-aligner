@@ -1,6 +1,6 @@
 #include "results.h"
 
-bool write_results(results_list *r_list, uintmax_t *k, uintmax_t *l, exome* ex, bwt_index *backward, bwt_index *forward, char *mapping, uintmax_t nW, bool type, FILE *fp) {
+bool write_results(results_list *r_list, intmax_t *k, intmax_t *l, exome* ex, bwt_index *backward, bwt_index *forward, char *mapping, uintmax_t nW, int type, FILE *fp) {
 
 	result *r;
 

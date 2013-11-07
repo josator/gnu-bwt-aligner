@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 
 	SA_TYPE ratio = atoi(argv[3]);
 
-	encode_reference(&X, &ex, false, argv[1]);
+	encode_reference(&X, &ex, true, argv[1]);
 	save_ref_vector(&X, argv[2], "X");
 	save_exome_file(&ex, false, argv[2]);
   print_vector(X.vector, X.n);
@@ -55,7 +55,8 @@ int main(int argc, char **argv)
 	free(R.vector);
 
 	read_ref_vector(&Xi, argv[2], "X");
-	revstring(Xi.vector, Xi.n);
+	revstring(Xi.vector, Xi.n / 2);
+	revstring(Xi.vector + (Xi.n / 2), Xi.n / 2);
 	save_ref_vector(&Xi, argv[2], "Xi");
   print_vector(Xi.vector, Xi.n);
 

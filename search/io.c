@@ -9,7 +9,7 @@ void load_exome_file(exome *ex, const char *directory) {
   strcat(path, directory);
   strcat(path, "/index");
 
-  fp  = fopen(path,  "r");
+  fp  = fopen(path, "r");
   check_file_open(fp, path);
 
   char line[MAXLINE];

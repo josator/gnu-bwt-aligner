@@ -77,8 +77,8 @@ int main(int argc, char **argv) {
 
   toc();
 
-  uintmax_t *k = (uintmax_t*)malloc(RESULTS * sizeof(uintmax_t));
-  uintmax_t *l = (uintmax_t*)malloc(RESULTS * sizeof(uintmax_t));
+  intmax_t *k = (intmax_t*)malloc(RESULTS * sizeof(intmax_t));
+  intmax_t *l = (intmax_t*)malloc(RESULTS * sizeof(intmax_t));
 
   uintmax_t nW_aux;
 
