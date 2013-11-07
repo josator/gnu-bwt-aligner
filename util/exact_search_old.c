@@ -110,6 +110,8 @@ int main(int argc, char **argv) {
 		BWSearchCPU(W.vector, W.n, &backward, &forward, &rl_prev, &rl_next, &rl_prev_i, &rl_next_i, &rl_final, FRAGSIZE, 1);
     write_results(&rl_final, k, l, &ex, &backward, &forward, Worig, nW_aux, 2, output_file);
 
+		rl_final.num_results=0;
+
     read_index++;
 
   }

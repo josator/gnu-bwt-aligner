@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
 	encode_reference(&X, &ex, true, argv[1]);
 	save_ref_vector(&X, argv[2], "X");
-	save_exome_file(&ex, false, argv[2]);
+	save_exome_file(&ex, true, argv[2]);
   print_vector(X.vector, X.n);
 
 	tic("Calc. BWT -> Sadakane direct SAIS");
