@@ -15,34 +15,6 @@
 #define MISMATCH  2
 #define INSERTION 3
 
-extern int number_of_batchs;
-
-extern int time_flag;
-
-extern double read_time;
-extern struct timeval t1_read, t2_read;
-
-extern double gpu_time;
-extern struct timeval t1_gpu, t2_gpu;
-
-extern double cpu_time;
-extern struct timeval t1_cpu, t2_cpu;
-
-extern double kmers_time;
-extern struct timeval t1_kmers, t2_kmers;
-
-extern double result_time;
-extern struct timeval t1_result, t2_result;
-
-extern double reporting_time;
-extern struct timeval t1_reporting, t2_reporting;
-
-extern double write_time;
-extern struct timeval t1_write, t2_write;
-
-extern double mean_reads_per_batch;
-extern double mean_batch_size;
-
 #define timevars() struct timeval t1, t2;
 
 #ifndef min

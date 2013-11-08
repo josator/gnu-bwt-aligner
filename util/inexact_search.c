@@ -1,22 +1,19 @@
 #include <pthread.h>
 
-#include "../BW_search.h"
-#include "../BW_io.h"
+#include "../search/search.h"
+#include "../search/io.h"
 
 #define MAX_READ_THREAD 1024
 
 char *h_Worig, *h_Worig2, *h_Worig3;
-REF_TYPE *h_We, *h_We2, *h_We3;
-SA_TYPE *h_nWe, *h_nWe2, *h_nWe3;
+uint8_t *h_We, *h_We2, *h_We3;
+uint64_t *h_nWe, *h_nWe2, *h_nWe3;
 
 char *read_Worig, *gpu_Worig, *store_Worig, *swap_Worig;
-REF_TYPE *read_We, *gpu_We, *store_We, *swap_We;
-SA_TYPE *read_nWe, *gpu_nWe, *store_nWe, *swap_nWe;
+uint8_t *read_We, *gpu_We, *store_We, *swap_We;
+uint64_t *read_nWe, *gpu_nWe, *store_nWe, *swap_nWe;
 
-comp_matrix h_O, h_rO, h_Oi, h_rOi;
-
-vector h_C, h_rC, h_C1, h_rC1;
-comp_vector S, Si, R, Ri;
+bwt_index backward, forward, backward_rev, forward_rev;
 
 results_list rl_prev, rl_next, rl_prev_i, rl_next_i;
 
@@ -25,9 +22,9 @@ results_list rl_final_r[MAX_READ_THREAD], rl_final_r2[MAX_READ_THREAD];
 results_list *gpu_rl_final,  *store_rl_final,  *swap_rl_final;
 results_list *gpu_rl_final_r,  *store_rl_final_r,  *swap_rl_final_r;
 
-SA_TYPE *k, *l;
+intmax_t *k, *l;
 
-timeval t1, t2, t1_write, t2_write;
+struct timeval t1, t2, t1_write, t2_write;
 float t_gpu=0, t_total=0, t_write=0;
 uintmax_t descartadas=0;
 
@@ -123,12 +120,12 @@ void *writeResults(void *threadid) {
 			found = false; found2 = false;
 
 			if (store_rl_final[i].num_results) {
-				write_results(store_rl_final + i, k, l, &ex, &S, &Si, &h_C, &h_O, &h_Oi, store_Worig + i*MAXLINE, store_nWe[i], true, output_file);
+				write_results(store_rl_final + i, k, l, &ex, &backward, &forward, store_Worig + i*MAXLINE, store_nWe[i], true, output_file);
 				found = true;
 			}
 
 			if (store_rl_final_r[i].num_results) {
-				write_results(store_rl_final_r + i, k, l, &ex, &S, &Si, &h_C, &h_O, &h_Oi, store_Worig + i*MAXLINE, store_nWe[i], false, output_file);
+				write_results(store_rl_final_r + i, k, l, &ex, &backward, &forward, store_Worig + i*MAXLINE, store_nWe[i], false, output_file);
 				found2 = true;
 			}
 
@@ -157,15 +154,15 @@ void *cpuSearch(void *threadid) {
 
 	uintmax_t num_read = 0;
 	//int tid=0;
-  //tid = (long)threadid;i
+  //tid = (long)threadid;
 
-	REF_TYPE *g_We;
-	SA_TYPE *g_nWe;
+	uint8_t *g_We;
+	uint64_t *g_nWe;
 
-	g_We  = (REF_TYPE*)malloc(MAX_READ_THREAD * MAXLINE * sizeof(REF_TYPE));
+	g_We  = (uint8_t*) malloc(MAX_READ_THREAD * MAXLINE * sizeof(uint8_t));
 	check_malloc(g_We,  "cpuSearch");
 
-	g_nWe  = (SA_TYPE*)malloc(MAX_READ_THREAD * sizeof(SA_TYPE));
+	g_nWe  = (uint64_t*) malloc(MAX_READ_THREAD * sizeof(uint64_t));
 	check_malloc(g_nWe, "cpuSearch");
 
 	while(1) {
@@ -232,7 +229,7 @@ void *cpuSearch(void *threadid) {
 			gpu_rl_final_r[i].read_index = num_read;
 
 			int n_count = 0;
-			for (SA_TYPE nn=0; nn<g_nWe[i]; nn++) {
+			for (uint64_t nn=0; nn<g_nWe[i]; nn++) {
 				if (g_We[i * MAXLINE + nn] == 'N') n_count++;
 				if (n_count>num_errors) {
 					descartadas++;
@@ -249,14 +246,8 @@ void *cpuSearch(void *threadid) {
 				BWSearchCPU(
 						g_We + i * MAXLINE,
 						g_nWe[i],
-						&h_C,
-						&h_C1,
-						&h_O,
-						&h_Oi,
-						&S,
-						&R,
-						&Si,
-						&Ri,
+						&backward,
+						&forward,
 						&rl_prev,
 						&rl_next,
 						&rl_prev_i,
@@ -269,14 +260,8 @@ void *cpuSearch(void *threadid) {
 				BWSearchCPU(
 						g_We + i * MAXLINE,
 						g_nWe[i],
-						&h_rC,
-						&h_rC1,
-						&h_rOi,
-						&h_rO,
-						&Si,
-						&Ri,
-						&S,
-						&R,
+						&forward_rev,
+						&backward_rev,
 						&rl_prev,
 						&rl_next,
 						&rl_prev_i,
@@ -336,39 +321,28 @@ int main(int argc, char **argv) {
 	fragsize = atoi(argv[6]);
 	init_replace_table(argv[7]);
 
-	read_vector(&h_C,     argv[2], "C");
-	read_vector(&h_C1,    argv[2], "C1");
-	read_comp_matrix(&h_O,  argv[2], "O");
-	read_comp_matrix(&h_Oi, argv[2], "Oi");
+	load_bwt_index(&backward_rev, &backward, argv[2], 1);
+	load_bwt_index(&forward_rev, &forward, argv[2], 0);
 
-	read_comp_vector(&S,   argv[2], "S");
-	read_comp_vector(&Si,  argv[2], "Si");
-	read_comp_vector(&R,   argv[2], "R");
-	read_comp_vector(&Ri,  argv[2], "Ri");
-
-	reverse_strand_C(&h_rC, &h_C, &h_rC1, &h_C1);
-	reverse_strand_O(&h_rO, &h_O);
-	reverse_strand_O(&h_rOi, &h_Oi);
-
-	h_Worig  = (char*)malloc(MAX_READ_THREAD * MAXLINE * sizeof(char));
+	h_Worig  = (char*) malloc(MAX_READ_THREAD * MAXLINE * sizeof(char));
 	check_malloc(h_Worig,  "main");
-	h_Worig2 = (char*)malloc(MAX_READ_THREAD * MAXLINE * sizeof(char));
+	h_Worig2 = (char*) malloc(MAX_READ_THREAD * MAXLINE * sizeof(char));
 	check_malloc(h_Worig2, "main");
-	h_Worig3 = (char*)malloc(MAX_READ_THREAD * MAXLINE * sizeof(char));
+	h_Worig3 = (char*) malloc(MAX_READ_THREAD * MAXLINE * sizeof(char));
 	check_malloc(h_Worig3, "main");
 
-	h_We  = (REF_TYPE*)malloc(MAX_READ_THREAD * MAXLINE * sizeof(REF_TYPE));
+	h_We  = (uint8_t*) malloc(MAX_READ_THREAD * MAXLINE * sizeof(uint8_t));
 	check_malloc(h_We,  "main");
-	h_We2 = (REF_TYPE*)malloc(MAX_READ_THREAD * MAXLINE * sizeof(REF_TYPE));
+	h_We2 = (uint8_t*) malloc(MAX_READ_THREAD * MAXLINE * sizeof(uint8_t));
 	check_malloc(h_We2, "main");
-	h_We3 = (REF_TYPE*)malloc(MAX_READ_THREAD * MAXLINE * sizeof(REF_TYPE));
+	h_We3 = (uint8_t*) malloc(MAX_READ_THREAD * MAXLINE * sizeof(uint8_t));
 	check_malloc(h_We3, "main");
 
-	h_nWe  = (SA_TYPE*)malloc(MAX_READ_THREAD * sizeof(SA_TYPE));
+	h_nWe  = (uint64_t*) malloc(MAX_READ_THREAD * sizeof(uint64_t));
 	check_malloc(h_nWe, "main");
-	h_nWe2 = (SA_TYPE*)malloc(MAX_READ_THREAD * sizeof(SA_TYPE));
+	h_nWe2 = (uint64_t*) malloc(MAX_READ_THREAD * sizeof(uint64_t));
 	check_malloc(h_nWe2, "main");
-	h_nWe3 = (SA_TYPE*)malloc(MAX_READ_THREAD * sizeof(SA_TYPE));
+	h_nWe3 = (uint64_t*) malloc(MAX_READ_THREAD * sizeof(uint64_t));
 	check_malloc(h_nWe3, "main");
 
 	new_results_list(&rl_prev, RESULTS); new_results_list(&rl_prev_i, RESULTS);
@@ -381,8 +355,8 @@ int main(int argc, char **argv) {
 		new_results_list(rl_final_r2 + i, RESULTS);
 	}
 
-	k = (SA_TYPE*)malloc(RESULTS * sizeof(SA_TYPE));
-	l = (SA_TYPE*)malloc(RESULTS * sizeof(SA_TYPE));
+	k = (intmax_t *) malloc(RESULTS * sizeof(intmax_t));
+	l = (intmax_t *) malloc(RESULTS * sizeof(intmax_t));
 
 	read_Worig = h_Worig; gpu_Worig = h_Worig2; store_Worig = h_Worig3;
 	read_We = h_We; gpu_We = h_We2; store_We = h_We3;
@@ -508,17 +482,8 @@ int main(int argc, char **argv) {
 
 	pthread_attr_destroy(&attr);
 
-	free(h_C.vector);
-	free(h_C1.vector);
-	free(h_rC.vector);
-	free(h_rC1.vector);
-
-	free_comp_matrix(&h_rO, &h_O);
-	free_comp_matrix(&h_rOi, &h_Oi);
-	free(S.vector);
-	free(Si.vector);
-	free(R.vector);
-	free(Ri.vector);
+	free_bwt_index(&backward_rev, &backward);
+	free_bwt_index(&forward_rev, &forward);
 
 	free(h_We);
 

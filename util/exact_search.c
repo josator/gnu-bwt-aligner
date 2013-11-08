@@ -10,10 +10,7 @@
 
 int main(int argc, char **argv) {
 
-	CSA SA, SAi;
 	bwt_index backward, forward;
-	backward.csa = &SA;
-	forward.csa = &SAi;
 
 	char *Worig;
   ref_vector W;
@@ -25,12 +22,8 @@ int main(int argc, char **argv) {
   exome ex;
 
 	FILE *queries_file, *output_file;
-	char *fname[2];
 
-	if (argc!=7) {
-    printf("Syntax:\n\t%s search_file input_dir output_file results_buffer frag_size nucleotides\n", argv[0]);
-    return 1;
-  }
+	check_syntax(argc, 7, "exact_search search_file input_dir output_file results_buffer frag_size nucleotides");	
 
 	timevars();
   init_replace_table(argv[6]);
@@ -49,30 +42,8 @@ int main(int argc, char **argv) {
   }
 
 	tic("Loading FM-Index");
-
-	fname[0] = (char *) malloc(500 * sizeof(char));
-	fname[1] = (char *) malloc(500 * sizeof(char));
-
-	fname[0][0]='\0';
-  strcat(fname[0], argv[2]);
-  strcat(fname[0], "/backward.bwd");
-
-	fname[1][0]='\0';
-  strcat(fname[1], argv[2]);
-  strcat(fname[1], "/backward.idx");
-
-	csa_read(backward.csa, 2, fname);
-
-	fname[0][0]='\0';
-  strcat(fname[0], argv[2]);
-  strcat(fname[0], "/forward.bwd");
-
-	fname[1][0]='\0';
-  strcat(fname[1], argv[2]);
-  strcat(fname[1], "/forward.idx");
-
-	csa_read(forward.csa, 2, fname);
-
+	load_bwt_index(NULL, &backward, argv[2], 1);
+	load_bwt_index(NULL, &forward, argv[2], 0);
 	toc();
 
 	tic("Preparing search space");
@@ -127,6 +98,9 @@ int main(int argc, char **argv) {
 
 	free(k);
   free(l);
+
+	free_bwt_index(NULL, &backward);
+	free_bwt_index(NULL, &forward);
 
   free(rl_prev.list);
   free(rl_next.list);
