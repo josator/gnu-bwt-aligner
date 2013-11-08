@@ -10,10 +10,11 @@
 
 int main(int argc, char **argv) {
 
-	CSA SA;
-	bwt_index backward;
+	CSA SA, SAi;
+	bwt_index backward, forward;
 	backward.csa = &SA;
-	
+	forward.csa = &SAi;
+
 	char *Worig;
   ref_vector W;
 
@@ -50,16 +51,27 @@ int main(int argc, char **argv) {
 	tic("Loading FM-Index");
 
 	fname[0] = (char *) malloc(500 * sizeof(char));
+	fname[1] = (char *) malloc(500 * sizeof(char));
+
 	fname[0][0]='\0';
   strcat(fname[0], argv[2]);
   strcat(fname[0], "/backward.bwd");
 
-	fname[1] = (char *) malloc(500 * sizeof(char));
 	fname[1][0]='\0';
   strcat(fname[1], argv[2]);
   strcat(fname[1], "/backward.idx");
 
 	csa_read(backward.csa, 2, fname);
+
+	fname[0][0]='\0';
+  strcat(fname[0], argv[2]);
+  strcat(fname[0], "/forward.bwd");
+
+	fname[1][0]='\0';
+  strcat(fname[1], argv[2]);
+  strcat(fname[1], "/forward.idx");
+
+	csa_read(forward.csa, 2, fname);
 
 	toc();
 
@@ -97,16 +109,10 @@ int main(int argc, char **argv) {
     rl_next.read_index = read_index; rl_next_i.read_index = read_index;
     rl_final.read_index = read_index;
 
-		result r;
-		init_result(&r, 0);
-		change_result(&r, 0, size_SA(&backward)-1, W.n-1);
-		bound_result(&r, 0, W.n-1);
-		BWExactSearchBackward(W.vector, &backward, &r);
-		//backward.csa->search(W.vector, W.n, backward.csa, &r_k, &r_l);
-		printf("%ld - %ld : %ld\n", r.k, r.l);
+		BWSearchCPU(W.vector, W.n, &backward, &forward, &rl_prev, &rl_next, &rl_prev_i, &rl_next_i, &rl_final, FRAGSIZE, 1);
+    write_results(&rl_final, k, l, &ex, &backward, &forward, Worig, nW_aux, 2, output_file);
 
-		//BWSearchCPU(W.vector, W.n, &C, &C1, &O, &Oi, &S, &R, &Si, &Ri, &rl_prev, &rl_next, &rl_prev_i, &rl_next_i, &rl_final, FRAGSIZE, 1);
-    //write_results(&rl_final, k, l, &ex, &S, &Si, &C, &O, &Oi, Worig, nW_aux, 1, output_file);
+		rl_final.num_results=0;
 
 		read_index++;
 

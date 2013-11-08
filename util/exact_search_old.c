@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
 
   FILE *queries_file, *output_file;
 
-  if (argc!=7) {
+	if (argc!=7) {
     printf("Syntax:\n\t%s search_file input_dir output_file results_buffer frag_size nucleotides\n", argv[0]);
     return 1;
   }
