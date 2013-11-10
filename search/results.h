@@ -122,7 +122,7 @@ inline void concat_error_string(char *mask, char *mask_aux, result *r, uint8_t r
 
 }
 
-inline void manage_single_result(result *r, exome* ex, bwt_index *backward, bwt_index *forward, char *search, int type, FILE *fp, uintmax_t read_index, bool *found) {
+inline void manage_single_result(result *r, exome* ex, bwt_index *backward, bwt_index *forward, char *search, unsigned int type, FILE *fp, uintmax_t read_index, bool *found) {
 
 	bool direction;
 	uintmax_t enW;
@@ -133,9 +133,12 @@ inline void manage_single_result(result *r, exome* ex, bwt_index *backward, bwt_
 	char mask[6*(MAXLINE+1)];
 	char mask_aux[6];
 
-	if (type==0) {
+	if        (type==0) {
 		direction = !r->dir;
 		type2 = 0;
+	} else if (type==1) {
+		direction = r->dir;
+		type2 = 1;
 	} else {
 		direction = r->dir;
 	}
@@ -161,13 +164,21 @@ inline void manage_single_result(result *r, exome* ex, bwt_index *backward, bwt_
 
 		if(key + enW <= ex->offset[index]) {
 
-			if (type==2 && key >= (uintmax_t) (size_SA(backward) / 2)) {
-				index2 = ex->size - index;
-				key2 = ex->start[index2-1] + (size_SA(forward) - key - enW - 1) - ex->offset[index2-1];
-				type2 = 0; 
+			if (type>1) {
+
+				if (key >= (uintmax_t) (size_SA(backward) / 2)) {
+					index2 = ex->size - index;
+					key2 = ex->start[index2] + (size_SA(forward) - key - enW - 1) - ex->offset[index2];
+					type2 = 0; 
+				} else {
+		  		key2 = ex->start[index-1] + key - ex->offset[index-1];
+					type2 = 1;
+				}
+
 			} else {
-		  	key2 = ex->start[index-1] + key - ex->offset[index-1];
-				type2 = 1;
+
+				key2 = ex->start[index-1] + key - ex->offset[index-1];
+
 			}
 
 			fprintf(fp, "read_%ju %c %s %ju %d%s %s\n", (uintmax_t) read_index, plusminus[type2], ex->chromosome + (index-1)*IDMAX, key2, r->num_mismatches, mask, search);

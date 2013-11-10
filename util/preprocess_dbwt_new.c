@@ -28,8 +28,7 @@ int main(int argc, char **argv)
 	toc();
 
 	read_ref_vector(&Xi, argv[2], "X");
-	revstring(Xi.vector, Xi.n / 2);
-	revstring(Xi.vector + (Xi.n / 2), Xi.n / 2);
+	revstring(Xi.vector, Xi.n);
 	save_ref_vector(&Xi, argv[2], "Xi");
 
 	tic("Calc. Forward Burrows-Wheeler Transform -> Sadakane direct SAIS");

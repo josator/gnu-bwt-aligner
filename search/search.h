@@ -39,7 +39,7 @@ inline void BWExactSearchForward(uint8_t *W, bwt_index *index, result *r) {
 	k2 = r->k;
 	l2 = r->l;
 
-	//printf("F1º -> %lu - %lu\n", k2, l2);
+	//printf("F1º-> %d -> %lu - %lu\n", i, k2, l2);
 
 	for(i=r->pos; i<=r->end; i++) {
 

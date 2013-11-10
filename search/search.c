@@ -521,6 +521,7 @@ bool BWExactPartialResultsBackward(uint8_t *W, bwt_index *index, results_list *r
 			BWiteration(k, l, k_next, l_next, W[i], index);
 			results      = results_next;
 			results_next = l_next - k_next;
+
 			if (results == results_next) continue;
 
 			change_result(r_iterator, k, l, i);
@@ -1029,21 +1030,21 @@ bool BWSearchCPU(uint8_t *W, uint64_t nW, bwt_index *backward, bwt_index *forwar
 
 	if (fragments <= 1) {
 
-		if (type) {
+//		if (type == 0) {
+//			init_result(&r, 1);
+//			change_result(&r, 0, size_SA(forward)-1, 0);
+//			bound_result(&r, 0, nW-1);
+//			BWExactSearchForward(W, forward, &r);
+//			if (r.k<=r.l)
+//				add_result(&r, rl_final);
+//		} else {
 			init_result(&r, 0);
 			change_result(&r, 0, size_SA(backward)-1, nW-1);
 			bound_result(&r, 0, nW-1);
 			BWExactSearchBackward(W, backward, &r);
 			if (r.k<=r.l)
 				add_result(&r, rl_final);
-		} else {
-			init_result(&r, 1);
-			change_result(&r, 0, size_SA(forward)-1, 0);
-			bound_result(&r, 0, nW-1);
-			BWExactSearchForward(W, forward, &r);
-			if (r.k<=r.l)
-				add_result(&r, rl_final);
-		}
+//		}
 
 		return false;
 
@@ -1052,6 +1053,7 @@ bool BWSearchCPU(uint8_t *W, uint64_t nW, bwt_index *backward, bwt_index *forwar
 	//////////////////////////////FORWARD///////////////////////////////////////////
 
 	for (int16_t i = half-1; i > 0; i--) {
+		//printf("\n****BLOCK %d****\n", i);
 
 		flow = true;
 
@@ -1130,10 +1132,10 @@ bool BWSearchCPU(uint8_t *W, uint64_t nW, bwt_index *backward, bwt_index *forwar
 	//////////////////////////////BACKWARD///////////////////////////////////////////
 
 	for (int16_t i = half; i<fragments-1; i++) {
+		//printf("\n****BLOCK %d****\n", i);
 
 		flow = true;
 
-		/* printf("\n****BLOCK %d****\n", i); */
 		err_count = fragments-1;
 
 		rl_prev->num_results = 0; rl_prev_i->num_results = 0;
@@ -1172,8 +1174,7 @@ bool BWSearchCPU(uint8_t *W, uint64_t nW, bwt_index *backward, bwt_index *forwar
 	}
 
 	///////BLOCK FRAGMENTS-1/////////////////////////////////////
-
-	/* printf("\n****BLOCK %d****\n", fragments-1); */
+	//printf("\n****BLOCK %d****\n", fragments-1);
 
 	flow = true;
 

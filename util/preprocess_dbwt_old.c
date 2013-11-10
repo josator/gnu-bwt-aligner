@@ -12,16 +12,17 @@ int main(int argc, char **argv)
 
 	exome ex;
 
-	check_syntax(argc, 5, "preprocess ref_file output_dir s_ratio nucleotides");
+	check_syntax(argc, 6, "preprocess ref_file output_dir s_ratio duplicate_reverse nucleotides");
 
 	timevars();
-  init_replace_table(argv[4]);
+  init_replace_table(argv[5]);
 
-	SA_TYPE ratio = atoi(argv[3]);
+	uintmax_t ratio = atoi(argv[3]);
+	int duplicate_reverse = atoi(argv[4]);
 
-	encode_reference(&X, &ex, true, argv[1]);
+	encode_reference(&X, &ex, duplicate_reverse, argv[1]);
 	save_ref_vector(&X, argv[2], "X");
-	save_exome_file(&ex, true, argv[2]);
+	save_exome_file(&ex, duplicate_reverse, argv[2]);
   print_vector(X.vector, X.n);
 
 	tic("Calc. BWT -> Sadakane direct SAIS");
@@ -55,8 +56,7 @@ int main(int argc, char **argv)
 	free(R.vector);
 
 	read_ref_vector(&Xi, argv[2], "X");
-	revstring(Xi.vector, Xi.n / 2);
-	revstring(Xi.vector + (Xi.n / 2), Xi.n / 2);
+	revstring(Xi.vector, Xi.n);
 	save_ref_vector(&Xi, argv[2], "Xi");
   print_vector(Xi.vector, Xi.n);
 

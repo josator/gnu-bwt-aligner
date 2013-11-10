@@ -39,7 +39,7 @@ FILE *output_file;
 
 exome ex;
 
-int num_errors, fragsize, RESULTS;
+int num_errors, fragsize, RESULTS, duplicate_reference;
 
 void *writeResults(void *threadid) {
 
@@ -119,19 +119,35 @@ void *writeResults(void *threadid) {
 
 			found = false; found2 = false;
 
-			if (store_rl_final[i].num_results) {
-				write_results(store_rl_final + i, k, l, &ex, &backward, &forward, store_Worig + i*MAXLINE, store_nWe[i], true, output_file);
-				found = true;
-			}
+			if (duplicate_reference) {
 
-			if (store_rl_final_r[i].num_results) {
-				write_results(store_rl_final_r + i, k, l, &ex, &backward, &forward, store_Worig + i*MAXLINE, store_nWe[i], false, output_file);
-				found2 = true;
-			}
+				if (store_rl_final[i].num_results) {
+					write_results(store_rl_final + i, k, l, &ex, &backward, &forward, store_Worig + i*MAXLINE, store_nWe[i], 2, output_file);
+					found = true;
+				}
 
-			if ((!found) && (!found2)) {
+				if (!found) {
+				} else {
+					contador++;
+				}
+
 			} else {
-				contador++;
+
+				if (store_rl_final[i].num_results) {
+					write_results(store_rl_final + i, k, l, &ex, &backward, &forward, store_Worig + i*MAXLINE, store_nWe[i], 1, output_file);
+					found = true;
+				}
+
+				if (store_rl_final_r[i].num_results) {
+					write_results(store_rl_final_r + i, k, l, &ex, &backward, &forward, store_Worig + i*MAXLINE, store_nWe[i], 0, output_file);
+					found2 = true;
+				}
+
+				if ((!found) && (!found2)) {
+				} else {
+					contador++;
+				}
+
 			}
 
 			total++;
@@ -154,7 +170,7 @@ void *cpuSearch(void *threadid) {
 
 	uintmax_t num_read = 0;
 	//int tid=0;
-  //tid = (long)threadid;
+	//tid = (long)threadid;
 
 	uint8_t *g_We;
 	uint64_t *g_nWe;
@@ -243,33 +259,53 @@ void *cpuSearch(void *threadid) {
 				if (aux_fragsize < fragsize)
 					aux_fragsize = fragsize;
 
-				BWSearchCPU(
-						g_We + i * MAXLINE,
-						g_nWe[i],
-						&backward,
-						&forward,
-						&rl_prev,
-						&rl_next,
-						&rl_prev_i,
-						&rl_next_i,
-						gpu_rl_final + i,
-						aux_fragsize,
-						1
-						);
+				if (duplicate_reference) {
 
-				BWSearchCPU(
-						g_We + i * MAXLINE,
-						g_nWe[i],
-						&forward_rev,
-						&backward_rev,
-						&rl_prev,
-						&rl_next,
-						&rl_prev_i,
-						&rl_next_i,
-						gpu_rl_final_r + i,
-						aux_fragsize,
-						0
-						);
+					BWSearchCPU(
+							g_We + i * MAXLINE,
+							g_nWe[i],
+							&backward,
+							&forward,
+							&rl_prev,
+							&rl_next,
+							&rl_prev_i,
+							&rl_next_i,
+							gpu_rl_final + i,
+							aux_fragsize,
+							2
+							);
+
+				} else {
+
+					BWSearchCPU(
+							g_We + i * MAXLINE,
+							g_nWe[i],
+							&backward,
+							&forward,
+							&rl_prev,
+							&rl_next,
+							&rl_prev_i,
+							&rl_next_i,
+							gpu_rl_final + i,
+							aux_fragsize,
+							1
+							);
+
+					BWSearchCPU(
+							g_We + i * MAXLINE,
+							g_nWe[i],
+							&forward_rev,
+							&backward_rev,
+							&rl_prev,
+							&rl_next,
+							&rl_prev_i,
+							&rl_next_i,
+							gpu_rl_final_r + i,
+							aux_fragsize,
+							0
+							);
+
+				}
 
 			}
 
@@ -311,18 +347,21 @@ int main(int argc, char **argv) {
 
 	FILE *queries_file;
 
-	if (argc!=8) {
-		fprintf(stderr, "Syntax:\n\t%s f_mappings d_transform f_output search_tree_size num_errors min_fragment nucleotides\n", argv[0]);
-		return 1;
+	check_syntax(argc, 9, "inexact_search f_mappings d_transform f_output duplicate_reference search_tree_size num_errors min_fragment nucleotides");
+
+	duplicate_reference = atoi(argv[4]);
+	RESULTS = atoi(argv[5]);
+	num_errors = atoi(argv[6]);
+	fragsize = atoi(argv[7]);
+	init_replace_table(argv[8]);
+
+	if (duplicate_reference) {
+		load_bwt_index(NULL, &backward, argv[2], 1);
+		load_bwt_index(NULL, &forward, argv[2], 0);
+	} else {
+		load_bwt_index(&backward_rev, &backward, argv[2], 1);
+		load_bwt_index(&forward_rev, &forward, argv[2], 0);
 	}
-
-	RESULTS = atoi(argv[4]);
-	num_errors = atoi(argv[5]);
-	fragsize = atoi(argv[6]);
-	init_replace_table(argv[7]);
-
-	load_bwt_index(&backward_rev, &backward, argv[2], 1);
-	load_bwt_index(&forward_rev, &forward, argv[2], 0);
 
 	h_Worig  = (char*) malloc(MAX_READ_THREAD * MAXLINE * sizeof(char));
 	check_malloc(h_Worig,  "main");
@@ -482,8 +521,13 @@ int main(int argc, char **argv) {
 
 	pthread_attr_destroy(&attr);
 
-	free_bwt_index(&backward_rev, &backward);
-	free_bwt_index(&forward_rev, &forward);
+	if (duplicate_reference) {
+		free_bwt_index(NULL, &backward);
+		free_bwt_index(NULL, &forward);
+	} else {
+		free_bwt_index(&backward_rev, &backward);
+		free_bwt_index(&forward_rev, &forward);
+	}
 
 	free(h_We);
 
