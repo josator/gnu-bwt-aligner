@@ -81,6 +81,21 @@ void revstring(uint8_t *X, uintmax_t nX) {
 
 }
 
+void revstrand(uint8_t *X, uintmax_t nX) {
+
+  char tmp;
+  uintmax_t i, j;
+
+  if (nX <= 1) return;
+
+  for (i=0, j=nX-1; i<=j; i++, j--) {
+    tmp = reverse[X[i]];
+    X[i] = reverse[X[j]];
+    X[j] = tmp;
+  }
+
+}
+
 void duplicate_reverse(uint8_t *X, uintmax_t nX) {
 
   uintmax_t i, j;

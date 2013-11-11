@@ -46,6 +46,7 @@ void encode_bases(uint8_t* dest, char* src, uintmax_t length);
 void decode_bases(char* dest, uint8_t* src, uintmax_t length);
 
 void revstring(uint8_t *X, uintmax_t nX);
+void revstrand(uint8_t *X, uintmax_t nX);
 
 void duplicate_reverse(uint8_t *X, uintmax_t nX);
 

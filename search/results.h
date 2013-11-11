@@ -128,7 +128,7 @@ inline void manage_single_result(result *r, exome* ex, bwt_index *backward, bwt_
 	uintmax_t enW;
 	char plusminus[] = "-+";
 	uintmax_t index, index2, key, key2;
-	int type2;
+	int type2=0;
 
 	char mask[6*(MAXLINE+1)];
 	char mask_aux[6];

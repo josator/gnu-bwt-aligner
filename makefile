@@ -18,4 +18,5 @@ clean:
 	make -C dbwt/ clean
 	make -C csalib/ clean
 	make -C search/ clean
+	make -C gpu/ clean
 	make -C util/ clean
