@@ -2,7 +2,6 @@
 #include <cuda_runtime_api.h>
 
 #include "../gpu/gpu.cuh"
-#include "../search/csafm.h"
 #include "../search/search.h"
 #include "../search/io.h"
 
