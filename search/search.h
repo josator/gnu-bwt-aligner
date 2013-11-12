@@ -196,17 +196,6 @@ void BWExactSearchVectorForward(uint8_t *W, int16_t start, int16_t end, intmax_t
 
 bool BWSearch1GPUHelper(uint8_t *W, int16_t start, int16_t end, intmax_t *vec_k, intmax_t *vec_l, intmax_t *vec_ki, intmax_t *vec_li, bwt_index *backward, bwt_index *forward, results_list *r_list);
 
-//bool BWSearch1GPUHelper(uint8_t *W, int16_t start, int16_t end, SA_TYPE *vec_k, SA_TYPE *vec_l, SA_TYPE *vec_ki, SA_TYPE *vec_li, vector *C, vector *C1, comp_matrix *O, comp_matrix *Oi, results_list *r_list);
-//
-///******DEPRECATED FUNCTIONS******/
-//bool BWSearch1CPU(uint8_t *W, vector *C, vector *C1, comp_matrix *O, comp_matrix *Oi, result *res, results_list *r_list);
-//bool BWSimpleSearch1Backward(uint8_t *W, vector *C, vector *C1, comp_matrix *O, result *res, results_list *r_list);
-//bool BWSimpleSearch1Forward(uint8_t *W, vector *C, vector *C1, comp_matrix *O, result *res, results_list *r_list);
-//
-//void BWExactSearchVectorBackward(uint8_t *W, int16_t start, int16_t end, SA_TYPE k, SA_TYPE l, SA_TYPE *vec_k, SA_TYPE *vec_l, vector *C, vector *C1, comp_matrix *O);
-//void BWExactSearchVectorForward(uint8_t *W, int16_t start, int16_t end, SA_TYPE k, SA_TYPE l, SA_TYPE *vec_k, SA_TYPE *vec_l, vector *C, vector *C1, comp_matrix *O);
-///********************************/
-//
-//bool nextFASTAToken(FILE *queries_file, char *uncoded, uint8_t *coded, SA_TYPE *nquery); 
+bool BWSearch1CPU(uint8_t *W, bwt_index *backward, bwt_index *forward, result *res, results_list *r_list);
 
 #endif

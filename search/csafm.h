@@ -143,7 +143,7 @@ void free_comp_matrix(comp_matrix *reverse, comp_matrix *strand);
 #ifdef __SSE4_2__
 #define popcount(x) _mm_popcnt_u32(x)
 #else
-inline SA_TYPE popcount(uint32_t i) {
+inline unsigned int popcount(uint32_t i) {
   i = i - ((i >> 1) & 0x55555555);
   i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
   return (((i + (i >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
@@ -155,7 +155,7 @@ inline SA_TYPE popcount(uint32_t i) {
 #ifdef __SSE4_2__
 #define popcount(x) _mm_popcnt_u64(x)
 #else
-inline SA_TYPE popcount(uint64_t i) {
+inline unsigned int popcount(uint64_t i) {
   i = i - ((i >> 1) & 0x5555555555555555);
   i = (i & 0x3333333333333333) + ((i >> 2) & 0x3333333333333333);
   return (((i + (i >> 4)) & 0xF0F0F0F0F0F0F0F) * 0x101010101010101) >> 56;
