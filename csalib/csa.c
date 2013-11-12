@@ -570,9 +570,9 @@ void csa_new_from_bwt_gnu_bwt_wrapper(const char *directory, const char *name) {
 	psi_id = 0;
 
 	char csa_opt[10];
-	strcpy(csa_opt, ":512:512");
+	strcpy(csa_opt, ":64:64");
 	char psi_opt[10];
-	strcpy(psi_opt, "3:512");
+	strcpy(psi_opt, "3:64");
 
 	csa_options(&csa, csa_opt);
 	psi_options(&csa, psi_opt);
