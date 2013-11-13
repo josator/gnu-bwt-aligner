@@ -356,11 +356,11 @@ int main(int argc, char **argv) {
 	init_replace_table(argv[8]);
 
 	if (duplicate_reference) {
-		load_bwt_index(NULL, &backward, argv[2], 1);
-		load_bwt_index(NULL, &forward, argv[2], 0);
+		load_bwt_index(NULL, &backward, argv[2], 1, true);
+		load_bwt_index(NULL, &forward, argv[2], 0, true);
 	} else {
-		load_bwt_index(&backward_rev, &backward, argv[2], 1);
-		load_bwt_index(&forward_rev, &forward, argv[2], 0);
+		load_bwt_index(&backward_rev, &backward, argv[2], 1, true);
+		load_bwt_index(&forward_rev, &forward, argv[2], 0, true);
 	}
 
 	h_Worig  = (char*) malloc(MAX_READ_THREAD * MAXLINE * sizeof(char));

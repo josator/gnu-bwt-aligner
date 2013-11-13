@@ -42,8 +42,8 @@ int main(int argc, char **argv) {
   }
 
 	tic("Loading FM-Index");
-	load_bwt_index(NULL, &backward, argv[2], 1);
-	load_bwt_index(NULL, &forward, argv[2], 0);
+	load_bwt_index(NULL, &backward, argv[2], 1, true);
+	load_bwt_index(NULL, &forward, argv[2], 0, true);
 	toc();
 
 	tic("Preparing search space");
