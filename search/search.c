@@ -458,10 +458,11 @@ bool BWBranchFinalResultsForward(uint8_t *W, bwt_index *index, results_list *rl_
 
 }
 
-bool BWExactPartialResultsBackward(uint8_t *W, bwt_index *index, results_list *rl_prev, results_list *rl_next, results_list *rl_next_i, int16_t block_size, int16_t last_block) {
+bool BWExactPartialResultsBackward(uint8_t *W, uint8_t *D, uint8_t max_errors, bwt_index *index, results_list *rl_prev, results_list *rl_next, results_list *rl_next_i, int16_t block_size, int16_t last_block) {
 
 	intmax_t k, l, k_next, l_next;
 	int16_t start, pos, current_block, last_block_pos;
+	uint8_t num_mismatches;
 	bool complete_search;
 
 	result *r_iterator;
@@ -473,6 +474,8 @@ bool BWExactPartialResultsBackward(uint8_t *W, bwt_index *index, results_list *r
 
 		start  = r_iterator->start;
 		pos    = r_iterator->pos;
+
+		num_mismatches = r_iterator->num_mismatches;
 
 		k_next = r_iterator->k;
 		l_next = r_iterator->l;
@@ -522,7 +525,7 @@ bool BWExactPartialResultsBackward(uint8_t *W, bwt_index *index, results_list *r
 			results      = results_next;
 			results_next = l_next - k_next;
 
-			if (results == results_next) continue;
+			if (results == results_next || (max_errors - num_mismatches) < D[i]) continue;
 
 			change_result(r_iterator, k, l, i);
 			add_result(r_iterator, rl_next);
@@ -1015,6 +1018,30 @@ void BWChangeDirectionForward(bwt_index *backward, bwt_index *forward, results_l
 
 }
 
+void calculateD(uint8_t *D, uint8_t *W, uint64_t nW, bwt_index *index) {
+
+  uintmax_t k,l;
+  uint8_t z;
+
+	k = 0;
+  l = size_SA(index)-1;
+  z = 0;
+
+  for (uint64_t i=0; i<nW; i++) {
+
+		BWiteration(k, l, k, l, W[i], index);
+
+    if (k>l) {
+      k=0;
+      l=size_SA(index)-1;
+      z++;
+    }
+
+    D[i] = z;
+  }
+
+}
+
 bool BWSearchCPU(uint8_t *W, uint64_t nW, bwt_index *backward, bwt_index *forward, results_list *rl_prev, results_list *rl_next, results_list *rl_prev_i, results_list *rl_next_i, results_list *rl_final, int16_t fragsize, bool type) {
 
 	result r;
@@ -1026,152 +1053,154 @@ bool BWSearchCPU(uint8_t *W, uint64_t nW, bwt_index *backward, bwt_index *forwar
 
 	bool flow;
 
+	uint8_t *D = (uint8_t *) malloc (nW * sizeof(uint8_t));
+
 	//printf("\n***** Size: %d, Fragments: %d Errors: %d\n", nW, fragments, fragments-1);
 
-	if (fragments <= 1) {
-
-		if (type == 0) {
-			init_result(&r, 1);
-			change_result(&r, 0, size_SA(forward)-1, 0);
-			bound_result(&r, 0, nW-1);
-			BWExactSearchForward(W, forward, &r);
-			if (r.k<=r.l)
-				add_result(&r, rl_final);
-		} else {
-			init_result(&r, 0);
-			change_result(&r, 0, size_SA(backward)-1, nW-1);
-			bound_result(&r, 0, nW-1);
-			BWExactSearchBackward(W, backward, &r);
-			if (r.k<=r.l)
-				add_result(&r, rl_final);
-		}
-
-		return false;
-
-	}
-
-	//////////////////////////////FORWARD///////////////////////////////////////////
-
-	for (int16_t i = half-1; i > 0; i--) {
-		//printf("\n****BLOCK %d****\n", i);
-
-		flow = true;
-
-		err_count = fragments-1;
-
-		rl_prev->num_results = 0; rl_prev_i->num_results = 0;
-		rl_next->num_results = 0; rl_next_i->num_results = 0;
-
-		init_result(&r, 1);
-		change_result(&r, 0, size_SA(forward)-1, fragsize*i);
-		bound_result(&r, fragsize*i, fragsize*(i+1) - 1);
-		BWExactSearchForward(W, forward, &r);
-		r.end = nW-1;
-
-		if (r.k <= r.l) {
-
-			add_result(&r, rl_prev);
-
-			while (err_count > 0) {
-
-				if (BWExactPartialResultsForward(W, forward, rl_prev, rl_next, rl_prev_i, fragsize, half-1)) {flow = false; break;}
-				BWChangeDirectionForward(forward, backward, rl_prev_i, 0);
-				if (BWExactPartialResultsBackward(W, backward, rl_prev_i, rl_next_i, rl_final, fragsize, half-1)) {flow = false; break;}
-				if (err_count==1) break;
-				if (BWBranchPartialResultsForward(W, forward, rl_next, rl_prev)) {flow = false; break;}
-				if (BWBranchPartialResultsBackward(W, backward, rl_next_i, rl_prev_i)) {flow = false; break;}
-				err_count--;
-
-			}
-
-			if (flow) {
-				BWBranchFinalResultsForward(W, forward, rl_next, rl_prev_i, fragsize, half-1);
-				BWChangeDirectionForward(forward, backward, rl_prev_i, 0);
-				BWExactFinalResultsBackward(W, backward, rl_prev_i, rl_final, fragsize, half-1);
-
-				BWBranchFinalResultsBackward(W, backward, rl_next_i, rl_final, fragsize, half-1);
-			}
-
-		}
-
-	}
-
-	///////BLOCK 0/////////////////////////////////////
-	//printf("\n****BLOCK %d****\n", 0);
-
-	flow = true;
-
-	err_count = fragments-1;
-
-	rl_prev->num_results = 0; rl_prev_i->num_results = 0;
-	rl_next->num_results = 0; rl_next_i->num_results = 0;
-
-	init_result(&r, 1);
-	change_result(&r, 0, size_SA(forward)-1, 0);
-	bound_result(&r, 0, fragsize - 1);
-	BWExactSearchForward(W, forward, &r);
-	r.end = nW-1;
-
-	if (r.k <= r.l) {
-
-		add_result(&r, rl_prev);
-
-		while (err_count > 0) {
-			if (BWExactPartialResultsForward(W, forward, rl_prev, rl_next, rl_final, fragsize, half-1)) {flow = false; break;}
-			if (err_count==1) break;
-			if (BWBranchPartialResultsForward(W, forward, rl_next, rl_prev)) {flow = false; break;}
-			err_count--;
-		}
-
-		if (flow) {
-			BWBranchFinalResultsForward(W, forward, rl_next, rl_final, fragsize, half-1);
-		}
-
-	}
-
-	//////////////////////////////BACKWARD///////////////////////////////////////////
-
-	for (int16_t i = half; i<fragments-1; i++) {
-		//printf("\n****BLOCK %d****\n", i);
-
-		flow = true;
-
-		err_count = fragments-1;
-
-		rl_prev->num_results = 0; rl_prev_i->num_results = 0;
-		rl_next->num_results = 0; rl_next_i->num_results = 0;
-
-		init_result(&r, 0);
-		change_result(&r, 0, size_SA(backward)-1, fragsize*(i+1) - 1);
-		bound_result(&r, fragsize*i, fragsize*(i+1) - 1);
-		BWExactSearchBackward(W, backward, &r);
-		r.start = 0;
-
-		if (r.k <= r.l) {
-
-			add_result(&r, rl_prev);
-
-			while (err_count > 0) {
-				if (BWExactPartialResultsBackward(W, backward, rl_prev, rl_next, rl_prev_i, fragsize, 0)) {flow = false; break;}
-				BWChangeDirectionBackward(backward, forward, rl_prev_i, nW-1);
-				if (BWExactPartialResultsForward(W, forward, rl_prev_i, rl_next_i, rl_final, fragsize, 0)) {flow = false; break;}
-				if (err_count==1) break;
-				if (BWBranchPartialResultsBackward(W, backward, rl_next, rl_prev)) {flow = false; break;}
-				if (BWBranchPartialResultsForward(W, forward, rl_next_i, rl_prev_i)) {flow = false; break;}
-				err_count--;
-			}
-
-			if (flow) {
-				BWBranchFinalResultsBackward(W, backward, rl_next, rl_prev_i, fragsize, 0);
-				BWChangeDirectionBackward(backward, forward, rl_prev_i, nW-1);
-				BWExactFinalResultsForward(W, forward, rl_prev_i, rl_final, fragsize, 0);
-
-				BWBranchFinalResultsForward(W, forward, rl_next_i, rl_final, fragsize, 0);
-			}
-
-		}
-
-	}
+//	if (fragments <= 0) {
+//
+//		if (type == 0) {
+//			init_result(&r, 1);
+//			change_result(&r, 0, size_SA(forward)-1, 0);
+//			bound_result(&r, 0, nW-1);
+//			BWExactSearchForward(W, forward, &r);
+//			if (r.k<=r.l)
+//				add_result(&r, rl_final);
+//		} else {
+//			init_result(&r, 0);
+//			change_result(&r, 0, size_SA(backward)-1, nW-1);
+//			bound_result(&r, 0, nW-1);
+//			BWExactSearchBackward(W, backward, &r);
+//			if (r.k<=r.l)
+//				add_result(&r, rl_final);
+//		}
+//
+//		return false;
+//
+//	}
+//
+//	//////////////////////////////FORWARD///////////////////////////////////////////
+//
+//	for (int16_t i = half-1; i > 0; i--) {
+//		//printf("\n****BLOCK %d****\n", i);
+//
+//		flow = true;
+//
+//		err_count = fragments-1;
+//
+//		rl_prev->num_results = 0; rl_prev_i->num_results = 0;
+//		rl_next->num_results = 0; rl_next_i->num_results = 0;
+//
+//		init_result(&r, 1);
+//		change_result(&r, 0, size_SA(forward)-1, fragsize*i);
+//		bound_result(&r, fragsize*i, fragsize*(i+1) - 1);
+//		BWExactSearchForward(W, forward, &r);
+//		r.end = nW-1;
+//
+//		if (r.k <= r.l) {
+//
+//			add_result(&r, rl_prev);
+//
+//			while (err_count > 0) {
+//
+//				if (BWExactPartialResultsForward(W, forward, rl_prev, rl_next, rl_prev_i, fragsize, half-1)) {flow = false; break;}
+//				BWChangeDirectionForward(forward, backward, rl_prev_i, 0);
+//				if (BWExactPartialResultsBackward(W, backward, rl_prev_i, rl_next_i, rl_final, fragsize, half-1)) {flow = false; break;}
+//				if (err_count==1) break;
+//				if (BWBranchPartialResultsForward(W, forward, rl_next, rl_prev)) {flow = false; break;}
+//				if (BWBranchPartialResultsBackward(W, backward, rl_next_i, rl_prev_i)) {flow = false; break;}
+//				err_count--;
+//
+//			}
+//
+//			if (flow) {
+//				BWBranchFinalResultsForward(W, forward, rl_next, rl_prev_i, fragsize, half-1);
+//				BWChangeDirectionForward(forward, backward, rl_prev_i, 0);
+//				BWExactFinalResultsBackward(W, backward, rl_prev_i, rl_final, fragsize, half-1);
+//
+//				BWBranchFinalResultsBackward(W, backward, rl_next_i, rl_final, fragsize, half-1);
+//			}
+//
+//		}
+//
+//	}
+//
+//	///////BLOCK 0/////////////////////////////////////
+//	//printf("\n****BLOCK %d****\n", 0);
+//
+//	flow = true;
+//
+//	err_count = fragments-1;
+//
+//	rl_prev->num_results = 0; rl_prev_i->num_results = 0;
+//	rl_next->num_results = 0; rl_next_i->num_results = 0;
+//
+//	init_result(&r, 1);
+//	change_result(&r, 0, size_SA(forward)-1, 0);
+//	bound_result(&r, 0, fragsize - 1);
+//	BWExactSearchForward(W, forward, &r);
+//	r.end = nW-1;
+//
+//	if (r.k <= r.l) {
+//
+//		add_result(&r, rl_prev);
+//
+//		while (err_count > 0) {
+//			if (BWExactPartialResultsForward(W, forward, rl_prev, rl_next, rl_final, fragsize, half-1)) {flow = false; break;}
+//			if (err_count==1) break;
+//			if (BWBranchPartialResultsForward(W, forward, rl_next, rl_prev)) {flow = false; break;}
+//			err_count--;
+//		}
+//
+//		if (flow) {
+//			BWBranchFinalResultsForward(W, forward, rl_next, rl_final, fragsize, half-1);
+//		}
+//
+//	}
+//
+//	//////////////////////////////BACKWARD///////////////////////////////////////////
+//
+//	for (int16_t i = half; i<fragments-1; i++) {
+//		//printf("\n****BLOCK %d****\n", i);
+//
+//		flow = true;
+//
+//		err_count = fragments-1;
+//
+//		rl_prev->num_results = 0; rl_prev_i->num_results = 0;
+//		rl_next->num_results = 0; rl_next_i->num_results = 0;
+//
+//		init_result(&r, 0);
+//		change_result(&r, 0, size_SA(backward)-1, fragsize*(i+1) - 1);
+//		bound_result(&r, fragsize*i, fragsize*(i+1) - 1);
+//		BWExactSearchBackward(W, backward, &r);
+//		r.start = 0;
+//
+//		if (r.k <= r.l) {
+//
+//			add_result(&r, rl_prev);
+//
+//			while (err_count > 0) {
+//				if (BWExactPartialResultsBackward(W, backward, rl_prev, rl_next, rl_prev_i, fragsize, 0)) {flow = false; break;}
+//				BWChangeDirectionBackward(backward, forward, rl_prev_i, nW-1);
+//				if (BWExactPartialResultsForward(W, forward, rl_prev_i, rl_next_i, rl_final, fragsize, 0)) {flow = false; break;}
+//				if (err_count==1) break;
+//				if (BWBranchPartialResultsBackward(W, backward, rl_next, rl_prev)) {flow = false; break;}
+//				if (BWBranchPartialResultsForward(W, forward, rl_next_i, rl_prev_i)) {flow = false; break;}
+//				err_count--;
+//			}
+//
+//			if (flow) {
+//				BWBranchFinalResultsBackward(W, backward, rl_next, rl_prev_i, fragsize, 0);
+//				BWChangeDirectionBackward(backward, forward, rl_prev_i, nW-1);
+//				BWExactFinalResultsForward(W, forward, rl_prev_i, rl_final, fragsize, 0);
+//
+//				BWBranchFinalResultsForward(W, forward, rl_next_i, rl_final, fragsize, 0);
+//			}
+//
+//		}
+//
+//	}
 
 	///////BLOCK FRAGMENTS-1/////////////////////////////////////
 	//printf("\n****BLOCK %d****\n", fragments-1);
@@ -1191,17 +1220,19 @@ bool BWSearchCPU(uint8_t *W, uint64_t nW, bwt_index *backward, bwt_index *forwar
 
 	if (r.k <= r.l) {
 
+		calculateD(D, W, nW, forward);
+
 		add_result(&r, rl_prev);
 
 		while (err_count > 0) {
-			if (BWExactPartialResultsBackward(W, backward, rl_prev, rl_next, rl_final, fragsize, 0)) {flow = false; break;}
+			if (BWExactPartialResultsBackward(W, D, fragments-1, backward, rl_prev, rl_next, rl_final, fragsize, /*0*/fragments-1)) {flow = false; break;}
 			if(err_count==1) break;
 			if (BWBranchPartialResultsBackward(W, backward, rl_next, rl_prev)) {flow = false; break;}
 			err_count--;
 		}
 
 		if (flow) {
-			BWBranchFinalResultsBackward(W, backward, rl_next, rl_final, fragsize, 0);
+			BWBranchFinalResultsBackward(W, backward, rl_next, rl_final, fragsize, /*0*/fragments-1);
 		}
 
 	}
