@@ -71,7 +71,7 @@ void *writeResults(void *threadid) {
 			fclose(output_file);
 
 			//printf("W -> Saliendo\n");
-			//printf("%lu founds of %ju -> found %.2f, discarded %ju\n", contador, total, contador * 100.0 / total, descartadas * 100 / total);
+			printf("%lu founds of %ju -> found %.2f, discarded %ju\n", contador, total, contador * 100.0 / total, descartadas * 100 / total);
 			pthread_exit(NULL);
 
 		}

@@ -1057,10 +1057,9 @@ void calculateDBackward(uint8_t *D, uint8_t *W, uint64_t nW, bwt_index *backward
 
 	} else {
 
-		change_direction(backward, forward, &r);
-		k=r.k;
-		l=r.l;
-
+    k=0;
+    l=size_SA(backward)-1;
+ 
 		for (uint64_t i=r.end+1; i < nW; i++) {
 
 			BWiteration(k, l, k, l, W[i], forward);
@@ -1121,10 +1120,9 @@ void calculateDForward(uint8_t *D, uint8_t *W, uint64_t nW, bwt_index *backward,
 
 	} else {
 
-		change_direction(forward, backward, &r);
-    k=r.k;
-    l=r.l;
-
+    k=0;
+    l=size_SA(backward)-1;
+ 
 		for (int16_t i=r.start-1; i >= 0; i--) {
 
 			BWiteration(k, l, k, l, W[i], backward);
