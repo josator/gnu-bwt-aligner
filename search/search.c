@@ -1166,7 +1166,7 @@ bool BWSearchCPU(uint8_t *W, uint64_t nW, bwt_index *backward, bwt_index *forwar
 
 	//printf("\n***** Size: %d, Fragments: %d Errors: %d\n", nW, fragments, fragments-1);
 
-	if (fragments <= 0) {
+	if (fragments <= 1) {
 
 		if (type == 0) {
 			init_result(&r, 1);
