@@ -170,18 +170,20 @@ bool BWBranchFinalResultsBackward(uint8_t *W, bwt_index *index, results_list *rl
 
 					if (k_aux > l_aux) continue;
 
-					//Insertion
-					if (b!=W[last_err_pos]) {
-						change_result(r_iterator, k_aux, l_aux, pos);
-						modify_last_mismatch2(r_iterator, INSERTION, b);
-						if (BWExactFinalResultBackward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
-					}
-
-					//Mismatch
 					if (b!=W[pos]) {
+
+						//Insertion
+						if (b!=W[last_err_pos]) {
+							change_result(r_iterator, k_aux, l_aux, pos);
+							modify_last_mismatch2(r_iterator, INSERTION, b);
+							if (BWExactFinalResultBackward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
+						}
+
+						//Mismatch
 						change_result(r_iterator, k_aux, l_aux, pos-1);
 						modify_last_mismatch2(r_iterator, MISMATCH, b);
 						if (BWExactFinalResultBackward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
+
 					}
 
 				}
@@ -202,7 +204,8 @@ bool BWBranchFinalResultsBackward(uint8_t *W, bwt_index *index, results_list *rl
 
 					// NO INSERTION
 
-					if (b!=W[pos]) { //Mismatch
+					//Mismatch
+					if (b!=W[pos]) {
 
 						if (b!=W[last_err_pos]) {
 							change_result(r_iterator, k_aux, l_aux, pos-1);
@@ -228,14 +231,14 @@ bool BWBranchFinalResultsBackward(uint8_t *W, bwt_index *index, results_list *rl
 
 				if (k_aux > l_aux) continue;
 
-				//Insertion
-				change_result(r_iterator, k_aux, l_aux, pos);
-				modify_last_mismatch2(r_iterator, INSERTION, b);
-				if (BWExactFinalResultBackward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
-
-				//Mismatch
 				if (b!=W[pos]) {
 
+					//Insertion
+					change_result(r_iterator, k_aux, l_aux, pos);
+					modify_last_mismatch2(r_iterator, INSERTION, b);
+					if (BWExactFinalResultBackward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
+
+					//Mismatch
 					if (W[pos]!=last_err_base) {
 						r_iterator->pos = pos-1;
 						modify_last_mismatch1(r_iterator, MISMATCH);
@@ -262,16 +265,18 @@ bool BWBranchFinalResultsBackward(uint8_t *W, bwt_index *index, results_list *rl
 
 				if (k_aux > l_aux) continue;
 
-				//Insertion
-				change_result(r_iterator, k_aux, l_aux, pos);
-				modify_last_mismatch2(r_iterator, INSERTION, b);
-				if (BWExactFinalResultBackward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
-
-				//Mismatch
 				if (b!=W[pos]) {
+
+					//Insertion
+					change_result(r_iterator, k_aux, l_aux, pos);
+					modify_last_mismatch2(r_iterator, INSERTION, b);
+					if (BWExactFinalResultBackward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
+
+					//Mismatch
 					r_iterator->pos = pos-1;
 					modify_last_mismatch1(r_iterator, MISMATCH);
 					if (BWExactFinalResultBackward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
+
 				}
 
 			}
@@ -343,18 +348,20 @@ bool BWBranchFinalResultsForward(uint8_t *W, bwt_index *index, results_list *rl_
 
 					if (k_aux > l_aux) continue;
 
-					//Insertion
-					if (b!=W[last_err_pos]) {
-						change_result(r_iterator, k_aux, l_aux, pos);
-						modify_last_mismatch2(r_iterator, INSERTION, b);
-						if (BWExactFinalResultForward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
-					}
-
-					//Mismatch
 					if (b!=W[pos]) {
+
+						//Insertion
+						if (b!=W[last_err_pos]) {
+							change_result(r_iterator, k_aux, l_aux, pos);
+							modify_last_mismatch2(r_iterator, INSERTION, b);
+							if (BWExactFinalResultForward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
+						}
+
+						//Mismatch
 						change_result(r_iterator, k_aux, l_aux, pos+1);
 						modify_last_mismatch2(r_iterator, MISMATCH, b);
 						if (BWExactFinalResultForward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
+
 					}
 
 				}
@@ -401,14 +408,14 @@ bool BWBranchFinalResultsForward(uint8_t *W, bwt_index *index, results_list *rl_
 
 				if (k_aux > l_aux) continue;
 
-				//Insertion
-				change_result(r_iterator, k_aux, l_aux, pos);
-				modify_last_mismatch2(r_iterator, INSERTION, b);
-				if (BWExactFinalResultForward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
-
-				//Mismatch
 				if (b!=W[pos]) {
 
+					//Insertion
+					change_result(r_iterator, k_aux, l_aux, pos);
+					modify_last_mismatch2(r_iterator, INSERTION, b);
+					if (BWExactFinalResultForward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
+
+					//Mismatch
 					if (W[pos]!=last_err_base) {
 						r_iterator->pos = pos+1;
 						modify_last_mismatch1(r_iterator, MISMATCH);
@@ -435,15 +442,18 @@ bool BWBranchFinalResultsForward(uint8_t *W, bwt_index *index, results_list *rl_
 
 				if (k_aux > l_aux) continue;
 
-				//Insertion
-				change_result(r_iterator, k_aux, l_aux, pos);
-				modify_last_mismatch2(r_iterator, INSERTION, b);
-				if (BWExactFinalResultForward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
+				if (b!=W[pos]) {
 
-				if (b!=W[pos]) { //Mismatch
+					//Insertion
+					change_result(r_iterator, k_aux, l_aux, pos);
+					modify_last_mismatch2(r_iterator, INSERTION, b);
+					if (BWExactFinalResultForward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
+
+					//Mismatch
 					r_iterator->pos = pos+1;
 					modify_last_mismatch1(r_iterator, MISMATCH);
 					if (BWExactFinalResultForward(W, index, r_iterator, rl_final, block_size, last_block)) return true;
+
 				}
 
 			}
@@ -692,18 +702,20 @@ bool BWBranchPartialResultsBackward(uint8_t *W, bwt_index *index, results_list *
 
 					if (k_aux > l_aux) continue;
 
-					//Insertion
-					if (b!=W[last_err_pos]) {
-						change_result(r_iterator, k_aux, l_aux, pos);
-						modify_last_mismatch2(r_iterator, INSERTION, b);
-						add_result(r_iterator, rl_next);
-					}
-
-					//Mismatch
 					if (b!=W[pos]) {
+
+						//Insertion
+						if (b!=W[last_err_pos]) {
+							change_result(r_iterator, k_aux, l_aux, pos);
+							modify_last_mismatch2(r_iterator, INSERTION, b);
+							add_result(r_iterator, rl_next);
+						}
+
+						//Mismatch
 						change_result(r_iterator, k_aux, l_aux, pos-1);
 						modify_last_mismatch2(r_iterator, MISMATCH, b);
 						add_result(r_iterator, rl_next);
+
 					}
 
 				}
@@ -750,14 +762,13 @@ bool BWBranchPartialResultsBackward(uint8_t *W, bwt_index *index, results_list *
 
 				if (k_aux > l_aux) continue;
 
-				//Insertion
-				change_result(r_iterator, k_aux, l_aux, pos);
-				modify_last_mismatch2(r_iterator, INSERTION, b);
-				add_result(r_iterator, rl_next);
-
-				//Mismatch
 				if (b!=W[pos]) {
+					//Insertion
+					change_result(r_iterator, k_aux, l_aux, pos);
+					modify_last_mismatch2(r_iterator, INSERTION, b);
+					add_result(r_iterator, rl_next);
 
+					//Mismatch
 					if (W[pos]!=last_err_base) {
 						r_iterator->pos = pos-1;
 						modify_last_mismatch1(r_iterator, MISMATCH);
@@ -784,16 +795,18 @@ bool BWBranchPartialResultsBackward(uint8_t *W, bwt_index *index, results_list *
 
 				if (k_aux > l_aux) continue;
 
-				//Insertion
-				change_result(r_iterator, k_aux, l_aux, pos);
-				modify_last_mismatch2(r_iterator, INSERTION, b);
-				add_result(r_iterator, rl_next);
-
-				//Mismatch
 				if (b!=W[pos]) {
+
+					//Insertion
+					change_result(r_iterator, k_aux, l_aux, pos);
+					modify_last_mismatch2(r_iterator, INSERTION, b);
+					add_result(r_iterator, rl_next);
+
+					//Mismatch
 					r_iterator->pos = pos-1;
 					modify_last_mismatch1(r_iterator, MISMATCH);
 					add_result(r_iterator, rl_next);
+
 				}
 
 			}
@@ -866,18 +879,20 @@ bool BWBranchPartialResultsForward(uint8_t *W, bwt_index *index, results_list *r
 
 					if (k_aux > l_aux) continue;
 
-					//Insertion
-					if (b!=W[last_err_pos]) {
-						change_result(r_iterator, k_aux, l_aux, pos);
-						modify_last_mismatch2(r_iterator, INSERTION, b);
-						add_result(r_iterator, rl_next);
-					}
-
-					//Mismatch
 					if (b!=W[pos]) {
+
+						//Insertion
+						if (b!=W[last_err_pos]) {
+							change_result(r_iterator, k_aux, l_aux, pos);
+							modify_last_mismatch2(r_iterator, INSERTION, b);
+							add_result(r_iterator, rl_next);
+						}
+
+						//Mismatch
 						change_result(r_iterator, k_aux, l_aux, pos+1);
 						modify_last_mismatch2(r_iterator, MISMATCH, b);
 						add_result(r_iterator, rl_next);
+
 					}
 
 				}
@@ -925,14 +940,14 @@ bool BWBranchPartialResultsForward(uint8_t *W, bwt_index *index, results_list *r
 
 				if (k_aux > l_aux) continue;
 
-				//Insertion
-				change_result(r_iterator, k_aux, l_aux, pos);
-				modify_last_mismatch2(r_iterator, INSERTION, b);
-				add_result(r_iterator, rl_next);
-
-				//Mismatch
 				if (b!=W[pos]) {
 
+					//Insertion
+					change_result(r_iterator, k_aux, l_aux, pos);
+					modify_last_mismatch2(r_iterator, INSERTION, b);
+					add_result(r_iterator, rl_next);
+
+					//Mismatch
 					if (W[pos]!=last_err_base) {
 						r_iterator->pos = pos+1;
 						modify_last_mismatch1(r_iterator, MISMATCH);
@@ -959,15 +974,17 @@ bool BWBranchPartialResultsForward(uint8_t *W, bwt_index *index, results_list *r
 
 				if (k_aux > l_aux) continue;
 
-				//Insertion
-				change_result(r_iterator, k_aux, l_aux, pos);
-				modify_last_mismatch2(r_iterator, INSERTION, b);
-				add_result(r_iterator, rl_next);
-
 				if (b!=W[pos]) { //Mismatch
+
+					//Insertion
+					change_result(r_iterator, k_aux, l_aux, pos);
+					modify_last_mismatch2(r_iterator, INSERTION, b);
+					add_result(r_iterator, rl_next);
+
 					r_iterator->pos = pos+1;
 					modify_last_mismatch1(r_iterator, MISMATCH);
 					add_result(r_iterator, rl_next);
+
 				}
 
 			}
