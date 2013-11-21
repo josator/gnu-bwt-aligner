@@ -8,7 +8,7 @@
 #include "runtime.h"
 #include "io.h"
 
-#define MAX_MISMATCHES 50
+#define MAX_MISMATCHES 20
 
 typedef struct {
 	intmax_t k, l;

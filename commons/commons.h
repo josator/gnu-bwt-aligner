@@ -6,8 +6,8 @@
 #include <sys/time.h>
 #include <stdbool.h>
 
-#define MAXLINE      2000
-#define MAXLINECOMP  500
+#define MAXLINE      800
+#define MAXLINECOMP  200
 
 //The meaning of Insertion and Deletion may be swapped to the meaning of the SAM file format
 #define MATCH	  0
