@@ -1,11 +1,11 @@
-#include <pthread.h>
 #include <cuda_runtime_api.h>
+#include <pthread.h>
 
 #include "../gpu/gpu.cuh"
 #include "../search/search.h"
 #include "../search/io.h"
 
-#define MAX_READ_GPU 32000
+#define MAX_READ_GPU 4192
 #define TAM_BLOQUE_GPU 32
 #define NUM_CARDS 2
 #define RESULTS 2000
@@ -98,6 +98,12 @@ void *writeResults(void *threadid) {
 
 			//printf("W -> Saliendo\n");
 			//printf("%lu founds of %lu -> %.2f, discarded %lu -> %.2f\n", contador, total, contador * 100.0 / total, descartadas, contador * 100.0 / (total-descartadas));
+			gettimeofday(&t2, NULL);
+			t_total = (t2.tv_sec-t1.tv_sec)*1e6+(t2.tv_usec-t1.tv_usec);
+
+			printf("Write: %f\n", t_write / 1000000);
+			printf("Total: %f\n", t_total / 1000000);
+
 			pthread_exit(NULL);
 
 		}
@@ -177,7 +183,6 @@ void *writeResults(void *threadid) {
 						h_laux = store_h_l + MAX_READ_GPU * type;
 
 						//fprintf(output_file, "%u - %u\n", h_kaux[i], h_laux[i]);
-						//printf("%u - %u\n", h_kaux[i], h_laux[i]);
 
 						for (intmax_t j=h_kaux[i]; j<=h_laux[i]; j++) {
 
@@ -239,8 +244,8 @@ void *writeResults(void *threadid) {
 						h_kiaux = store_h_ki + MAX_READ_GPU * MAXLINE * type;
 						h_liaux = store_h_li + MAX_READ_GPU * MAXLINE * type;
 
-						//f//printf(output_file, "%u - %u\n", h_kaux[i*MAXLINE + store_nWe[i]-1], h_laux[i*MAXLINE + store_nWe[i]-1]);
-						//f//printf(output_file, "%u - %u\n", h_kiaux[i*MAXLINE], h_liaux[i*MAXLINE]);
+						//fprintf(output_file, "%u - %u\n", h_kaux[i*MAXLINE + store_nWe[i]-1], h_laux[i*MAXLINE + store_nWe[i]-1]);
+						//fprintf(output_file, "%u - %u\n", h_kiaux[i*MAXLINE], h_liaux[i*MAXLINE]);
 
 						r_list.num_results = 0;
 						r_list.read_index = num_write + i;
@@ -828,13 +833,7 @@ void *writeResults(void *threadid) {
 		fflush(notfound_file);
 		fclose(notfound_file);
 
-		gettimeofday(&t2, NULL);
-		t_total = (t2.tv_sec-t1.tv_sec)*1e6+(t2.tv_usec-t1.tv_usec);
-
-		printf("Write: %f\n", t_write / 1000000);
-		printf("Total: %f\n", t_total / 1000000);
-
-		//printf("L -> Saliendo\n");
+		printf("L -> Saliendo\n");
 
 		return 0;
 
