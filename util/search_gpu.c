@@ -831,8 +831,8 @@ void *writeResults(void *threadid) {
 		gettimeofday(&t2, NULL);
 		t_total = (t2.tv_sec-t1.tv_sec)*1e6+(t2.tv_usec-t1.tv_usec);
 
-		//printf("Write: %f\n", t_write / 1000000);
-		//printf("Total: %f\n", t_total / 1000000);
+		printf("Write: %f\n", t_write / 1000000);
+		printf("Total: %f\n", t_total / 1000000);
 
 		//printf("L -> Saliendo\n");
 
