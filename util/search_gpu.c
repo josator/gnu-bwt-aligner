@@ -833,7 +833,7 @@ void *writeResults(void *threadid) {
 		fflush(notfound_file);
 		fclose(notfound_file);
 
-		printf("L -> Saliendo\n");
+		//printf("L -> Saliendo\n");
 
 		return 0;
 
