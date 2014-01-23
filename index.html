@@ -17,8 +17,8 @@
   <body>
 
       <header>
-        <h1>Gnu-bwt-aligner</h1>
-        <p>See description below.</p>
+        <h1>GRyCAP Gnu Backward Search Aligner</h1>
+        <p>An inexact mapping algorithm compatible with any backward search runtime</p>
       </header>
 
       <div id="banner">
@@ -39,7 +39,7 @@
         <ul></ul>
       </nav>
       <section>
-        <p>h1. Introduction</p>
+        <h1> Introduction</h1>
 
 <p>New high-throughput sequencers are able to produce data at an unprecedented scale, while sequencing costs are in free fall. Primary data processing, which often includes mapping short reads onto a reference genome, is computationally very expensive. Recently, a variety of programs, many of them implementing Burrows-Wheeler Transform (BWT), have been developed for such task. Despite the efficiency of BWT, the general view is that new approaches will be necessary to cope with the increasing flood of sequencing data.</p>
 
@@ -47,8 +47,8 @@
 
 <ul>
 <li><p>The first one takes advantage of CUDA GPGPU processors. We have implemented BTW on GPU, allowing alignments of up to one error. Also, we parallelised the input/output operations on the CPU and the GPU execution of the mapping process. Our experiments show that this heterogeneous and really cheap solution outperforms by 3x the conventional algorithms based only on CPU.</p></li>
-<li><p>The second one is a CPU implementation of the inexact search with BWT. By using optimised branch and bound techniques for biological information the number of errors allowed is greatly increased. In the case of the human genome, we support 6 errors with no sensibility penalty and within a reasonable execution time and memory size. The search routine studies insertions, deletions and mismatches. Our solution outperforms by a factor of 8x other BWT-CPU solutions. Also, by reducing the sensibility in 5-10% the speed of the algorithm can be increased by a factor of 4x, allowing up to 7-10 errors analysis.</p></li>
-</ul><p>h2. System Requirements</p>
+<li><p>The second one is a CPU implementation of an inexact mapping algorithm compatible with any backward search method. By using optimised search tree exploration techniques we achieve unprecedented results. We are able to deal with 400bps reads using only backward search (like the BWT and SA). Our solution outperforms by a factor of 7x similar algorithms. Also, when dealing with <400bps reads it can be used as a preprocessing that accelerates modern aligners by a 20-40%.
+</ul><h2> System Requirements</h2>
 
 <ul>
 <li>Hardware:
@@ -59,11 +59,7 @@
 **  GPUs with at least 3GB of RAM are needed for the human genome.</li>
 <li>Software:
 **  64-bit Linux system</li>
-</ul><p>h2. Installation and datasets</p>
-
-<p>The x86_64 binaries and the source files are "here":<a href="http://docs.bioinfo.cipf.es/projects/bwtgpu/documents/">http://docs.bioinfo.cipf.es/projects/bwtgpu/documents/</a>.</p>
-
-<p>The instructions on how to execute the binaries can be found "here":<a href="http://docs.bioinfo.cipf.es/projects/bwtgpu/wiki">http://docs.bioinfo.cipf.es/projects/bwtgpu/wiki</a>.</p>
+</ul><h2> Installation and datasets</h2>
 
 <p>The BWT indexes and datasets employed to measure the performance of this tool are availabe "here":<a href="https://www.dropbox.com/sh/k9xqljzchyztta8/g7sWOjcUic">https://www.dropbox.com/sh/k9xqljzchyztta8/g7sWOjcUic</a>.</p>
 
@@ -72,9 +68,9 @@ The preprocess program needs to activate OpenMP with -fopenmp also.</p>
 
 <p>Both preprocess and search must have been compiled with the same options in order to use the generated index with the search tool.</p>
 
-<p>h2. Command line options</p>
+<h2> Command line options</h2>
 
-<p>h3. <em>preprocess</em></p>
+<h3> <em>preprocess</em></h3>
 
 <pre>
 ./preprocess reference_file output_directory ratio duplicate_reverse nucleotides
@@ -102,10 +98,10 @@ The preprocess program needs to activate OpenMP with -fopenmp also.</p>
 
 <p>The preprocess command employs the algorithm and code proposed in "Daisuke Okanohara, Kunihiko Sadakane. A Linear-Time Burrows-Wheeler Transform Using Induced Sorting. In Proc. of SPIRE, LNCS 5721, pp. 90-101, 2009", hosted at <a href="https://code.google.com/p/csalib/downloads/list">https://code.google.com/p/csalib/downloads/list</a></p>
 
-<p>h3. <em>inexact_search</em></p>
+<h3> <em>inexact_search</em></h3>
 
 <pre>
-./inexact_search mappings_file index_dir output_file duplicate_reverse search_tree_size num_errors min_fragment nucleotides
+./inexact_search mappings_file index_dir output_file notfound_file duplicate_reverse search_tree_size num_errors min_fragment nucleotides
 </pre>
 
 <blockquote>
@@ -114,6 +110,8 @@ The preprocess program needs to activate OpenMP with -fopenmp also.</p>
 <p><em>index_dir</em> The directory with the index files</p>
 
 <p><em>output_file</em>, file where the mappings found will be stored</p>
+
+<p><em>notfound_file</em>, file where the mappings not found will be stored</p>
 
 <p><em>duplicate_reverse</em>, if 1 the index of the reference and the concatenated duplicate reverse was stored in <em>index_dir</em>.</p>
 
@@ -134,7 +132,7 @@ The preprocess program needs to activate OpenMP with -fopenmp also.</p>
 
 <p>will map reads in drosophila.fa using the preprocessed index in folder drosophila_dbwt, which does not include the reverse. The reads found will be stored in the file "found", with a search_tree_size of 10000 elements, allowing up to 3 errors and a minimum segment size of 17 nucleotides (for the human genome 30 is a good value). The nucleotides encoding in this reference will be ACGT - 0123.</p>
 
-<p>h3. <em>search_gpu</em></p>
+<h3> <em>search_gpu</em></h3>
 
 <pre>
 ./search_gpu mappings_file index_dir output_file notfound_file num_errors nucleotides
