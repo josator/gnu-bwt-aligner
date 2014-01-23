@@ -48,6 +48,9 @@
 <ul>
 <li><p>The first one takes advantage of CUDA GPGPU processors. We have implemented BTW on GPU, allowing alignments of up to one error. Also, we parallelised the input/output operations on the CPU and the GPU execution of the mapping process. Our experiments show that this heterogeneous and really cheap solution outperforms by 3x the conventional algorithms based only on CPU.</p></li>
 <li><p>The second one is a CPU implementation of an inexact mapping algorithm compatible with any backward search method. By using optimised search tree exploration techniques we achieve unprecedented results. We are able to deal with 400bps reads using only backward search (like the BWT and SA). Our solution outperforms by a factor of 7x similar algorithms. Also, when dealing with <400bps reads it can be used as a preprocessing that accelerates modern aligners by a 20-40%.
+
+<p>The BWT indexes and datasets employed to measure the performance of this tool are availabe:<a href="https://www.dropbox.com/sh/k9xqljzchyztta8/g7sWOjcUic">here</a>.</p>
+
 </ul><h2> System Requirements</h2>
 
 <ul>
@@ -61,7 +64,6 @@
 **  64-bit Linux system</li>
 </ul><h2> Installation and datasets</h2>
 
-<p>The BWT indexes and datasets employed to measure the performance of this tool are availabe "here":<a href="https://www.dropbox.com/sh/k9xqljzchyztta8/g7sWOjcUic">https://www.dropbox.com/sh/k9xqljzchyztta8/g7sWOjcUic</a>.</p>
 
 <p>When compiling the tools do not forget to check in the makefile that the preprocessor variables -DVECTOR_O_64BIT_COMPRESSION are present, in order to enable 32/64 bits vector O compression.
 The preprocess program needs to activate OpenMP with -fopenmp also.</p>
