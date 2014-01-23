@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Gnu-bwt-aligner by josator</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Gnu-bwt-aligner</h1>
+        <p>See description below.</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/josator/gnu-bwt-aligner" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/josator/gnu-bwt-aligner/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/josator/gnu-bwt-aligner/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <p>h1. Introduction</p>
+
+<p>New high-throughput sequencers are able to produce data at an unprecedented scale, while sequencing costs are in free fall. Primary data processing, which often includes mapping short reads onto a reference genome, is computationally very expensive. Recently, a variety of programs, many of them implementing Burrows-Wheeler Transform (BWT), have been developed for such task. Despite the efficiency of BWT, the general view is that new approaches will be necessary to cope with the increasing flood of sequencing data.</p>
+
+<p>HPG-BWT proposes two new approaches to BWT sequence mapping:</p>
+
+<ul>
+<li><p>The first one takes advantage of CUDA GPGPU processors. We have implemented BTW on GPU, allowing alignments of up to one error. Also, we parallelised the input/output operations on the CPU and the GPU execution of the mapping process. Our experiments show that this heterogeneous and really cheap solution outperforms by 3x the conventional algorithms based only on CPU.</p></li>
+<li><p>The second one is a CPU implementation of the inexact search with BWT. By using optimised branch and bound techniques for biological information the number of errors allowed is greatly increased. In the case of the human genome, we support 6 errors with no sensibility penalty and within a reasonable execution time and memory size. The search routine studies insertions, deletions and mismatches. Our solution outperforms by a factor of 8x other BWT-CPU solutions. Also, by reducing the sensibility in 5-10% the speed of the algorithm can be increased by a factor of 4x, allowing up to 7-10 errors analysis.</p></li>
+</ul><p>h2. System Requirements</p>
+
+<ul>
+<li>Hardware:
+**  64-bit x86-64 CPUs
+**  32GB of RAM for human genome index calculation (This will be reduced in the near future).
+**  The GPU test program requires two graphic cards, a more complete version is included in the HPG pipeline.
+**  The CPU RAM required for searching against the human genome with the CPU or GPU test programs depends on the suffix array compression ratio (S, R and O.desp), with compression ratio 32x it needs about 7GB. This compression does not affect the search algorithm but can affect the speed of seeded mapping when using the tool with an Smith-Watterman implementation.
+**  GPUs with at least 3GB of RAM are needed for the human genome.</li>
+<li>Software:
+**  64-bit Linux system</li>
+</ul><p>h2. Installation and datasets</p>
+
+<p>The x86_64 binaries and the source files are "here":<a href="http://docs.bioinfo.cipf.es/projects/bwtgpu/documents/">http://docs.bioinfo.cipf.es/projects/bwtgpu/documents/</a>.</p>
+
+<p>The instructions on how to execute the binaries can be found "here":<a href="http://docs.bioinfo.cipf.es/projects/bwtgpu/wiki">http://docs.bioinfo.cipf.es/projects/bwtgpu/wiki</a>.</p>
+
+<p>The BWT indexes and datasets employed to measure the performance of this tool are availabe "here":<a href="https://www.dropbox.com/sh/k9xqljzchyztta8/g7sWOjcUic">https://www.dropbox.com/sh/k9xqljzchyztta8/g7sWOjcUic</a>.</p>
+
+<p>When compiling the tools do not forget to check in the makefile that the preprocessor variables -DVECTOR_O_64BIT_COMPRESSION are present, in order to enable 32/64 bits vector O compression.
+The preprocess program needs to activate OpenMP with -fopenmp also.</p>
+
+<p>Both preprocess and search must have been compiled with the same options in order to use the generated index with the search tool.</p>
+
+<p>h2. Command line options</p>
+
+<p>h3. <em>preprocess</em></p>
+
+<pre>
+./preprocess reference_file output_directory ratio duplicate_reverse nucleotides
+</pre>
+
+<blockquote>
+<p><em>reference_file</em>, input file, in FASTA format, containing the reference to be indexed (up to 6GB references are supported)</p>
+
+<p><em>output_directory</em>, existing directory where the index files will be stored</p>
+
+<p><em>ratio</em>, the compression ratio of suffix array and its inverse (S and R).</p>
+
+<p><em>duplicate_reverse</em>, if 1 concatenates de reverse strand genome and computes the double sized index to search reverse and strand at the same time (for the human genome check that you compile the code with the flag -DSA_64, at the moment this takes a lot of memory).</p>
+
+<p><em>nucleotides</em>, the nucleotides present in the reference, in order.</p>
+</blockquote>
+
+<p>For example,</p>
+
+<pre>
+./preprocess genome.fa index/ 8 0 ACGT
+</pre>
+
+<p>will index genome.fa and store the output files in directory "index", vectors S and R will be 8x compressed, the duplicate reverse will not be appended and the nucleotides encoding in this reference will be ACGT - 0123.</p>
+
+<p>The preprocess command employs the algorithm and code proposed in "Daisuke Okanohara, Kunihiko Sadakane. A Linear-Time Burrows-Wheeler Transform Using Induced Sorting. In Proc. of SPIRE, LNCS 5721, pp. 90-101, 2009", hosted at <a href="https://code.google.com/p/csalib/downloads/list">https://code.google.com/p/csalib/downloads/list</a></p>
+
+<p>h3. <em>inexact_search</em></p>
+
+<pre>
+./inexact_search mappings_file index_dir output_file duplicate_reverse search_tree_size num_errors min_fragment nucleotides
+</pre>
+
+<blockquote>
+<p><em>mappings_file</em> The file with the reads</p>
+
+<p><em>index_dir</em> The directory with the index files</p>
+
+<p><em>output_file</em>, file where the mappings found will be stored</p>
+
+<p><em>duplicate_reverse</em>, if 1 the index of the reference and the concatenated duplicate reverse was stored in <em>index_dir</em>.</p>
+
+<p><em>search_tree_size</em>, the search tree size used for the Breadth First Search exploration (an small value increases performance but decreases the sensitivity).</p>
+
+<p><em>num_errors</em>, the maximum number of errors allowed during the search.</p>
+
+<p><em>min_fragment</em>, the minimum fragment size used by the exploration bounding techniques (does not affect sensitivity but an small value decreases performance).</p>
+
+<p><em>nucleotides</em>, the nucleotides present in the reference, in order.</p>
+</blockquote>
+
+<p>For example,</p>
+
+<pre>
+./inexact_search drosophila.fa drosophila_dbwt found 0 10000 3 17 ACGT
+</pre>
+
+<p>will map reads in drosophila.fa using the preprocessed index in folder drosophila_dbwt, which does not include the reverse. The reads found will be stored in the file "found", with a search_tree_size of 10000 elements, allowing up to 3 errors and a minimum segment size of 17 nucleotides (for the human genome 30 is a good value). The nucleotides encoding in this reference will be ACGT - 0123.</p>
+
+<p>h3. <em>search_gpu</em></p>
+
+<pre>
+./search_gpu mappings_file index_dir output_file notfound_file num_errors nucleotides
+</pre>
+
+<blockquote>
+<p><em>mappings_file</em> The file with the reads</p>
+
+<p><em>index_dir</em> The directory with the index files</p>
+
+<p><em>output_file</em>, file where the mappings found will be stored</p>
+
+<p><em>notfound_file</em>, file where the mappings not found will be stored</p>
+
+<p><em>num_errors</em>, the maximum number of errors allowed during the search (only 0 or 1).</p>
+
+<p><em>nucleotides</em>, the nucleotides present in the reference, in order.</p>
+</blockquote>
+
+<p>For example,</p>
+
+<pre>
+./search_gpu drosophila.fa drosophila_dbwt found notfound 1 ACGT
+</pre>
+
+<p>will map reads in drosophila.fa using the preprocessed index in folder drosophila_dbwt. The reads found will be stored in the file "found", the reads not found in file "notfound", allowing up to 1 errors. The nucleotides encoding in this reference will be ACGT - 0123.</p>
+
+<p>Currently this is only a test program and it needs a configuration with two nvidia graphic cards in order to work. It does not support duplicate reference indexes at the moment.</p>
+
+<p>Notice also that in all the tools the encoding for the four bases should be indicated. For genomes with less bases please check the reverse strand functions in file "search/csafm.c", and please do not forget to call function init_replace_table when embedding the source code.</p>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/josator">josator</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
