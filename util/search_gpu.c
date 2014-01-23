@@ -61,7 +61,7 @@ void *writeResults(void *threadid) {
 
 	results_list r_list;
 
-	char search[201];
+	char search[1001];
 	char plusminus[] = "-+";
 	uintmax_t index, key;
 

@@ -35,13 +35,15 @@ int stop=0, start=0, end=0;
 int start_write=0, stop_write=0, end_write=0;
 uintmax_t tam_read_gpu=0, tam_read_gpu2=0;
 
-FILE *output_file;
+FILE *output_file, *notfound_file;
 
 exome ex;
 
 int num_errors, fragsize, RESULTS, duplicate_reference;
 
 void *writeResults(void *threadid) {
+
+	char search[1001];
 
 	uintmax_t w=0;
 	uintmax_t tam_write=0;
@@ -69,6 +71,8 @@ void *writeResults(void *threadid) {
 
 			fflush(output_file);
 			fclose(output_file);
+			fflush(notfound_file);
+			fclose(notfound_file);
 
 			//printf("W -> Saliendo\n");
 			printf("%lu founds of %ju -> found %.2f, discarded %ju\n", contador, total, contador * 100.0 / total, descartadas * 100 / total);
@@ -144,6 +148,9 @@ void *writeResults(void *threadid) {
 				}
 
 				if ((!found) && (!found2)) {
+					search[0] = '\0';
+					strncat(search, store_Worig + i * MAXLINE, store_nWe[i]);
+					fprintf(notfound_file, ">read_%ju\n%s\n", total, search);
 				} else {
 					contador++;
 				}
@@ -347,13 +354,13 @@ int main(int argc, char **argv) {
 
 	FILE *queries_file;
 
-	check_syntax(argc, 9, "inexact_search f_mappings d_transform f_output duplicate_reference search_tree_size num_errors min_fragment nucleotides");
+	check_syntax(argc, 10, "inexact_search f_mappings d_transform f_output f_notfound duplicate_reference search_tree_size num_errors min_fragment nucleotides");
 
-	duplicate_reference = atoi(argv[4]);
-	RESULTS = atoi(argv[5]);
-	num_errors = atoi(argv[6]);
-	fragsize = atoi(argv[7]);
-	init_replace_table(argv[8]);
+	duplicate_reference = atoi(argv[5]);
+	RESULTS = atoi(argv[6]);
+	num_errors = atoi(argv[7]);
+	fragsize = atoi(argv[8]);
+	init_replace_table(argv[9]);
 
 	if (duplicate_reference) {
 		load_bwt_index(NULL, &backward, argv[2], 1, true);
@@ -408,6 +415,8 @@ int main(int argc, char **argv) {
 	check_file_open(queries_file, argv[1]);
 	output_file = fopen(argv[3], "w");
 	check_file_open(output_file, argv[3]);
+  notfound_file = fopen(argv[4], "w");
+	check_file_open(notfound_file, argv[4]);
 
 	pthread_mutex_init(&gpu_time_thread,  NULL);
 	pthread_mutex_init(&print_results,  NULL);
