@@ -49,6 +49,8 @@
 <li><p>The first one takes advantage of CUDA GPGPU processors. We have implemented BTW on GPU, allowing alignments of up to one error. Also, we parallelised the input/output operations on the CPU and the GPU execution of the mapping process. Our experiments show that this heterogeneous and really cheap solution outperforms by 3x the conventional algorithms based only on CPU.</p></li>
 <li><p>The second one is a CPU implementation of an inexact mapping algorithm compatible with any backward search method. By using optimised search tree exploration techniques we achieve unprecedented results. We are able to deal with 400bps reads using only backward search (like the BWT and SA). Our solution outperforms by a factor of 7x similar algorithms. Also, when dealing with <400bps reads it can be used as a preprocessing that accelerates modern aligners by a 20-40%.
 
+</ul><h2>Datasets</h2>
+
 <p>The BWT indexes and datasets employed to measure the performance of this tool are availabe <a href="https://www.dropbox.com/sh/k9xqljzchyztta8/g7sWOjcUic">here</a>.</p>
 
 </ul><h2> System Requirements</h2>
@@ -56,7 +58,7 @@
 <ul>
 <li>Hardware:
 **  64-bit x86-64 CPUs
-**  32GB of RAM for human genome index calculation (This will be reduced in the near future).
+**  7GB of RAM for human genome index calculation (This will be reduced in the near future).
 **  The GPU test program requires two graphic cards, a more complete version is included in the HPG pipeline.
 **  The CPU RAM required for searching against the human genome with the CPU or GPU test programs depends on the suffix array compression ratio (S, R and O.desp), with compression ratio 32x it needs about 7GB. This compression does not affect the search algorithm but can affect the speed of seeded mapping when using the tool with an Smith-Watterman implementation.
 **  GPUs with at least 3GB of RAM are needed for the human genome.</li>
