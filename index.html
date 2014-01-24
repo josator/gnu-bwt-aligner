@@ -43,13 +43,13 @@
 
 <p>New high-throughput sequencers are able to produce data at an unprecedented scale, while sequencing costs are in free fall. Primary data processing, which often includes mapping short reads onto a reference genome, is computationally very expensive. Recently, a variety of programs based on backward search methods have been developed for such task. Despite the efficiency of the FM-Index, the general view is that new approaches will be necessary to cope with the increasing flood of sequencing data.</p>
 
-<p>GBSA proposes three approaches to BWT sequence mapping:</p>
+<p>GBSA proposes three approaches to backward search sequence mapping:</p>
 
 <ul>
 
 <li><p>The first one takes advantage of CUDA GPGPU processors. We have implemented BTW on GPU, allowing alignments of up to one error. Also, we parallelised the input/output operations on the CPU and the GPU execution of the mapping process. Our experiments show that this heterogeneous and really cheap solution outperforms by 3x the conventional algorithms based only on CPU.</p></li>
 <li><p>The second one is a CPU implementation of an inexact mapping algorithm compatible with any backward search method. By using optimised search tree exploration techniques we achieve unprecedented results. Our solution outperforms by a factor of 7x similar algorithms allowing 3 errors on 250bps reads. Also, when dealing with 400bps reads it can be used as a preprocessing that accelerates modern aligners by 20-40%.</p></li>
-<li><p>The third one uses csalib to provide an out-of-core implementation of the reference index, being able to map reads using only 100MB of RAM.</p></li>
+<li><p>The third one uses csalib to provide an out-of-core implementation of the reference index, being able to map reads using only 100MB of RAM. The interfaces used to provide compatibility with csalib can be used to employ other index implementations</p></li>
 
 </ul><h2>Datasets</h2>
 
