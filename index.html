@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>GRyCAP GNU Backward Search Aligner</title>
+    <title>GRyCAP Backward Search Aligner</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -17,7 +17,7 @@
   <body>
 
       <header>
-        <h1>GRyCAP GNU Backward Search Aligner</h1>
+        <h1>GRyCAP Backward Search Aligner</h1>
         <p>An inexact mapping algorithm compatible with any backward search runtime</p>
       </header>
 
@@ -43,11 +43,11 @@
 
 <p>New high-throughput sequencers are able to produce data at an unprecedented scale, while sequencing costs are in free fall. Primary data processing, which often includes mapping short reads onto a reference genome, is computationally very expensive. Recently, a variety of programs, many of them implementing Burrows-Wheeler Transform (BWT), have been developed for such task. Despite the efficiency of BWT, the general view is that new approaches will be necessary to cope with the increasing flood of sequencing data.</p>
 
-<p>HPG-BWT proposes two new approaches to BWT sequence mapping:</p>
+<p>GBSA proposes two approaches to BWT sequence mapping:</p>
 
 <ul>
 <li><p>The first one takes advantage of CUDA GPGPU processors. We have implemented BTW on GPU, allowing alignments of up to one error. Also, we parallelised the input/output operations on the CPU and the GPU execution of the mapping process. Our experiments show that this heterogeneous and really cheap solution outperforms by 3x the conventional algorithms based only on CPU.</p></li>
-<li><p>The second one is a CPU implementation of an inexact mapping algorithm compatible with any backward search method. By using optimised search tree exploration techniques we achieve unprecedented results. We are able to deal with 400bps reads using only backward search (like the BWT and SA). Our solution outperforms by a factor of 7x similar algorithms. Also, when dealing with <400bps reads it can be used as a preprocessing that accelerates modern aligners by a 20-40%.
+<li><p>The second one is a CPU implementation of an inexact mapping algorithm compatible with any backward search method. By using optimised search tree exploration techniques we achieve unprecedented results. We are able to deal with 400bps reads using only backward search methods (BWT or SA). Our solution outperforms by a factor of 7x similar algorithms. Also, when dealing with <400bps reads it can be used as a preprocessing that accelerates modern aligners by a 20-40%.
 
 </ul><h2>Datasets</h2>
 
