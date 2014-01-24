@@ -57,7 +57,7 @@
 
 <p>Work in progress.</p>
 
-</ul><h2> System Requirements</h2>
+</ul><h2>System Requirements</h2>
 
 <ul>
 <li>Hardware:
@@ -67,7 +67,8 @@ The RAM required for searching against the human genome depends on the suffix ar
 If compiled to run with the csalib backend the total memory requirements are below 200MB, but GPU are still not supported in this operation mode</li>
 <li>Software:
 64-bit POSIX System</li>
-</ul><h2> Installation</h2>
+
+</ul><h2>Compile instructions</h2>
 
 <p>When compiling the tools do not forget to check in the makefile that the preprocessor variables -DFM_COMP_64 and -DSA_32 are present, in order to enable 32/64 bits compression of the FM-Index and 8/16/32/64 bits compression of the Suffix Array.
 To enable the csalib backend compile with the preprocessor variable -DCSALIB_SEARCH.
@@ -102,8 +103,6 @@ The preprocess program needs to activate OpenMP with -fopenmp also.</p>
 </pre>
 
 <p>will index genome.fa and store the output files in directory "index", vectors S and R will be 8x compressed, the duplicate reverse will not be appended and the nucleotides encoding in this reference will be ACGT - 0123. Currently there exist two versions of this tool old for our BWT implementation and new for the csalib implementation</p>
-
-<p>The preprocess command employs the algorithm and code proposed in "Daisuke Okanohara, Kunihiko Sadakane. A Linear-Time Burrows-Wheeler Transform Using Induced Sorting. In Proc. of SPIRE, LNCS 5721, pp. 90-101, 2009", hosted at <a href="https://code.google.com/p/csalib/downloads/list">https://code.google.com/p/csalib/downloads/list</a></p>
 
 <h3> <em>inexact_search</em></h3>
 
@@ -178,5 +177,43 @@ The preprocess program needs to activate OpenMP with -fopenmp also.</p>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
+</ul><h2>Authors, licenses and contact</h2>
+
+Burrows-Wheeler Transform libraries for short read inexact alignment released under the LGPL v3 license.
+
+Developed at "Instituto de instrumentación de la imagen molecular" (I3M) of "Universitat Politècnica de València" (UPV) Valencia, Spain:
+
+<a href="http://www.i3m.upv.es/view.php/GRYCAP/Principal?lang=EN</a>
+
+in collaboration with "Centro de Investigación Príncipe Felipe" Valencia Spain:
+
+<a href="http://www.cipf.es/</a>
+
+and the support of Bull Inc.
+
+An early publication on the implementation of this project in GPU exists, please refer to:
+
+<a href="http://dx.doi.org/10.1109/TCBB.2012.49</a>
+
+Main developer:
+
+<a href="http://www.grycap.upv.es/view.php/GRyCAP/Organizacion/jsalavert</a>
+
+Project supervisor:
+
+<a href="http://www.grycap.upv.es/view.php/GRyCAP/Organizacion/iblanque</a>
+
+The code from CSALIB library included in this project is provided by "National Institute of Informatics" Tokyo, Japan under the MIT license:
+
+<a href="https://code.google.com/p/csalib/</a>
+
+Please contact:
+
+<a href="http://researchmap.jp/sada/english/</a>
+
+Related publication:
+
+<p>The preprocess command employs the algorithm and code proposed in "Daisuke Okanohara, Kunihiko Sadakane. A Linear-Time Burrows-Wheeler Transform Using Induced Sorting. In Proc. of SPIRE, LNCS 5721, pp. 90-101, 2009", hosted at <a href="https://code.google.com/p/csalib/downloads/list">https://code.google.com/p/csalib/downloads/list</a></p>
+
   </body>
 </html>
