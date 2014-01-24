@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>GRyCAP Backward Search Aligner</title>
+    <title>GRyCAP GNU Backward Search Aligner</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -17,7 +17,7 @@
   <body>
 
       <header>
-        <h1>GRyCAP Backward Search Aligner</h1>
+        <h1>GRyCAP GNU Backward Search Aligner</h1>
         <p>An inexact mapping algorithm compatible with any backward search runtime</p>
       </header>
 
@@ -43,11 +43,16 @@
 
 <p>New high-throughput sequencers are able to produce data at an unprecedented scale, while sequencing costs are in free fall. Primary data processing, which often includes mapping short reads onto a reference genome, is computationally very expensive. Recently, a variety of programs, many of them implementing Burrows-Wheeler Transform (BWT), have been developed for such task. Despite the efficiency of BWT, the general view is that new approaches will be necessary to cope with the increasing flood of sequencing data.</p>
 
-<p>GBSA proposes two approaches to BWT sequence mapping:</p>
+<p>GBSA proposes three approaches to BWT sequence mapping:</p>
 
 <ul>
+
 <li><p>The first one takes advantage of CUDA GPGPU processors. We have implemented BTW on GPU, allowing alignments of up to one error. Also, we parallelised the input/output operations on the CPU and the GPU execution of the mapping process. Our experiments show that this heterogeneous and really cheap solution outperforms by 3x the conventional algorithms based only on CPU.</p></li>
-<li><p>The second one is a CPU implementation of an inexact mapping algorithm compatible with any backward search method. By using optimised search tree exploration techniques we achieve unprecedented results. Our solution outperforms by a factor of 7x similar algorithms allowing 3 errors on 250bps reads. Also, when dealing with <400bps reads it can be used as a preprocessing that accelerates modern aligners by 20-40%.
+<li><p>The second one is a CPU implementation of an inexact mapping algorithm compatible with any backward search method. By using optimised search tree exploration techniques we achieve unprecedented results. Our solution outperforms by a factor of 7x similar algorithms allowing 3 errors on 250bps reads. Also, when dealing with 400bps reads it can be used as a preprocessing that accelerates modern aligners by 20-40%.</p></li>
+<li><p>The third one uses csalib to provide an out-of-core implementation of the reference index, being able to map reads using only 100MB of RAM.</p></li>
+
+<p>GBSA is released under the GNU/LGPLv3 license terms.</p>
+<p>csalib is released unther the MIT license terms.</p>
 
 </ul><h2>Datasets</h2>
 
@@ -170,9 +175,7 @@ The preprocess program needs to activate OpenMP with -fopenmp also.</p>
 
 <p>Notice also that in all the tools the encoding for the four bases should be indicated. For genomes with less bases please check the reverse strand functions in file "search/csafm.c", and please do not forget to call function init_replace_table when embedding the source code.</p>
 
-<h2>Authors, licenses and contact</h2>
-
-<p>Burrows-Wheeler Transform libraries for short read inexact alignment released under the LGPL v3 license.</p>
+<h2>Licenses and contact information</h2>
 
 <p>Developed at <a href="http://www.i3m.upv.es/view.php/GRYCAP/Principal?lang=EN">"Instituto de instrumentación de la imagen molecular"</a> (UPV) Valencia, Spain in collaboration with <a href="http://www.cipf.es/">"Centro de Investigación Príncipe Felipe" Valencia Spain</a> and the support of Bull Inc.</p>
 
