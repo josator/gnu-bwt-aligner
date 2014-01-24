@@ -169,6 +169,23 @@ The preprocess program needs to activate OpenMP with -fopenmp also.</p>
 <p>Currently this is only a test program and it needs a configuration with two nvidia graphic cards in order to work. It does not support duplicate reference indexes at the moment.</p>
 
 <p>Notice also that in all the tools the encoding for the four bases should be indicated. For genomes with less bases please check the reverse strand functions in file "search/csafm.c", and please do not forget to call function init_replace_table when embedding the source code.</p>
+
+<h2>Authors, licenses and contact</h2>
+
+<p>Burrows-Wheeler Transform libraries for short read inexact alignment released under the LGPL v3 license.</p>
+
+<p>Developed at <a href="http://www.i3m.upv.es/view.php/GRYCAP/Principal?lang=EN">"Instituto de instrumentación de la imagen molecular"</a> (UPV) Valencia, Spain in collaboration with <a href="http://www.cipf.es/">"Centro de Investigación Príncipe Felipe" Valencia Spain</a> and the support of Bull Inc.</p>
+
+<p>An early <a href="http://dx.doi.org/10.1109/TCBB.2012.49">publication</a> on the implementation of this project in GPU has been already published.</p>
+
+<p><a href="http://www.grycap.upv.es/view.php/GRyCAP/Organizacion/jsalavert">José Salavert Torres</a> is the main developer, <a href="http://www.grycap.upv.es/view.php/GRyCAP/Organizacion/iblanque">Ignacio Blanquer Espert</a> is the Project supervisor.</p>
+
+<p>The code from <a href="https://code.google.com/p/csalib/">csalib</a> library included in this project is provided by "National Institute of Informatics" Tokyo, Japan under the MIT license.</p>
+
+<p>Please contact professor <a href="http://researchmap.jp/sada/english/">Kunihiko Sadakane</a>:</p>
+
+<p>The preprocess command employs the algorithm and code proposed in "Daisuke Okanohara, Kunihiko Sadakane. A Linear-Time Burrows-Wheeler Transform Using Induced Sorting. In Proc. of SPIRE, LNCS 5721, pp. 90-101, 2009", hosted <a href="https://code.google.com/p/csalib/downloads/list">here</a></p>.
+
       </section>
       <footer>
         <p>Project maintained by <a href="https://github.com/josator">josator</a></p>
@@ -177,23 +194,5 @@ The preprocess program needs to activate OpenMP with -fopenmp also.</p>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
-<h2>Authors, licenses and contact</h2>
-
-Burrows-Wheeler Transform libraries for short read inexact alignment released under the LGPL v3 license.
-
-Developed at <a href="http://www.i3m.upv.es/view.php/GRYCAP/Principal?lang=EN">"Instituto de instrumentación de la imagen molecular"</a> (UPV) Valencia, Spain in collaboration with <a href="http://www.cipf.es/">"Centro de Investigación Príncipe Felipe" Valencia Spain</a> and the support of Bull Inc.
-
-An early <a href="http://dx.doi.org/10.1109/TCBB.2012.49">publication</a> on the implementation of this project in GPU has been already published.
-
-<a href="http://www.grycap.upv.es/view.php/GRyCAP/Organizacion/jsalavert">José Salavert Torres</a> is the main developer, <a href="http://www.grycap.upv.es/view.php/GRyCAP/Organizacion/iblanque">Ignacio Blanquer Espert</a> is the Project supervisor.
-
-The code from <a href="https://code.google.com/p/csalib/">csalib</a> library included in this project is provided by "National Institute of Informatics" Tokyo, Japan under the MIT license.
-
-Please contact professor <a href="http://researchmap.jp/sada/english/">Kunihiko Sadakane</a>:
-
-Related publication:
-
-<p>The preprocess command employs the algorithm and code proposed in "Daisuke Okanohara, Kunihiko Sadakane. A Linear-Time Burrows-Wheeler Transform Using Induced Sorting. In Proc. of SPIRE, LNCS 5721, pp. 90-101, 2009", hosted <a href="https://code.google.com/p/csalib/downloads/list">here</a></p>.
-
   </body>
 </html>
