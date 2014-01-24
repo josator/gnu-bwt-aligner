@@ -47,27 +47,30 @@
 
 <ul>
 <li><p>The first one takes advantage of CUDA GPGPU processors. We have implemented BTW on GPU, allowing alignments of up to one error. Also, we parallelised the input/output operations on the CPU and the GPU execution of the mapping process. Our experiments show that this heterogeneous and really cheap solution outperforms by 3x the conventional algorithms based only on CPU.</p></li>
-<li><p>The second one is a CPU implementation of an inexact mapping algorithm compatible with any backward search method. By using optimised search tree exploration techniques we achieve unprecedented results. We are able to deal with 400bps reads using only backward search methods (BWT or SA). Our solution outperforms by a factor of 7x similar algorithms. Also, when dealing with <400bps reads it can be used as a preprocessing that accelerates modern aligners by a 20-40%.
+<li><p>The second one is a CPU implementation of an inexact mapping algorithm compatible with any backward search method. By using optimised search tree exploration techniques we achieve unprecedented results. Our solution outperforms by a factor of 7x similar algorithms allowing 3 errors on 250bps reads. Also, when dealing with <400bps reads it can be used as a preprocessing that accelerates modern aligners by 20-40%.
 
 </ul><h2>Datasets</h2>
 
 <p>The BWT indexes and datasets employed to measure the performance of this tool are availabe <a href="https://www.dropbox.com/sh/k9xqljzchyztta8/g7sWOjcUic">here</a>.</p>
 
+</ul><h2>API Documentation</h2>
+
+<p>Work in progress.</p>
+
 </ul><h2> System Requirements</h2>
 
 <ul>
 <li>Hardware:
-**  64-bit x86-64 CPUs
-**  7GB of RAM for human genome index calculation (This will be reduced in the near future).
-**  The GPU test program requires two graphic cards, a more complete version is included in the HPG pipeline.
-**  The CPU RAM required for searching against the human genome with the CPU or GPU test programs depends on the suffix array compression ratio (S, R and O.desp), with compression ratio 32x it needs about 7GB. This compression does not affect the search algorithm but can affect the speed of seeded mapping when using the tool with an Smith-Watterman implementation.
-**  GPUs with at least 3GB of RAM are needed for the human genome.</li>
+7GB of RAM for human genome index calculation.
+The GPU test program requires two graphic cards, a more complete version is in development.
+The RAM required for searching against the human genome depends on the suffix array compression ratio and the number of errors, with compression ratio 32x and support for more than one error it needs about 7GB. This compression does not affect the search algorithm but can affect the speed when mapping great quantities of small seeds. GPUs with at least 3GB of RAM are needed for the human genome.
+If compiled to run with the csalib backend the total memory requirements are below 200MB, but GPU are still not supported in this operation mode</li>
 <li>Software:
-**  64-bit Linux system</li>
+64-bit POSIX System</li>
 </ul><h2> Installation</h2>
 
-
-<p>When compiling the tools do not forget to check in the makefile that the preprocessor variables -DVECTOR_O_64BIT_COMPRESSION are present, in order to enable 32/64 bits vector O compression.
+<p>When compiling the tools do not forget to check in the makefile that the preprocessor variables -DFM_COMP_64 and -DSA_32 are present, in order to enable 32/64 bits compression of the FM-Index and 8/16/32/64 bits compression of the Suffix Array.
+To enable the csalib backend compile with the preprocessor variable -DCSALIB_SEARCH.
 The preprocess program needs to activate OpenMP with -fopenmp also.</p>
 
 <p>Both preprocess and search must have been compiled with the same options in order to use the generated index with the search tool.</p>
@@ -98,7 +101,7 @@ The preprocess program needs to activate OpenMP with -fopenmp also.</p>
 ./preprocess genome.fa index/ 8 0 ACGT
 </pre>
 
-<p>will index genome.fa and store the output files in directory "index", vectors S and R will be 8x compressed, the duplicate reverse will not be appended and the nucleotides encoding in this reference will be ACGT - 0123.</p>
+<p>will index genome.fa and store the output files in directory "index", vectors S and R will be 8x compressed, the duplicate reverse will not be appended and the nucleotides encoding in this reference will be ACGT - 0123. Currently there exist two versions of this tool old for our BWT implementation and new for the csalib implementation</p>
 
 <p>The preprocess command employs the algorithm and code proposed in "Daisuke Okanohara, Kunihiko Sadakane. A Linear-Time Burrows-Wheeler Transform Using Induced Sorting. In Proc. of SPIRE, LNCS 5721, pp. 90-101, 2009", hosted at <a href="https://code.google.com/p/csalib/downloads/list">https://code.google.com/p/csalib/downloads/list</a></p>
 
