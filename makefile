@@ -1,8 +1,11 @@
 COMMONS_DIR = commons/
 
-.PHONY: all clean dbwt csalib util
+.PHONY: all clean bindir dbwt csalib util
 
-all: dbwt csalib util
+all: bindir dbwt csalib util
+
+bindir:
+	mkdir bin
 
 dbwt:
 	make -C dbwt/ all
