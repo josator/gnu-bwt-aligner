@@ -110,13 +110,13 @@ inline void concat_error_string(char *mask, char *mask_aux, result *r, uint8_t r
 		(*enW)++;
 
 	if      (r->err_kind[rr]==DELETION) {
-		sprintf(mask_aux, " %d%c",   r->err_pos[rr], 'd');
+		sprintf(mask_aux, "_%d%c",   r->err_pos[rr], 'd');
 		strcat(mask, mask_aux);
 	} else if (r->err_kind[rr]==MISMATCH) {
-		sprintf(mask_aux, " %d%c%c", r->err_pos[rr], 'm', rev_table[r->err_base[rr]]);
+		sprintf(mask_aux, "_%d%c%c", r->err_pos[rr], 'm', rev_table[r->err_base[rr]]);
 		strcat(mask, mask_aux);
 	} else {
-		sprintf(mask_aux, " %d%c%c", r->err_pos[rr], 'i', rev_table[r->err_base[rr]]);
+		sprintf(mask_aux, "_%d%c%c", r->err_pos[rr], 'i', rev_table[r->err_base[rr]]);
 		strcat(mask, mask_aux);
 	}
 
@@ -181,7 +181,7 @@ inline void manage_single_result(result *r, exome* ex, bwt_index *backward, bwt_
 
 			}
 
-			fprintf(fp, "read_%ju %c %s %ju %d%s %s\n", (uintmax_t) read_index, plusminus[type2], ex->chromosome + (index-1)*IDMAX, key2, r->num_mismatches, mask, search);
+			fprintf(fp, "read_%ju %c %s %ju %d %s %s\n", (uintmax_t) read_index, plusminus[type2], ex->chromosome + (index-1)*IDMAX, key2, r->num_mismatches, mask, search);
 			*found=1;
 
 		}
