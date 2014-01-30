@@ -110,13 +110,13 @@ inline void concat_error_string(char *mask, char *mask_aux, result *r, uint8_t r
 		(*enW)++;
 
 	if      (r->err_kind[rr]==DELETION) {
-		sprintf(mask_aux, "_%d%c",   r->err_pos[rr], 'd');
+		sprintf(mask_aux, " %d%c",   r->err_pos[rr], 'd');
 		strcat(mask, mask_aux);
 	} else if (r->err_kind[rr]==MISMATCH) {
-		sprintf(mask_aux, "_%d%c%c", r->err_pos[rr], 'm', rev_table[r->err_base[rr]]);
+		sprintf(mask_aux, " %d%c%c", r->err_pos[rr], 'm', rev_table[r->err_base[rr]]);
 		strcat(mask, mask_aux);
 	} else {
-		sprintf(mask_aux, "_%d%c%c", r->err_pos[rr], 'i', rev_table[r->err_base[rr]]);
+		sprintf(mask_aux, " %d%c%c", r->err_pos[rr], 'i', rev_table[r->err_base[rr]]);
 		strcat(mask, mask_aux);
 	}
 
