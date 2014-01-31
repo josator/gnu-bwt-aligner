@@ -5,7 +5,7 @@ COMMONS_DIR = commons/
 all: bindir dbwt csalib util
 
 bindir:
-	mkdir bin
+	#mkdir -f bin
 
 dbwt:
 	make -C dbwt/ all

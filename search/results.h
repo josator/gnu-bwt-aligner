@@ -181,7 +181,7 @@ inline void manage_single_result(result *r, exome* ex, bwt_index *backward, bwt_
 
 			}
 
-			fprintf(fp, "read_%ju %c %s %ju %d %s %s\n", (uintmax_t) read_index, plusminus[type2], ex->chromosome + (index-1)*IDMAX, key2, r->num_mismatches, mask, search);
+			fprintf(fp, "read_%ju %c %s %ju %d %s\n", (uintmax_t) read_index, plusminus[type2], ex->chromosome + (index-1)*IDMAX, key2, r->num_mismatches, mask);
 			*found=1;
 
 		}
