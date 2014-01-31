@@ -10,7 +10,7 @@ CFLAGSCUDA = -Wall -m64 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -O9 -fPIC
 
 .PHONY: all clean
 
-all: ../bin/preprocess_dbwt_old ../bin/preprocess_dbwt_new ../bin/exact_search ../bin/inexact_search ../bin/search_gpu
+all: ../bin/preprocess_dbwt_old ../bin/preprocess_dbwt_new ../bin/exact_search ../bin/inexact_search ../bin/search_gpu ../bin/optimize_speedup_vector
 
 ../bin/preprocess_dbwt_old: preprocess_dbwt_old.c dbwt csalib search commons
 	$(CC) $(CFLAGS) -o $@ preprocess_dbwt_old.c ../search/search.a ../dbwt/dbwt.a ../csalib/csalib.a  $(COMMONS_DIR)/commons.a
@@ -25,7 +25,10 @@ all: ../bin/preprocess_dbwt_old ../bin/preprocess_dbwt_new ../bin/exact_search .
 	$(CC) $(CFLAGS) -o $@ inexact_search.c ../csalib/csalib.a ../search/search.a $(COMMONS_DIR)/commons.a
 
 ../bin/search_gpu: search_gpu.c csalib search gpu commons
+
 	$(CC) $(CFLAGSCUDA) -o $@ search_gpu.c ../csalib/csalib.a ../search/search.a ../gpu/gpu.a $(COMMONS_DIR)/commons.a
+../bin/optimize_speedup_vector: optimize_speedup_vector.c csalib search gpu commons
+	$(CC) $(CFLAGSCUDA) -o $@ optimize_speedup_vector.c ../csalib/csalib.a ../search/search.a ../gpu/gpu.a $(COMMONS_DIR)/commons.a
 
 dbwt:
 	make -C ../dbwt/ dbwt.a

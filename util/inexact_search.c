@@ -4,6 +4,7 @@
 #include "../search/io.h"
 
 #define MAX_READ_THREAD 1024
+#define MAXLINE 1000
 
 char *h_Worig, *h_Worig2, *h_Worig3;
 uint8_t *h_We, *h_We2, *h_We3;

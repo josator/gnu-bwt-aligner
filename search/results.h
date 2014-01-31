@@ -130,7 +130,7 @@ inline void manage_single_result(result *r, exome* ex, bwt_index *backward, bwt_
 	uintmax_t index, index2, key, key2;
 	int type2=0;
 
-	char mask[6*(MAXLINE+1)];
+	char mask[6*(1001)];
 	char mask_aux[6];
 
 	if        (type==0) {
@@ -191,5 +191,7 @@ inline void manage_single_result(result *r, exome* ex, bwt_index *backward, bwt_
 }
 
 bool write_results(results_list *r_list, intmax_t *k, intmax_t *l, exome* ex, bwt_index *backward, bwt_index *forward, char *mapping, uintmax_t nW, int type, FILE *fp);
+
+bool write_results_gpu(results_list *r_list, uint32_t *k, uint32_t *l, exome* ex, bwt_index *backward, bwt_index *forward, char *mapping, uintmax_t nW, int type, FILE *fp);
 
 #endif

@@ -330,7 +330,7 @@ void free_comp_matrix_gpu_device(comp_matrix *reverse, comp_matrix *strand) {
 //}
 //
 
-__global__ void BWExactSearchBackwardGPU(uint8_t *W, uint64_t *nW, intmax_t *k, intmax_t *l, intmax_t k_ini, intmax_t l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
+__global__ void BWExactSearchBackwardGPU(uint8_t *W, uint64_t *nW, int MAXLINE, uint32_t *k, uint32_t *l, uint32_t k_ini, uint32_t l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
 
 	intmax_t i;
 	intmax_t k2, l2;
@@ -356,7 +356,7 @@ __global__ void BWExactSearchBackwardGPU(uint8_t *W, uint64_t *nW, intmax_t *k, 
 
 }
 
-__global__ void BWExactSearchForwardGPU(uint8_t *W, uint64_t *nW, intmax_t *k, intmax_t *l, intmax_t k_ini, intmax_t l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
+__global__ void BWExactSearchForwardGPU(uint8_t *W, uint64_t *nW, int MAXLINE, uint32_t *k, uint32_t *l, uint32_t k_ini, uint32_t l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
 
 	intmax_t i;
 	intmax_t k2, l2;
@@ -382,10 +382,10 @@ __global__ void BWExactSearchForwardGPU(uint8_t *W, uint64_t *nW, intmax_t *k, i
 
 }
 
-__global__ void BWExactSearchBackwardVectorGPU(uint8_t *W, uint64_t *nW, intmax_t *k, intmax_t *l, intmax_t k_ini, intmax_t l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
+__global__ void BWExactSearchBackwardVectorGPU(uint8_t *W, uint64_t *nW, int MAXLINE, uint32_t *k, uint32_t *l, uint32_t k_ini, uint32_t l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
 
 	intmax_t i;
-	intmax_t k2, l2;
+	uint32_t k2, l2;
 	uintmax_t offset  = blockIdx.x * blockDim.x + threadIdx.x;
 
 	__shared__ SA_TYPE Cshared[4];
@@ -421,10 +421,10 @@ __global__ void BWExactSearchBackwardVectorGPU(uint8_t *W, uint64_t *nW, intmax_
 
 }
 
-__global__ void BWExactSearchForwardVectorGPU(uint8_t *W, uint64_t *nW, intmax_t *k, intmax_t *l, intmax_t k_ini, intmax_t l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
+__global__ void BWExactSearchForwardVectorGPU(uint8_t *W, uint64_t *nW, int MAXLINE, uint32_t *k, uint32_t *l, uint32_t k_ini, uint32_t l_ini, SA_TYPE *C, SA_TYPE *C1, comp_matrix O) {
 
 	intmax_t i;
-	intmax_t k2, l2;
+	uint32_t k2, l2;
 	uintmax_t offset  = blockIdx.x * blockDim.x + threadIdx.x;
 
 	__shared__ SA_TYPE Cshared[4];
@@ -2102,18 +2102,18 @@ __global__ void BWExactSearchForwardVectorGPU(uint8_t *W, uint64_t *nW, intmax_t
 ///* } */
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void BWExactSearchBackwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, intmax_t* k, intmax_t* l, intmax_t k_ini, intmax_t l_ini, vector* C, vector* C1, comp_matrix* O) {
-	BWExactSearchBackwardGPU<<<num_bloques,tam_bloques>>>(W, nW, k, l, k_ini, l_ini, C->vector, C1->vector, *O);
+void BWExactSearchBackwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, int MAXLINE, uint32_t* k, uint32_t* l, uint32_t k_ini, uint32_t l_ini, vector* C, vector* C1, comp_matrix* O) {
+	BWExactSearchBackwardGPU<<<num_bloques,tam_bloques>>>(W, nW, MAXLINE, k, l, k_ini, l_ini, C->vector, C1->vector, *O);
 }
 
-void BWExactSearchForwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, intmax_t* k, intmax_t* l, intmax_t k_ini, intmax_t l_ini, vector* C, vector* C1, comp_matrix* O) {
-	BWExactSearchForwardGPU<<<num_bloques,tam_bloques>>>(W, nW, k, l, k_ini, l_ini, C->vector, C1->vector, *O);
+void BWExactSearchForwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, int MAXLINE, uint32_t* k, uint32_t* l, uint32_t k_ini, uint32_t l_ini, vector* C, vector* C1, comp_matrix* O) {
+	BWExactSearchForwardGPU<<<num_bloques,tam_bloques>>>(W, nW, MAXLINE, k, l, k_ini, l_ini, C->vector, C1->vector, *O);
 }
 
-void BWExactSearchBackwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, intmax_t* k, intmax_t* l, intmax_t k_ini, intmax_t l_ini, vector* C, vector* C1, comp_matrix* O) {
-	BWExactSearchBackwardVectorGPU<<<num_bloques,tam_bloques>>>(W, nW, k, l, k_ini, l_ini, C->vector, C1->vector, *O);
+void BWExactSearchBackwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, int MAXLINE, uint32_t* k, uint32_t* l, uint32_t k_ini, uint32_t l_ini, vector* C, vector* C1, comp_matrix* O) {
+	BWExactSearchBackwardVectorGPU<<<num_bloques,tam_bloques>>>(W, nW, MAXLINE, k, l, k_ini, l_ini, C->vector, C1->vector, *O);
 }
 
-void BWExactSearchForwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, intmax_t* k, intmax_t* l, intmax_t k_ini, intmax_t l_ini, vector* C, vector* C1, comp_matrix* O) {
-	BWExactSearchForwardVectorGPU<<<num_bloques,tam_bloques>>>(W, nW, k, l, k_ini, l_ini, C->vector, C1->vector, *O);
+void BWExactSearchForwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, int MAXLINE, uint32_t* k, uint32_t* l, uint32_t k_ini, uint32_t l_ini, vector* C, vector* C1, comp_matrix* O) {
+	BWExactSearchForwardVectorGPU<<<num_bloques,tam_bloques>>>(W, nW, MAXLINE, k, l, k_ini, l_ini, C->vector, C1->vector, *O);
 }

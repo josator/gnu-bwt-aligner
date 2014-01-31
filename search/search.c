@@ -1438,7 +1438,227 @@ void BWExactSearchVectorForward(uint8_t *W, int16_t start, int16_t end, intmax_t
 
 }
 
-bool BWSearch1GPUHelper(uint8_t *W, int16_t start, int16_t end, intmax_t *vec_k, intmax_t *vec_l, intmax_t *vec_ki, intmax_t *vec_li, bwt_index *backward, bwt_index *forward, results_list *r_list) {
+bool BWSearch1Helper(uint8_t *W, int16_t start, int16_t end, intmax_t *vec_k, intmax_t *vec_l, intmax_t *vec_ki, intmax_t *vec_li, bwt_index *backward, bwt_index *forward, results_list *r_list) {
+
+	intmax_t _k, _l, _ki, _li, _k_aux, _l_aux, _ki_aux, _li_aux;
+	intmax_t results, results_last;
+
+	int16_t i, j, half, n;
+
+	result r;
+
+	n = end - start;
+	half = n / 2;
+
+	init_result(&r, 0);
+
+	bound_result(&r, start, end);
+
+	if (vec_k[0] <= vec_l[0]) {
+		change_result(&r, vec_k[0], vec_l[0], -1);
+		add_result(&r, r_list);
+	}
+
+	add_mismatch(&r, MATCH, -1, start);
+
+	results = vec_l[0] - vec_k[0];
+
+	results_last = results;
+	_k  = vec_k[1];
+	_l  = vec_l[1];
+	results = _l  - _k;
+
+	//printf("B -> %d: %d -> %d, %u, %u\n", 0, results, results_last, _k, _l);
+
+	if (results != results_last) {
+
+		//printf("*B -> %d: %d -> %d, %u, %u\n", 0, results, results_last, _k, _l);
+
+		//printf("%d: %d -> %d\n", 0, results, results_last);
+
+		//Deletion
+		change_result(&r, _k, _l, -1);
+		modify_last_mismatch3(&r, DELETION, -1, start);
+		add_result(&r, r_list);
+
+		for (uint8_t b=0;b<nA;b++) {
+
+			BWiteration(_k, _l, _k_aux, _l_aux, b, backward);
+			//printf("W -> %d, %d - %d\n", b, _k_aux, _l_aux);
+
+			if (_k_aux > _l_aux) continue;
+			//printf("*W -> %d, %d - %d\n", b, _k_aux, _l_aux);
+
+			uint8_t b_w = W[start];
+
+			//Missmatch
+			if (b!=b_w) {
+				change_result(&r, _k_aux, _l_aux, -1);
+				modify_last_mismatch2(&r, MISMATCH, b);
+				add_result(&r, r_list);
+			}
+
+			//Insertion
+			BWiteration(_k_aux, _l_aux, _k_aux, _l_aux, b_w, backward);
+
+			if (_k_aux <= _l_aux) {
+				change_result(&r, _k_aux, _l_aux, -1);
+				modify_last_mismatch3(&r, 3, INSERTION, b);
+				add_result(&r, r_list);
+			}
+
+		}
+
+	}
+
+	for (i=start+2, j=2; j<=half; i++, j++) {
+
+		results_last = results;
+		_k = vec_k[j];
+		_l = vec_l[j];
+		results = _l  - _k;
+
+		//printf("B -> %d: %d -> %d, %u, %u\n", j-1, results, results_last, _k, _l);
+
+		if (results == results_last) continue;
+
+		//printf("*B -> %d: %d -> %d, %u, %u\n", j-1, results, results_last, _k, _l);
+
+		//Deletion
+		change_result(&r, _k, _l, i-2);
+		modify_last_mismatch3(&r, DELETION, -1, i-1);
+		BWExactSearchBackward(W, backward, &r);
+		if (r.k<=r.l) add_result(&r, r_list);
+
+		for (uint8_t b=0;b<nA;b++) {
+
+			BWiteration(_k, _l, _k_aux, _l_aux, b, backward);
+
+			if (_k_aux > _l_aux) continue;
+
+			//Insertion
+			change_result(&r, _k_aux, _l_aux, i-1);
+			modify_last_mismatch2(&r, INSERTION, b);
+			BWExactSearchBackward(W, backward, &r);
+			if (r.k<=r.l) add_result(&r, r_list);
+
+			//Mismatch
+			if (b!=W[i-1]) {
+				change_result(&r, _k_aux, _l_aux, i-2);
+				modify_last_mismatch1(&r, MISMATCH);
+				BWExactSearchBackward(W, backward, &r);
+				if (r.k<=r.l) add_result(&r, r_list);
+			}
+
+		}
+
+	}
+
+	//printf("\n");
+
+	half--;
+	results = vec_li[n] - vec_ki[n];
+
+	r.dir=1; //Change direction
+
+	results_last = results;
+	_ki  = vec_ki[n-1];
+	_li  = vec_li[n-1];
+	results = _li - _ki;
+
+	//printf("F-> %d: %d -> %d, %u, %u\n", n, results, results_last, _ki, _li);
+
+	if (results != results_last) {
+
+		//printf("*F -> %d: %d -> %d, %u - %u\n", i+1, results, results_last, _ki, _li);
+
+		//Deletion
+		change_result(&r, _ki, _li, -1);
+		modify_last_mismatch3(&r, DELETION, -1, end);
+		add_result(&r, r_list);
+
+		for (uint8_t b=0;b<nA;b++) {
+
+			BWiteration(_ki, _li, _ki_aux, _li_aux, b, forward);
+
+			if (_ki_aux > _li_aux) continue;
+
+			uint8_t b_w = W[end];
+
+			//Mismatch
+			if (b!=b_w) {
+				change_result(&r, _ki_aux, _li_aux, -1);
+				modify_last_mismatch2(&r, MISMATCH, b);
+				add_result(&r, r_list);
+			}
+
+			//Insertion
+			BWiteration(_ki_aux, _li_aux, _ki_aux, _li_aux, b_w, forward);
+
+			//printf("\tI -> %d - %d\n", _ki_aux, _li_aux);
+
+			if (_ki_aux <= _li_aux){
+				change_result(&r, _ki_aux, _li_aux, -1);
+				modify_last_mismatch2(&r, INSERTION, b);
+				add_result(&r, r_list);
+			}
+
+		}
+
+	}
+
+	for(i=end-2,j=n-2; j>=half; i--, j--) {
+
+		results_last = results;
+		_ki  = vec_ki[j];
+		_li  = vec_li[j];
+		results = _li - _ki;
+
+		//printf("F -> %d: %d -> %d, %u - %u\n", i+1, results, results_last, _ki, _li);
+
+		if (results == results_last) continue;
+
+		//printf("*F -> %d: %d -> %d, %u - %u\n", i+1, results, results_last, _ki, _li);
+
+		//Deletion
+		change_result(&r, _ki, _li, i+2);
+		modify_last_mismatch3(&r, DELETION, -1, i+1);
+		BWExactSearchForward(W, forward, &r);
+		if (r.k<=r.l) add_result(&r, r_list);
+
+		for (uint8_t b=0;b<nA;b++) {
+
+			BWiteration(_ki, _li, _ki_aux, _li_aux, b, forward);
+
+			//printf("W -> %d, %d - %d\n", b, _ki_aux, _li_aux);
+
+			if (_ki_aux > _li_aux) continue;
+
+			//Insertion
+			change_result(&r, _ki_aux, _li_aux, i+1);
+			modify_last_mismatch2(&r, INSERTION, b);
+			BWExactSearchForward(W, forward, &r);
+			if (r.k<=r.l) add_result(&r, r_list);
+
+			//Mismatch
+			if (b!= W[i+1]) {
+				change_result(&r, _ki_aux, _li_aux, i+2);
+				modify_last_mismatch1(&r, MISMATCH);
+				BWExactSearchForward(W, forward, &r);
+				if (r.k<=r.l) add_result(&r, r_list);
+			}
+
+		}
+
+	}
+
+	//printf("\n");
+
+	return false;
+
+}
+
+bool BWSearch1GPUHelper(uint8_t *W, int16_t start, int16_t end, uint32_t *vec_k, uint32_t *vec_l, uint32_t *vec_ki, uint32_t *vec_li, bwt_index *backward, bwt_index *forward, results_list *r_list) {
 
 	intmax_t _k, _l, _ki, _li, _k_aux, _l_aux, _ki_aux, _li_aux;
 	intmax_t results, results_last;

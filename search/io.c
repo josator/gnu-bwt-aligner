@@ -1,5 +1,7 @@
 #include "io.h"
 
+#define MAXLINE 1000
+
 void load_exome_file(exome *ex, const char *directory) {
 
   FILE *fp;

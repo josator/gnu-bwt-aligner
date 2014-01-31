@@ -10,6 +10,8 @@
 #define NUM_CARDS 2
 #define RESULTS 2000
 
+int MAXLINE;
+
 char *h_Worig, *h_Worig2, *h_Worig3;
 uint8_t *h_We, *h_We2, *h_We3;
 uint64_t *h_nWe, *h_nWe2, *h_nWe3;
@@ -25,18 +27,18 @@ comp_matrix h_O, h_rO, h_Oi, h_rOi;
 vector h_C, h_rC, h_C1, h_rC1;
 comp_vector S, Si;
 
-intmax_t *h_k, *h_l, *h_k2, *h_l2;
-intmax_t *h_ki, *h_li, *h_ki2, *h_li2;
+uint32_t *h_k, *h_l, *h_k2, *h_l2;
+uint32_t *h_ki, *h_li, *h_ki2, *h_li2;
 
-intmax_t *gpu_h_k, *gpu_h_l;
-intmax_t *store_h_k, *store_h_l;
-intmax_t *swap_h_k, *swap_h_l;
+uint32_t *gpu_h_k, *gpu_h_l;
+uint32_t *store_h_k, *store_h_l;
+uint32_t *swap_h_k, *swap_h_l;
 
-intmax_t *gpu_h_ki, *gpu_h_li;
-intmax_t *store_h_ki, *store_h_li;
-intmax_t *swap_h_ki, *swap_h_li;
+uint32_t *gpu_h_ki, *gpu_h_li;
+uint32_t *store_h_ki, *store_h_li;
+uint32_t *swap_h_ki, *swap_h_li;
 
-intmax_t *k, *l;
+uint32_t *k, *l;
 
 cudaError_t error;
 
@@ -65,8 +67,8 @@ void *writeResults(void *threadid) {
 	char plusminus[] = "-+";
 	uintmax_t index, key;
 
-	intmax_t *h_kaux, *h_laux;
-	intmax_t *h_kiaux, *h_liaux;
+	uint32_t *h_kaux, *h_laux;
+	uint32_t *h_kiaux, *h_liaux;
 
 	uintmax_t w=0;
 
@@ -184,7 +186,7 @@ void *writeResults(void *threadid) {
 
 						//fprintf(output_file, "%u - %u\n", h_kaux[i], h_laux[i]);
 
-						for (intmax_t j=h_kaux[i]; j<=h_laux[i]; j++) {
+						for (uint32_t j=h_kaux[i]; j<=h_laux[i]; j++) {
 
 							key = get_SA(j, &backward);
 
@@ -266,7 +268,7 @@ void *writeResults(void *threadid) {
 									);
 
 							found2 = false;
-							found2 = write_results(&r_list, k, l, &ex, &backward, &forward, store_Worig + i*MAXLINE, store_nWe[i], type, output_file);
+							found2 = write_results_gpu(&r_list, k, l, &ex, &backward, &forward, store_Worig + i*MAXLINE, store_nWe[i], type, output_file);
 							found = found || found2;
 
 						} else {
@@ -285,7 +287,7 @@ void *writeResults(void *threadid) {
 									);
 
 							found2 = false;
-							found2 = write_results(&r_list, k, l, &ex, &backward, &forward, store_Worig + i*MAXLINE, store_nWe[i], type, output_file);
+							found2 = write_results_gpu(&r_list, k, l, &ex, &backward, &forward, store_Worig + i*MAXLINE, store_nWe[i], type, output_file);
 							found = found || found2;
 
 						}
@@ -329,7 +331,7 @@ void *writeResults(void *threadid) {
 
 		uint8_t *d_We;
 		uint64_t *d_nWe;
-		intmax_t *d_k, *d_l;
+		uint32_t *d_k, *d_l;
 
 		cudaSetDevice(tid);
 		manageCudaError();
@@ -372,9 +374,9 @@ void *writeResults(void *threadid) {
 		//printf("%d -> Termina vector O\n", tid);
 
 		//printf("%d -> Vector k l\n", tid);
-		cudaMalloc((void**) &d_k,   MAX_READ_GPU * MAXLINE * sizeof(intmax_t));
+		cudaMalloc((void**) &d_k,   MAX_READ_GPU * MAXLINE * sizeof(uint32_t));
 		manageCudaError();
-		cudaMalloc((void**) &d_l,   MAX_READ_GPU * MAXLINE * sizeof(intmax_t));
+		cudaMalloc((void**) &d_l,   MAX_READ_GPU * MAXLINE * sizeof(uint32_t));
 		manageCudaError();
 		//printf("%d -> Termina k l\n", tid);
 
@@ -463,18 +465,18 @@ void *writeResults(void *threadid) {
 
 				if (tid) {
 					//printf("%d -> Lanzo kernel 0 - %lu\n", tid, d_O.siz-2);
-					BWExactSearchBackwardGPUWrapper(num_bloques_gpu, TAM_BLOQUE_GPU, d_We, d_nWe, d_k, d_l, 0, d_O.siz-2, &d_C, &d_C1, &d_O);
+					BWExactSearchBackwardGPUWrapper(num_bloques_gpu, TAM_BLOQUE_GPU, d_We, d_nWe, MAXLINE, d_k, d_l, 0, d_O.siz-2, &d_C, &d_C1, &d_O);
 					manageCudaError();
 				} else {
 					//printf("%d -> Lanzo kernel 0 - %lu\n", tid, d_O.siz-2);
-					BWExactSearchForwardGPUWrapper(num_bloques_gpu, TAM_BLOQUE_GPU, d_We, d_nWe, d_k, d_l, 0, d_O.siz-2, &d_rC, &d_rC1, &d_O);
+					BWExactSearchForwardGPUWrapper(num_bloques_gpu, TAM_BLOQUE_GPU, d_We, d_nWe, MAXLINE, d_k, d_l, 0, d_O.siz-2, &d_rC, &d_rC1, &d_O);
 					manageCudaError();
 				}
 
 				//printf("%d -> Copia %d resultados a la CPU\n", tid, tam_read_gpu2);
-				cudaMemcpy(gpu_h_k + MAX_READ_GPU * tid, d_k, sizeof(intmax_t) * tam_bus_gpu, cudaMemcpyDeviceToHost);
+				cudaMemcpy(gpu_h_k + MAX_READ_GPU * tid, d_k, sizeof(uint32_t) * tam_bus_gpu, cudaMemcpyDeviceToHost);
 				manageCudaError();
-				cudaMemcpy(gpu_h_l + MAX_READ_GPU * tid, d_l, sizeof(intmax_t) * tam_bus_gpu, cudaMemcpyDeviceToHost);
+				cudaMemcpy(gpu_h_l + MAX_READ_GPU * tid, d_l, sizeof(uint32_t) * tam_bus_gpu, cudaMemcpyDeviceToHost);
 				manageCudaError();
 				//printf("%d -> Termina de copiar %d resultados a la CPU\n", tid, tam_read_gpu2);
 
@@ -483,41 +485,41 @@ void *writeResults(void *threadid) {
 				if (tid) {
 
 					//printf("%d -> Lanzo kernel 0 - %lu\n", tid, d_O.siz-2);
-					BWExactSearchBackwardVectorGPUWrapper(num_bloques_gpu, TAM_BLOQUE_GPU, d_We, d_nWe, d_k, d_l, 0, d_O.siz-2, &d_C, &d_C1, &d_O);
+					BWExactSearchBackwardVectorGPUWrapper(num_bloques_gpu, TAM_BLOQUE_GPU, d_We, d_nWe, MAXLINE, d_k, d_l, 0, d_O.siz-2, &d_C, &d_C1, &d_O);
 					manageCudaError();
 
-					cudaMemcpy(gpu_h_k + MAX_READ_GPU * MAXLINE, d_k, sizeof(intmax_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
+					cudaMemcpy(gpu_h_k + MAX_READ_GPU * MAXLINE, d_k, sizeof(uint32_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
 					manageCudaError();
-					cudaMemcpy(gpu_h_l + MAX_READ_GPU * MAXLINE, d_l, sizeof(intmax_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
+					cudaMemcpy(gpu_h_l + MAX_READ_GPU * MAXLINE, d_l, sizeof(uint32_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
 					manageCudaError();
 
 					//printf("%d -> Lanzo kernel 0 - %lu\n", tid, d_rO.siz-2);
-					BWExactSearchForwardVectorGPUWrapper(num_bloques_gpu, TAM_BLOQUE_GPU, d_We, d_nWe, d_k, d_l, 0, d_rO.siz-2, &d_rC, &d_rC1, &d_rO);
+					BWExactSearchForwardVectorGPUWrapper(num_bloques_gpu, TAM_BLOQUE_GPU, d_We, d_nWe, MAXLINE, d_k, d_l, 0, d_rO.siz-2, &d_rC, &d_rC1, &d_rO);
 					manageCudaError();
 
-					cudaMemcpy(gpu_h_k,                          d_k, sizeof(intmax_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
+					cudaMemcpy(gpu_h_k,                          d_k, sizeof(uint32_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
 					manageCudaError();
-					cudaMemcpy(gpu_h_l,                          d_l, sizeof(intmax_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
+					cudaMemcpy(gpu_h_l,                          d_l, sizeof(uint32_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
 					manageCudaError();
 
 				} else {
 
 					//printf("%d -> Lanzo kernel 0 - %lu\n", tid, d_O.siz-2);
-					BWExactSearchForwardVectorGPUWrapper(num_bloques_gpu, TAM_BLOQUE_GPU, d_We, d_nWe, d_k, d_l, 0, d_O.siz-2, &d_C, &d_C1, &d_O);
+					BWExactSearchForwardVectorGPUWrapper(num_bloques_gpu, TAM_BLOQUE_GPU, d_We, d_nWe, MAXLINE, d_k, d_l, 0, d_O.siz-2, &d_C, &d_C1, &d_O);
 					manageCudaError();
 
-					cudaMemcpy(gpu_h_ki + MAX_READ_GPU * MAXLINE, d_k, sizeof(intmax_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
+					cudaMemcpy(gpu_h_ki + MAX_READ_GPU * MAXLINE, d_k, sizeof(uint32_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
 					manageCudaError();
-					cudaMemcpy(gpu_h_li + MAX_READ_GPU * MAXLINE, d_l, sizeof(intmax_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
+					cudaMemcpy(gpu_h_li + MAX_READ_GPU * MAXLINE, d_l, sizeof(uint32_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
 					manageCudaError();
 
 					//printf("%d -> Lanzo kernel 0 - %lu\n", tid, d_rO.siz-2);
-					BWExactSearchBackwardVectorGPUWrapper(num_bloques_gpu, TAM_BLOQUE_GPU, d_We, d_nWe, d_k, d_l, 0, d_rO.siz-2, &d_rC, &d_rC1, &d_rO);
+					BWExactSearchBackwardVectorGPUWrapper(num_bloques_gpu, TAM_BLOQUE_GPU, d_We, d_nWe, MAXLINE, d_k, d_l, 0, d_rO.siz-2, &d_rC, &d_rC1, &d_rO);
 					manageCudaError();
 
-					cudaMemcpy(gpu_h_ki,                          d_k, sizeof(intmax_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
+					cudaMemcpy(gpu_h_ki,                          d_k, sizeof(uint32_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
 					manageCudaError();
-					cudaMemcpy(gpu_h_li,                          d_l, sizeof(intmax_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
+					cudaMemcpy(gpu_h_li,                          d_l, sizeof(uint32_t) * tam_bus_gpu * MAXLINE, cudaMemcpyDeviceToHost);
 					manageCudaError();
 
 				}
@@ -553,10 +555,11 @@ void *writeResults(void *threadid) {
 
 		FILE *queries_file;
 
-		check_syntax(argc, 7, "search_gpu f_mappings d_transform f_output f_notfound num_errors nucleotides");
+		check_syntax(argc, 8, "search_gpu f_mappings d_transform f_output f_notfound num_errors max_length nucleotides");
 
 		num_errors = atoi(argv[5]);
-		init_replace_table(argv[6]);
+		MAXLINE = atoi(argv[6]);
+		init_replace_table(argv[7]);
 
 		read_vector(&h_C,  argv[2], "C");
 		read_vector(&h_C1, argv[2], "C1");
@@ -615,39 +618,39 @@ void *writeResults(void *threadid) {
 
 		if (!num_errors) {
 
-			h_k  = (intmax_t*)malloc(MAX_READ_GPU * NUM_CARDS * sizeof(intmax_t));
+			h_k  = (uint32_t*)malloc(MAX_READ_GPU * NUM_CARDS * sizeof(uint32_t));
 			check_malloc(h_k, "main");
-			h_l  = (intmax_t*)malloc(MAX_READ_GPU * NUM_CARDS * sizeof(intmax_t));
+			h_l  = (uint32_t*)malloc(MAX_READ_GPU * NUM_CARDS * sizeof(uint32_t));
 			check_malloc(h_l, "main");
-			h_k2 = (intmax_t*)malloc(MAX_READ_GPU * NUM_CARDS * sizeof(intmax_t));
+			h_k2 = (uint32_t*)malloc(MAX_READ_GPU * NUM_CARDS * sizeof(uint32_t));
 			check_malloc(h_k2, "main");
-			h_l2 = (intmax_t*)malloc(MAX_READ_GPU * NUM_CARDS * sizeof(intmax_t));
+			h_l2 = (uint32_t*)malloc(MAX_READ_GPU * NUM_CARDS * sizeof(uint32_t));
 			check_malloc(h_l2, "main");
 
 		} else {
 
-			h_k  = (intmax_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(intmax_t));
+			h_k  = (uint32_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(uint32_t));
 			check_malloc(h_k, "main");
-			h_l  = (intmax_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(intmax_t));
+			h_l  = (uint32_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(uint32_t));
 			check_malloc(h_l, "main");
-			h_k2 = (intmax_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(intmax_t));
+			h_k2 = (uint32_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(uint32_t));
 			check_malloc(h_k2, "main");
-			h_l2 = (intmax_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(intmax_t));
+			h_l2 = (uint32_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(uint32_t));
 			check_malloc(h_l2, "main");
 
-			h_ki  = (intmax_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(intmax_t));
+			h_ki  = (uint32_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(uint32_t));
 			check_malloc(h_ki, "main");
-			h_li  = (intmax_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(intmax_t));
+			h_li  = (uint32_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(uint32_t));
 			check_malloc(h_li, "main");
-			h_ki2 = (intmax_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(intmax_t));
+			h_ki2 = (uint32_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(uint32_t));
 			check_malloc(h_ki2, "main");
-			h_li2 = (intmax_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(intmax_t));
+			h_li2 = (uint32_t*)malloc(MAX_READ_GPU * MAXLINE * NUM_CARDS * sizeof(uint32_t));
 			check_malloc(h_li2, "main");
 
 		}
 
-		k = (intmax_t*)malloc(RESULTS * sizeof(intmax_t));
-		l = (intmax_t*)malloc(RESULTS * sizeof(intmax_t));
+		k = (uint32_t*)malloc(RESULTS * sizeof(uint32_t));
+		l = (uint32_t*)malloc(RESULTS * sizeof(uint32_t));
 
 		read_Worig = h_Worig; gpu_Worig = h_Worig2; store_Worig = h_Worig3;
 		read_We = h_We; gpu_We = h_We2; store_We = h_We3;

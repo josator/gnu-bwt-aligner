@@ -8,6 +8,8 @@
 #include "../search/io.h"
 #include "../csalib/csa.h"
 
+#define MAXLINE 1000
+
 int main(int argc, char **argv) {
 
 	bwt_index backward, forward;

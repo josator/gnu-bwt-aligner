@@ -194,7 +194,9 @@ bool BWSearchCPU(uint8_t *W, uint64_t nW, bwt_index *backward, bwt_index *forwar
 void BWExactSearchVectorBackward(uint8_t *W, int16_t start, int16_t end, intmax_t k, intmax_t l, intmax_t *vec_k, intmax_t *vec_l, bwt_index *index);
 void BWExactSearchVectorForward(uint8_t *W, int16_t start, int16_t end, intmax_t k, intmax_t l, intmax_t *vec_k, intmax_t *vec_l, bwt_index *index);
 
-bool BWSearch1GPUHelper(uint8_t *W, int16_t start, int16_t end, intmax_t *vec_k, intmax_t *vec_l, intmax_t *vec_ki, intmax_t *vec_li, bwt_index *backward, bwt_index *forward, results_list *r_list);
+bool BWSearch1Helper(uint8_t *W, int16_t start, int16_t end, intmax_t *vec_k, intmax_t *vec_l, intmax_t *vec_ki, intmax_t *vec_li, bwt_index *backward, bwt_index *forward, results_list *r_list);
+
+bool BWSearch1GPUHelper(uint8_t *W, int16_t start, int16_t end, uint32_t *vec_k, uint32_t *vec_l, uint32_t *vec_ki, uint32_t *vec_li, bwt_index *backward, bwt_index *forward, results_list *r_list);
 
 bool BWSearch1CPU(uint8_t *W, bwt_index *backward, bwt_index *forward, result *res, results_list *r_list);
 

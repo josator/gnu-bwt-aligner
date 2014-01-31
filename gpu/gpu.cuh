@@ -44,11 +44,11 @@ void free_comp_matrix_gpu_device(comp_matrix *reverse, comp_matrix *strand);
 
 void reverse_strand_gpu_O(comp_matrix *r_O, comp_matrix *s_O);
 
-void BWExactSearchBackwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, intmax_t* k, intmax_t* l, intmax_t k_ini, intmax_t l_ini, vector* C, vector* C1, comp_matrix* O);
-void BWExactSearchForwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, intmax_t* k, intmax_t* l, intmax_t k_ini, intmax_t l_ini, vector* C, vector* C1, comp_matrix* O);
+void BWExactSearchBackwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, int MAXLINE, uint32_t* k, uint32_t* l, uint32_t k_ini, uint32_t l_ini, vector* C, vector* C1, comp_matrix* O);
+void BWExactSearchForwardGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, int MAXLINE, uint32_t* k, uint32_t* l, uint32_t k_ini, uint32_t l_ini, vector* C, vector* C1, comp_matrix* O);
 
-void BWExactSearchBackwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, intmax_t* k, intmax_t* l, intmax_t k_ini, intmax_t l_ini, vector* C, vector* C1, comp_matrix* O);
-void BWExactSearchForwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, intmax_t* k, intmax_t* l, intmax_t k_ini, intmax_t l_ini, vector* C, vector* C1, comp_matrix* O);
+void BWExactSearchBackwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, int MAXLINE, uint32_t* k, uint32_t* l, uint32_t k_ini, uint32_t l_ini, vector* C, vector* C1, comp_matrix* O);
+void BWExactSearchForwardVectorGPUWrapper(uintmax_t num_bloques, uintmax_t tam_bloques, uint8_t* W, uint64_t* nW, int MAXLINE, uint32_t* k, uint32_t* l, uint32_t k_ini, uint32_t l_ini, vector* C, vector* C1, comp_matrix* O);
 
 #ifdef __cplusplus
 }
