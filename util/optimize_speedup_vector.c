@@ -9,12 +9,13 @@
 #include "../search/io.h"
 
 #define TAM_BLOQUE_GPU 32
+#define RESULTS 100
 
 int MAXLINE;
 
 float t_cpu=0, t_gpu=0;
 int NUM_REP;
-FILE *output_file;
+FILE *queries_file, *output_file;
 
 int MAX_BUS_GPU;
 int READS_PER_THREAD=0;
@@ -25,17 +26,22 @@ int main(int argc, char **argv) {
   uint64_t *h_nWe, *d_nWe;
 
   uint32_t *h_k, *h_l, *d_k, *d_l;
+  uint32_t *h_ki, *h_li, *d_ki, *d_li;
 	intmax_t *h_k2, *h_l2;
+	intmax_t *h_ki2, *h_li2;
 
-	bwt_index backward;
+	bwt_index backward, forward;
 
-  comp_matrix h_O, d_O;
+	exome ex;
+
+  comp_matrix h_O, d_O, h_Oi, d_Oi;
   vector h_C, d_C, h_C1, d_C1;
-  comp_vector h_S;
+  comp_vector h_S, h_Si;
+
+	results_list *r_lists;
+	uint32_t *k, *l;
 
   cudaSetDevice(0);
-
-  FILE *queries_file;
 
   cudaError_t error;
 
@@ -47,11 +53,10 @@ int main(int argc, char **argv) {
   timevars();
   init_replace_table(argv[7]);
 
-  queries_file = fopen(argv[1], "r");
-  if (!queries_file) {
-    fprintf(stderr, "Error opening file: %s\n", argv[1]);
-      return -1;
-  }
+	queries_file = fopen(argv[1], "r");
+	check_file_open(queries_file, argv[1]);
+	output_file = fopen(argv[3], "w");
+	check_file_open(output_file, argv[3]);
 
   MAX_BUS_GPU = atoi(argv[4]);
 	MAXLINE = atoi(argv[6]);
@@ -65,17 +70,25 @@ int main(int argc, char **argv) {
   copy_vector_gpu(&d_C1,  &h_C1);
 
   read_comp_matrix_gpu(&h_O, argv[2], "O");
+  read_comp_matrix_gpu(&h_Oi, argv[2], "Oi");
 
   copy_comp_matrix_gpu(&d_O, &h_O);
+  copy_comp_matrix_gpu(&d_Oi, &h_Oi);
 
   read_comp_vector(&h_S, argv[2], "S");
+  read_comp_vector(&h_Si, argv[2], "Si");
 
 	backward.C  = h_C;
 	backward.C1 = h_C1;
 	backward.O  = h_O;
 	backward.S  = h_S;
 
-  toc();
+	forward.C  = h_C;
+	forward.C1 = h_C1;
+	forward.O  = h_Oi;
+	forward.S  = h_Si;
+
+	load_exome_file(&ex, argv[2]);
 
   h_Worig = (char*)malloc(MAX_BUS_GPU * MAXLINE     * sizeof(char));
  
@@ -89,14 +102,33 @@ int main(int argc, char **argv) {
 
   cudaMallocHost((void**) &h_k, MAX_BUS_GPU * MAXLINE * sizeof(uint32_t));
   cudaMallocHost((void**) &h_l, MAX_BUS_GPU * MAXLINE * sizeof(uint32_t));
+  cudaMallocHost((void**) &h_ki, MAX_BUS_GPU * MAXLINE * sizeof(uint32_t));
+  cudaMallocHost((void**) &h_li, MAX_BUS_GPU * MAXLINE * sizeof(uint32_t));
 
   cudaMallocHost((void**) &h_k2, MAX_BUS_GPU * MAXLINE * sizeof(intmax_t));
   cudaMallocHost((void**) &h_l2, MAX_BUS_GPU * MAXLINE * sizeof(intmax_t));
+  cudaMallocHost((void**) &h_ki2, MAX_BUS_GPU * MAXLINE * sizeof(intmax_t));
+  cudaMallocHost((void**) &h_li2, MAX_BUS_GPU * MAXLINE * sizeof(intmax_t));
 
-  cudaMalloc((void**) &d_k, MAX_BUS_GPU * MAXLINE * sizeof(uint32_t));
+	cudaMalloc((void**) &d_k, MAX_BUS_GPU * MAXLINE * sizeof(uint32_t));
   manageCudaError();
   cudaMalloc((void**) &d_l, MAX_BUS_GPU * MAXLINE * sizeof(uint32_t));
   manageCudaError();
+	cudaMalloc((void**) &d_ki, MAX_BUS_GPU * MAXLINE * sizeof(uint32_t));
+  manageCudaError();
+  cudaMalloc((void**) &d_li, MAX_BUS_GPU * MAXLINE * sizeof(uint32_t));
+  manageCudaError();
+
+	r_lists = (results_list *) malloc(MAX_BUS_GPU * sizeof(results_list));
+
+	for (int i=0; i<MAX_BUS_GPU; i++) {
+			new_results_list(&r_lists[i], RESULTS);
+	}
+
+	k = (uint32_t*)malloc(RESULTS * sizeof(uint32_t));
+	l = (uint32_t*)malloc(RESULTS * sizeof(uint32_t));	
+
+  toc();
 
   int TAM_BUS_GPU=0, NUM_BLOQUES_GPU=0;
 
@@ -128,6 +160,7 @@ int main(int argc, char **argv) {
 	cudaThreadSynchronize();
   tic("GPU Kernel");
   BWExactSearchBackwardVectorGPUWrapper(NUM_BLOQUES_GPU, TAM_BLOQUE_GPU, d_We, d_nWe, MAXLINE, d_k, d_l, 0, d_O.siz-2, &d_C, &d_C1, &d_O);
+  BWExactSearchForwardVectorGPUWrapper(NUM_BLOQUES_GPU, TAM_BLOQUE_GPU, d_We, d_nWe, MAXLINE, d_ki, d_li, 0, d_Oi.siz-2, &d_C, &d_C1, &d_Oi);
   cudaThreadSynchronize();
   toc();
 
@@ -136,17 +169,72 @@ int main(int argc, char **argv) {
   cudaMemcpy(h_k, d_k, sizeof(uint32_t) * TAM_BUS_GPU * MAXLINE, cudaMemcpyDeviceToHost);
   manageCudaError();
   cudaMemcpy(h_l, d_l, sizeof(uint32_t) * TAM_BUS_GPU * MAXLINE, cudaMemcpyDeviceToHost);
+  manageCudaError();
+  cudaMemcpy(h_ki, d_ki, sizeof(uint32_t) * TAM_BUS_GPU * MAXLINE, cudaMemcpyDeviceToHost);
+  manageCudaError();
+  cudaMemcpy(h_li, d_li, sizeof(uint32_t) * TAM_BUS_GPU * MAXLINE, cudaMemcpyDeviceToHost);
   manageCudaError();  
   cudaThreadSynchronize();
   toc();
 
-  tic("CPU kernel");
+  tic("CPU Vector");
   for (int i=0; i<TAM_BUS_GPU; i++) {
     BWExactSearchVectorBackward(h_We + MAXLINE*i, 0, h_nWe[i]-1, 0, d_O.siz-2, h_k2 + MAXLINE*i, h_l2 + MAXLINE*i, &backward);
+	  BWExactSearchVectorForward(h_We + MAXLINE*i, 0, h_nWe[i]-1, 0, d_Oi.siz-2, h_ki2 + MAXLINE*i, h_li2 + MAXLINE*i, &forward);
+
   }
   toc();
 
-  /*
+  tic("CPU Search 1 error");
+  for (int i=0; i<TAM_BUS_GPU; i++) {
+
+	 result res;
+   init_result(&res, 1);
+   bound_result(&res, 0, h_nWe[i]-1);
+   change_result(&res, 0, h_O.siz-2, h_nWe[i]-1);
+
+	 r_lists[i].num_results = 0;
+	 r_lists[i].read_index = i;
+
+	 BWSearch1CPU(
+			h_We + i * MAXLINE,
+			&backward,
+		  &forward,
+			&res,
+		  &r_lists[i]);
+
+	}
+	toc();
+
+  tic("CPU Search 1 Error Helper");
+  for (int i=0; i<TAM_BUS_GPU; i++) {
+
+		r_lists[i].num_results = 0;
+		r_lists[i].read_index = i;
+
+		BWSearch1GPUHelper(
+				h_We + i * MAXLINE,
+				0,
+				h_nWe[i]-1,
+				h_k  + i*MAXLINE,
+				h_l  + i*MAXLINE,
+				h_ki + i*MAXLINE,
+				h_li + i*MAXLINE,
+				&backward,
+				&forward,
+				&r_lists[i]
+				);
+
+	}
+	toc();
+
+	tic("Write results");
+	for (int i=0; i<TAM_BUS_GPU; i++) {
+		write_results_gpu(&r_lists[i], k, l, &ex, &backward, &forward, h_Worig + i*MAXLINE, h_nWe[i], 1, output_file);
+	}
+	toc();
+
+	/*
   for (int i=0; i<TAM_BUS_GPU; i++) {
 
     for (int j=0; j<h_nWe[i]; j++) {
