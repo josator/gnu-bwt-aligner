@@ -1,6 +1,6 @@
 COMMONS_DIR = commons/
 
-.PHONY: all clean bindir dbwt csalib util
+.PHONY: all clean bindir dbwt csalib util gpu-tools
 
 all: bindir dbwt csalib util
 

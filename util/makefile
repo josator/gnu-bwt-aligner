@@ -8,7 +8,7 @@ NVCC = nvcc
 CFLAGS = -Wall -m64 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -O9 -fPIC -std=c99 -fopenmp -DFM_COMP_64 #-DCSALIB_SEARCH -DSA_64 -msse4.2 -DVERBOSE_DBG
 CFLAGSCUDA = -Wall -m64 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -O9 -fPIC -std=c99 -fopenmp -DFM_COMP_64 -I $(CUDA_LOCATION)/include/ -L /usr/local/cuda/lib64/ -lcudart #-DSA_64 -DCSALIB_SEARCH -msse4.2 -DVERBOSE_DBG
 
-.PHONY: all gpu-tools clean
+.PHONY: all gpu-tools dbwt csalib search gpu commons clean
 
 all: ../bin/preprocess_dbwt_old ../bin/preprocess_dbwt_new ../bin/exact_search ../bin/inexact_search
 
