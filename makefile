@@ -4,9 +4,6 @@ COMMONS_DIR = commons/
 
 all: bindir dbwt csalib util
 
-gpu:
-	make -C gpu/ all
-
 bindir:
 	-mkdir -f bin
 
@@ -18,6 +15,9 @@ csalib:
 
 util:
 	make -C util/ all
+
+gpu-tools:
+	make -C util/ gpu-tools
 
 clean:
 	make -C $(COMMONS_DIR) clean
