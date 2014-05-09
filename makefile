@@ -4,6 +4,9 @@ COMMONS_DIR = commons/
 
 all: bindir dbwt csalib util
 
+gpu:
+	make -C gpu/ all
+
 bindir:
 	-mkdir -f bin
 
