@@ -4,7 +4,7 @@ COMMONS_DIR = ../commons/
 CUDA_LOCATION=/usr/local/cuda
 
 CC = gcc
-CFLAGS = -Wall -m64 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -O9 -fPIC -fopenmp -std=c99 -DFM_COMP_64 #-DCSALIB_SEARCH -DSA_64 -msse4.2 -DVERBOSE_DBG
+CFLAGS = -Wall -m64 -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -fPIC -fopenmp -O9 -std=c99 -DFM_COMP_64 #-DCSALIB_SEARCH -DSA_64 -msse4.2 -DVERBOSE_DBG
 CFLAGSCUDA = -I $(CUDA_LOCATION)/include/ -L $(CUDA_LOCATION)/lib64/ -lcudart
 
 .PHONY: all gpu-tools dbwt csalib search gpu commons clean

@@ -130,8 +130,8 @@ inline void manage_single_result(result *r, exome* ex, bwt_index *backward, bwt_
 	uintmax_t index, index2, key, key2;
 	int type2=0;
 
-	char mask[6*(1001)];
-	char mask_aux[6];
+	char mask[10*(1001)];
+	char mask_aux[10];
 
 	if        (type==0) {
 		direction = !r->dir;
