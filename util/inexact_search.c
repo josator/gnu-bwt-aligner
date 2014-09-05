@@ -55,7 +55,7 @@ void *writeResults(void *threadid) {
 
 		pthread_mutex_lock(&print_results);
 
-		printf("W -> Para\n");
+		//printf("W -> Para\n");
 
 		while(start_write!=1) {
 			pthread_cond_wait(&start_time_write, &print_results);
@@ -63,7 +63,7 @@ void *writeResults(void *threadid) {
 
 		start_write=0;
 
-		printf("W -> Sigue\n");
+		//printf("W -> Sigue\n");
 
 		pthread_mutex_unlock(&print_results);
 
@@ -74,13 +74,13 @@ void *writeResults(void *threadid) {
 			fflush(notfound_file);
 			fclose(notfound_file);
 
-			printf("W -> Saliendo\n");
+			//printf("W -> Saliendo\n");
 			printf("%lu founds of %ju -> found %.2f, discarded %ju\n", contador, total, contador * 100.0 / total, descartadas * 100 / total);
 			pthread_exit(NULL);
 
 		}
 
-		printf("W -> Swap buffers\n");
+		//printf("W -> Swap buffers\n");
 
 		tam_write = tam_read_gpu2;
 
@@ -106,7 +106,7 @@ void *writeResults(void *threadid) {
 
 		pthread_mutex_lock(&print_results);
 
-		printf("W -> Ordena seguir a los hilos de búsqueda GPU\n");
+		//printf("W -> Ordena seguir a los hilos de búsqueda GPU\n");
 
 		stop_write = 1;
 
@@ -114,7 +114,7 @@ void *writeResults(void *threadid) {
 
 		pthread_mutex_unlock(&print_results);
 
-		printf("W -> Empieza a escribir %d resultados\n", tam_write);
+		//printf("W -> Empieza a escribir %d resultados\n", tam_write);
 
 		gettimeofday(&t1_write, NULL);
 
@@ -167,7 +167,7 @@ void *writeResults(void *threadid) {
 		t_gpu = (t2_write.tv_sec-t1_write.tv_sec)*1e6+(t2_write.tv_usec-t1_write.tv_usec);
 		t_write += t_gpu;
 
-		printf("W -> Termina de escribir hasta el resultado %d\n", w*MAX_READ_THREAD);
+		//printf("W -> Termina de escribir hasta el resultado %d\n", w*MAX_READ_THREAD);
 
 	}
 
@@ -191,7 +191,7 @@ void *cpuSearch(void *threadid) {
 	while(1) {
 
 		pthread_mutex_lock(&gpu_time_thread);
-		printf("%d -> Espera lectura\n", tid);
+		//printf("%d -> Espera lectura\n", tid);
 
 		while(!start) {
 			pthread_cond_wait(&start_time, &gpu_time_thread);
@@ -199,7 +199,7 @@ void *cpuSearch(void *threadid) {
 
 		start=0;
 
-		printf("%d -> Sigue\n", tid);
+		//printf("%d -> Sigue\n", tid);
 
 		pthread_mutex_unlock(&gpu_time_thread);
 
@@ -207,7 +207,7 @@ void *cpuSearch(void *threadid) {
 
 			pthread_mutex_lock(&print_results);
 
-			printf("%d -> Ordena terminar al hilo de escritura\n", tid);
+			//printf("%d -> Ordena terminar al hilo de escritura\n", tid);
 
 			start_write++;
 			end_write=1;
@@ -216,13 +216,13 @@ void *cpuSearch(void *threadid) {
 
 			pthread_mutex_unlock(&print_results);
 
-			printf("%d -> Saliendo\n", tid);
+			//printf("%d -> Saliendo\n", tid);
 
 			pthread_exit(NULL);
 
 		}
 
-		printf("%d -> Copia vectores\n", tid);
+		//printf("%d -> Copia vectores\n", tid);
 
 		tam_read_gpu2 = tam_read_gpu;
 
@@ -234,7 +234,7 @@ void *cpuSearch(void *threadid) {
 			g_nWe[i] = read_nWe[i];
 		}
 
-		printf("%d -> Ordena seguir al hilo de lectura\n", tid);
+		//printf("%d -> Ordena seguir al hilo de lectura\n", tid);
 
 		pthread_mutex_lock(&gpu_time_thread);
 
@@ -322,12 +322,12 @@ void *cpuSearch(void *threadid) {
 
 		pthread_mutex_lock(&print_results);
 
-		printf("%d -> Ordena continuar al hilo de escritura\n", tid);
+		//printf("%d -> Ordena continuar al hilo de escritura\n", tid);
 		start_write++;
 
 		pthread_cond_signal(&start_time_write);
 
-		printf("%d -> Espera escritura\n", tid);
+		//printf("%d -> Espera escritura\n", tid);
 
 		while(!stop_write) {
 			pthread_cond_wait(&stop_time_write, &print_results);
@@ -335,7 +335,7 @@ void *cpuSearch(void *threadid) {
 
 		stop_write=0;
 
-		printf("%d -> Sigue\n", tid);
+		//printf("%d -> Sigue\n", tid);
 
 		pthread_mutex_unlock(&print_results);
 
@@ -440,21 +440,21 @@ int main(int argc, char **argv) {
 	}
 
 	rc = pthread_create(&write_thread, &attr, writeResults, (void *)1);
-	if (rc){                                                                  
+	if (rc){
 		fprintf(stderr, "ERROR; return code from pthread_create() on writeResults thread %d is %d\n", 1, rc);
 		return 1;
 	}
 
-	printf("L -> Antes de cargar el fichero del exoma\n");
+	//printf("L -> Antes de cargar el fichero del exoma\n");
 	load_exome_file(&ex, argv[2]);
 
-	printf("L -> Antes del bucle de lecturas\n");
+	//printf("L -> Antes del bucle de lecturas\n");
 
 	bool exit=true;
 
 	while (exit) {
 
-		printf("L -> Empieza a leer\n");
+		//printf("L -> Empieza a leer\n");
 
 		while (exit) {
 
@@ -466,7 +466,7 @@ int main(int argc, char **argv) {
 
 		}
 
-		printf("L -> Termina de leer tam_read_gpu = %d, status(%d)\n", tam_read_gpu, exit);
+		//printf("L -> Termina de leer tam_read_gpu = %d, status(%d)\n", tam_read_gpu, exit);
 
 		if (!exit) {
 			tam_read_gpu--;
@@ -475,13 +475,13 @@ int main(int argc, char **argv) {
 
 		pthread_mutex_lock(&gpu_time_thread);
 
-		printf("L -> Digo a los GPU que copien\n");
+		//printf("L -> Digo a los GPU que copien\n");
 
 		start = 1;
 
 		pthread_cond_broadcast(&start_time);
 
-		printf("L -> Antes de parar\n");
+		//printf("L -> Antes de parar\n");
 
 		while(stop!=1) {
 			pthread_cond_wait(&stop_time, &gpu_time_thread);
@@ -491,7 +491,7 @@ int main(int argc, char **argv) {
 
 		pthread_mutex_unlock(&gpu_time_thread);
 
-		printf("L -> Swap buffers\n");
+		//printf("L -> Swap buffers\n");
 
 		swap_Worig = read_Worig;
 		read_Worig = gpu_Worig;
@@ -512,7 +512,7 @@ int main(int argc, char **argv) {
 	//Terminar los hilos
 	pthread_mutex_lock(&gpu_time_thread);
 
-	printf("L -> Ordena salir a los hilos\n");
+	//printf("L -> Ordena salir a los hilos\n");
 	start=1;
 	end=1;
 
@@ -567,10 +567,11 @@ int main(int argc, char **argv) {
 	gettimeofday(&t2, NULL);
 	t_total = (t2.tv_sec-t1.tv_sec)*1e6+(t2.tv_usec-t1.tv_usec);
 
-	printf("Write: %f\n", t_write / 1000000);
+  printf("Load: %f\n", t_load / 1000000);
+  printf("Write: %f\n", t_write / 1000000);
 	printf("Total: %f\n", t_total / 1000000);
 
-	printf("L -> Saliendo\n");
+	//printf("L -> Saliendo\n");
 
 	return 0;
 
